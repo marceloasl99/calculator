@@ -414,6 +414,7 @@ function bootstrapApp() {
       btn.textContent = t(`modes.${m}`);
       btn.classList.toggle('active', state.preferences.mode === m);
     });
+    updateModeLayout();
 
     // Angle buttons
     document.querySelectorAll('[data-angle-select]').forEach(btn => {
@@ -1337,6 +1338,7 @@ function bootstrapApp() {
   // Initial setup
   applyTheme();
   applyViewportMode();
+  updateModeLayout();
   renderMatrixGrids();
   applyTranslations();
   populateUnitsForCategory();
@@ -1345,6 +1347,46 @@ function bootstrapApp() {
   runSolverTool();
   runCalculusTool('derivative');
   runNumberTheoryTool('gcd_lcm');
+
+  // URL parameters support for deep linking, automation and screenshots
+  if (typeof window !== 'undefined' && window.location && window.location.search) {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('theme')) {
+      state.updatePreferences({ theme: params.get('theme') });
+      applyTheme();
+    }
+    if (params.has('lang') || params.has('locale')) {
+      state.updatePreferences({ locale: params.get('lang') || params.get('locale') });
+      applyTranslations();
+    }
+    if (params.has('mode')) {
+      state.updatePreferences({ mode: params.get('mode') });
+      updateModeLayout();
+      applyTranslations();
+    }
+    if (params.has('angle')) {
+      state.updatePreferences({ angleMode: params.get('angle') });
+      applyTranslations();
+    }
+    if (params.has('tab')) {
+      setSideTab(params.get('tab'));
+    }
+    if (params.has('expertTab')) {
+      setSideTab('expert');
+      setExpertCategory(params.get('expertTab'));
+    }
+    if (params.has('expr')) {
+      const e = params.get('expr');
+      if (exprInput) exprInput.value = e;
+      state.expression = e;
+      handleCalculate();
+    }
+    if (params.has('tests')) {
+      openModal('modal-tests');
+      const btn = document.getElementById('btn-run-all-tests');
+      if (btn) btn.click();
+    }
+  }
 }
 
 if (typeof document !== 'undefined') {

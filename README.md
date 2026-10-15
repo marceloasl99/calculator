@@ -20,6 +20,22 @@ O **Scientific Calculator Pro** é uma aplicação matemática completa projetad
 
 ---
 
+## 📸 Demonstração Visual (Screenshots)
+
+Confira a interface moderna, responsiva e com suporte a múltiplos temas e modos em ação:
+
+| 💻 Desktop - Modo Científico Intermediário | 🔬 Modo Expert - Laboratório de Matrizes & Álgebra |
+| :---: | :---: |
+| ![Scientific Calculator Pro Desktop](assets/screenshots/calculator-desktop.png) | ![Laboratório de Matrizes Expert](assets/screenshots/calculator-expert-matrices.png) |
+| *Cálculo com frações exatas (`≈ 17/2`), histórico lateral e múltiplos atalhos.* | *Multiplicação de matrizes 3x3, determinantes, inversão e resolução linear.* |
+
+| 📱 Mobile - Modo Simples Responsivo | 🧪 Suíte de Testes Automatizados Integrada |
+| :---: | :---: |
+| ![Scientific Calculator Pro Mobile](assets/screenshots/calculator-mobile.png) | ![Testes Automatizados Integrados](assets/screenshots/calculator-tests-modal.png) |
+| *Layout vertical compacto com cálculo de porcentagens e teclado ergonômico.* | *30 testes no navegador + 39 testes unitários em Node.js (`npm test`).* |
+
+---
+
 ## 🔍 2. Avaliação dos Projetos de Referência e Fusão
 
 Neste projeto, avaliamos detalhadamente três implementações prévias:

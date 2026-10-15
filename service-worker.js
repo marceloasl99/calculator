@@ -1,4 +1,4 @@
-const CACHE_NAME = 'scicalc-pro-v1';
+const CACHE_NAME = 'scicalc-pro-v2';
 
 const PRECACHE_ASSETS = [
   './',

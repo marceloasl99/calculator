@@ -6,7 +6,8 @@
   "main": "js/app.js",
   "scripts": {
     "test": "node --test tests/*.test.js",
-    "start": "node serve.js"
+    "start": "node serve.js",
+    "screenshots": "node scripts/capture.mjs"
   },
   "keywords": [
     "calculator",

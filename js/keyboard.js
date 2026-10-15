@@ -51,5 +51,6 @@ function initKeyboardShortcuts(handlers) {
 }
 
 export {
-  setupKeyboardShortcuts
+  initKeyboardShortcuts,
+  initKeyboardShortcuts as setupKeyboardShortcuts
 };
