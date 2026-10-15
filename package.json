@@ -1,0 +1,24 @@
+{
+  "name": "scientific-calculator-pro",
+  "version": "1.0.0",
+  "description": "Scientific Calculator Pro — High-precision multi-mode scientific calculator web application with desktop and mobile layouts, 8 themes, 6 languages, and expert engineering lab tools.",
+  "type": "module",
+  "main": "js/app.js",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "start": "node serve.js"
+  },
+  "keywords": [
+    "calculator",
+    "scientific-calculator",
+    "math",
+    "matrices",
+    "statistics",
+    "calculus",
+    "complex-numbers",
+    "pwa",
+    "i18n"
+  ],
+  "author": "Engineering Team",
+  "license": "MIT"
+}

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="ocean">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Scientific Calculator Pro — High-precision multi-mode scientific calculator web application with desktop and mobile layouts, 8 themes, 6 languages, and expert engineering lab." />
+  <meta name="theme-color" content="#0ea5e9" />
+  <title>Scientific Calculator Pro</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icons/calculator.svg" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/themes.css" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+
+
+<div id="scp-app-shell" class="scp-shell">
+  <!-- 1. TOP IDENTIFICATION & CONTROL BAR -->
+  <header class="scp-header" role="banner">
+    <div class="scp-brand">
+      <div class="scp-logo" aria-hidden="true">∑</div>
+      <div>
+        <h1 id="scp-app-title" class="scp-title">Scientific Calculator Pro</h1>
+        <p id="scp-app-subtitle" class="scp-subtitle">Suíte Matemática e Científica Multimodo</p>
+      </div>
+    </div>
+
+    <!-- Mode Selector: Simple, Intermediate, Expert -->
+    <div class="scp-segmented" role="tablist" aria-label="Calculator Mode">
+      <button type="button" class="scp-seg-btn" data-mode-select="simple">Simples</button>
+      <button type="button" class="scp-seg-btn active" data-mode-select="intermediate">Intermediário</button>
+      <button type="button" class="scp-seg-btn" data-mode-select="expert">Expert</button>
+    </div>
+
+    <!-- Angle Selector: DEG, RAD, GRAD -->
+    <div class="scp-segmented" role="group" aria-label="Angle Unit">
+      <button type="button" class="scp-seg-btn active" data-angle-select="DEG">DEG</button>
+      <button type="button" class="scp-seg-btn" data-angle-select="RAD">RAD</button>
+      <button type="button" class="scp-seg-btn" data-angle-select="GRAD">GRAD</button>
+    </div>
+
+    <!-- Language, Theme, Viewport & Utility Modals -->
+    <div class="scp-toolbar">
+      <select id="select-locale" class="scp-select" aria-label="Language">
+        <option value="pt-BR">🇵🇹🇧🇷 Português (pt-BR)</option>
+        <option value="en">🇺🇸🇬🇧 English (en)</option>
+        <option value="es">🇪🇸 Español (es)</option>
+        <option value="it">🇮🇹 Italiano (it)</option>
+        <option value="fr">🇫🇷 Français (fr)</option>
+        <option value="de">🇩🇪 Deutsch (de)</option>
+      </select>
+
+      <select id="select-theme" class="scp-select" aria-label="Theme">
+        <option value="ocean">Azul Oceano</option>
+        <option value="light">Claro</option>
+        <option value="dark">Escuro</option>
+        <option value="auto">Automático</option>
+        <option value="graphite">Grafite</option>
+        <option value="purple">Roxo</option>
+        <option value="emerald">Verde Esmeralda</option>
+        <option value="high-contrast">Alto Contraste</option>
+      </select>
+
+      <select id="select-viewport" class="scp-select" aria-label="Viewport Layout">
+        <option value="auto">🖥️📱 Auto</option>
+        <option value="desktop">🖥️ Desktop</option>
+        <option value="mobile">📱 Mobile</option>
+      </select>
+
+      <button type="button" id="btn-open-tests" class="scp-icon-btn">Testes Autom.</button>
+      <button type="button" id="btn-open-prompt" class="scp-icon-btn">Prompt Mestre</button>
+      <button type="button" id="btn-open-settings" class="scp-icon-btn">Configurações</button>
+      <button type="button" id="btn-open-help" class="scp-icon-btn">Atalhos e Ajuda</button>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE: CALCULATOR + CONTEXTUAL SIDE PANEL -->
+  <main class="scp-workspace" role="main">
+    <!-- LEFT COLUMN: MAIN CALCULATOR -->
+    <section class="scp-calc-card" aria-label="Calculator">
+      <div class="scp-display-box">
+        <div class="scp-status-row">
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <span id="badge-active-mode" class="scp-badge">Intermediário</span>
+            <span id="badge-active-angle" class="scp-badge active-toggle">DEG</span>
+            <span id="badge-memory-val" class="scp-badge tabular-nums">M: 0</span>
+            <span id="badge-ans-val" class="scp-badge tabular-nums">ans: 0</span>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button type="button" id="btn-toggle-fraction" class="scp-badge" style="cursor:pointer;">a/b Fração</button>
+            <button type="button" id="btn-toggle-sci" class="scp-badge" style="cursor:pointer;">10ˣ Sci</button>
+          </div>
+        </div>
+
+        <input
+          id="calc-expression-input"
+          type="text"
+          class="scp-expr-input tabular-nums"
+          placeholder="2 + 3 × 4"
+          aria-label="Mathematical Expression"
+          autocomplete="off"
+          spellcheck="false"
+        />
+
+        <div class="scp-result-row">
+          <span id="calc-fraction-badge" class="scp-fraction-badge tabular-nums"></span>
+          <output id="calc-result-display" class="scp-result-value tabular-nums" aria-live="polite">0</output>
+        </div>
+      </div>
+
+      <!-- Discrete Error / Validation Area -->
+      <div id="calc-error-banner" class="scp-error-banner hidden" role="alert"></div>
+
+      <!-- Memory Bar (MC, MR, M+, M-, MS, ans) -->
+      <div class="scp-memory-bar" role="group" aria-label="Memory Controls">
+        <button type="button" class="scp-key scp-key-fn" data-calc-action="mc" title="Memory Clear">MC</button>
+        <button type="button" class="scp-key scp-key-fn" data-calc-action="mr" title="Memory Recall">MR</button>
+        <button type="button" class="scp-key scp-key-fn" data-calc-action="mplus" title="Memory Add">M+</button>
+        <button type="button" class="scp-key scp-key-fn" data-calc-action="mminus" title="Memory Subtract">M−</button>
+        <button type="button" class="scp-key scp-key-fn" data-calc-action="ms" title="Memory Store">MS</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="ans" title="Last Answer">ans</button>
+      </div>
+
+      <!-- Scientific Functions Grid (Intermediate & Expert Modes) -->
+      <div id="scp-scientific-keypad" class="scp-sci-grid" role="group" aria-label="Scientific Functions">
+        <button type="button" id="fn-sin" class="scp-key scp-key-fn" data-insert="sin(">sen</button>
+        <button type="button" id="fn-cos" class="scp-key scp-key-fn" data-insert="cos(">cos</button>
+        <button type="button" id="fn-tan" class="scp-key scp-key-fn" data-insert="tan(">tan</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="π">π</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="e">e</button>
+
+        <button type="button" id="fn-asin" class="scp-key scp-key-fn" data-insert="asin(">arcsen</button>
+        <button type="button" id="fn-acos" class="scp-key scp-key-fn" data-insert="acos(">arccos</button>
+        <button type="button" id="fn-atan" class="scp-key scp-key-fn" data-insert="atan(">arctan</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="^2">x²</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="^3">x³</button>
+
+        <button type="button" class="scp-key scp-key-fn" data-insert="sinh(">sinh</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="cosh(">cosh</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="tanh(">tanh</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="^">xʸ</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="√(">√x</button>
+
+        <button type="button" class="scp-key scp-key-fn" data-insert="asinh(">asinh</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="acosh(">acosh</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="atanh(">atanh</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="nthRoot(">ⁿ√x</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="inv(">1/x</button>
+
+        <button type="button" class="scp-key scp-key-fn" data-insert="ln(">ln</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="log10(">log₁₀</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="logBase(">log_b</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="exp(">eˣ</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="10^">10ˣ</button>
+
+        <button type="button" class="scp-key scp-key-fn" data-insert="2^">2ˣ</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="!">n!</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="abs(">|x|</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert=" mod ">mod</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="floor(">floor</button>
+
+        <button type="button" class="scp-key scp-key-fn" data-insert="ceil(">ceil</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="round(">round</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="gcd(">MDC</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="lcm(">MMC</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert=",">;</button>
+      </div>
+
+      <!-- Core Keypad (All Modes) -->
+      <div class="scp-core-grid" role="group" aria-label="Primary Keypad">
+        <button type="button" class="scp-key scp-key-danger" data-calc-action="clear-all">AC</button>
+        <button type="button" class="scp-key scp-key-fn" data-calc-action="clear-entry">CE</button>
+        <button type="button" class="scp-key scp-key-fn" data-calc-action="backspace" aria-label="Backspace">⌫</button>
+        <button type="button" class="scp-key scp-key-op" data-insert="÷">÷</button>
+
+        <button type="button" class="scp-key scp-key-fn" data-insert="(">(</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert=")">)</button>
+        <button type="button" class="scp-key scp-key-fn" data-insert="%">%</button>
+        <button type="button" class="scp-key scp-key-op" data-insert="×">×</button>
+
+        <button type="button" class="scp-key scp-key-num tabular-nums" data-insert="7">7</button>
+        <button type="button" class="scp-key scp-key-num tabular-nums" data-insert="8">8</button>
+        <button type="button" class="scp-key scp-key-num tabular-nums" data-insert="9">9</button>
+        <button type="button" class="scp-key scp-key-op" data-insert="-">−</button>
+
+        <button type="button" class="scp-key scp-key-num tabular-nums" data-insert="4">4</button>
+        <button type="button" class="scp-key scp-key-num tabular-nums" data-insert="5">5</button>
+        <button type="button" class="scp-key scp-key-num tabular-nums" data-insert="6">6</button>
+        <button type="button" class="scp-key scp-key-op" data-insert="+">+</button>
+
+        <button type="button" class="scp-key scp-key-num tabular-nums" data-insert="1">1</button>
+        <button type="button" class="scp-key scp-key-num tabular-nums" data-insert="2">2</button>
+        <button type="button" class="scp-key scp-key-num tabular-nums" data-insert="3">3</button>
+        <button type="button" class="scp-key scp-key-fn" data-calc-action="toggle-sign">±</button>
+
+        <button type="button" class="scp-key scp-key-num tabular-nums" data-insert="0" style="grid-column: span 2;">0</button>
+        <button type="button" id="key-decimal-sep" class="scp-key scp-key-num" data-insert=".">,</button>
+        <button type="button" class="scp-key scp-key-eq" data-calc-action="equals">=</button>
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN: HISTORY & EXPERT LABORATORY -->
+    <aside class="scp-side-card" aria-label="Contextual Tools and History">
+      <div class="scp-panel-tabs">
+        <button type="button" id="tab-btn-history" class="scp-seg-btn active">Histórico</button>
+        <button type="button" id="tab-btn-expert" class="scp-seg-btn">Painel Expert</button>
+      </div>
+
+      <!-- TAB 1: PERSISTENT CALCULATION HISTORY -->
+      <div id="panel-history" class="scp-tool-section">
+        <div style="display:flex; gap:8px;">
+          <input id="input-history-search" type="search" class="scp-input" style="flex:1;" placeholder="Pesquisar no histórico..." aria-label="Search History" />
+          <button type="button" id="btn-clear-history" class="scp-icon-btn">Limpar Histórico</button>
+        </div>
+        <div id="history-list-container" class="scp-history-list"></div>
+      </div>
+
+      <!-- TAB 2: EXPERT MODE 7-CATEGORY LABORATORY -->
+      <div id="panel-expert" class="scp-tool-section hidden">
+        <div class="scp-expert-subtabs" role="tablist">
+          <button type="button" class="scp-subtab-btn active" data-expert-tab="complex">Complexos (a+bi)</button>
+          <button type="button" class="scp-subtab-btn" data-expert-tab="matrices">Matrizes</button>
+          <button type="button" class="scp-subtab-btn" data-expert-tab="statistics">Estatística</button>
+          <button type="button" class="scp-subtab-btn" data-expert-tab="solver">Equações</button>
+          <button type="button" class="scp-subtab-btn" data-expert-tab="calculus">Cálculo (d/dx, ∫)</button>
+          <button type="button" class="scp-subtab-btn" data-expert-tab="units">Unidades</button>
+          <button type="button" class="scp-subtab-btn" data-expert-tab="numberTheory">Primos e Bases</button>
+        </div>
+
+        <!-- A. COMPLEX NUMBERS -->
+        <div data-expert-section="complex" class="scp-tool-section">
+          <div class="scp-form-grid">
+            <label class="scp-field">Re(z₁) / r <input id="cx-z1-re" type="number" step="any" class="scp-input" value="3" /></label>
+            <label class="scp-field">Im(z₁) / θ <input id="cx-z1-im" type="number" step="any" class="scp-input" value="4" /></label>
+            <label class="scp-field">Re(z₂) <input id="cx-z2-re" type="number" step="any" class="scp-input" value="1" /></label>
+            <label class="scp-field">Im(z₂) <input id="cx-z2-im" type="number" step="any" class="scp-input" value="-2" /></label>
+            <label class="scp-field">Expoente / Raiz n <input id="cx-power-n" type="number" step="1" class="scp-input" value="3" /></label>
+            <label class="scp-field">Operação
+              <select id="cx-operation" class="scp-select">
+                <option value="add">z₁ + z₂ (Soma)</option>
+                <option value="sub">z₁ − z₂ (Subtração)</option>
+                <option value="mul">z₁ × z₂ (Multiplicação)</option>
+                <option value="div">z₁ ÷ z₂ (Divisão)</option>
+                <option value="conj">z̄₁, |z₁|, arg(z₁) e Polar</option>
+                <option value="polar2rect">Polar (r ∠ θ) → a + bi</option>
+                <option value="pow">Potência z₁ⁿ (De Moivre)</option>
+                <option value="roots">Raízes Complexas ⁿ√z₁</option>
+              </select>
+            </label>
+          </div>
+          <button type="button" id="btn-run-complex" class="scp-icon-btn" style="align-self:flex-start;">Calcular Complexos</button>
+          <div id="complex-result-box" class="scp-result-card tabular-nums"></div>
+        </div>
+
+        <!-- B. MATRICES -->
+        <div data-expert-section="matrices" class="scp-tool-section hidden">
+          <div class="scp-form-grid">
+            <label class="scp-field">Linhas A (1–6) <input id="mat-a-rows" type="number" min="1" max="6" class="scp-input" value="2" /></label>
+            <label class="scp-field">Colunas A (1–6) <input id="mat-a-cols" type="number" min="1" max="6" class="scp-input" value="2" /></label>
+            <label class="scp-field">Linhas B (1–6) <input id="mat-b-rows" type="number" min="1" max="6" class="scp-input" value="2" /></label>
+            <label class="scp-field">Colunas B (1–6) <input id="mat-b-cols" type="number" min="1" max="6" class="scp-input" value="2" /></label>
+            <label class="scp-field">Escalar k <input id="matrix-scalar-k" type="number" step="any" class="scp-input" value="2" /></label>
+          </div>
+          <button type="button" id="btn-apply-matrix-dims" class="scp-subtab-btn" style="align-self:flex-start;">Atualizar Dimensões (A & B)</button>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div>
+              <strong style="font-size:0.78rem;">Matriz A</strong>
+              <div id="matrix-a-grid" class="scp-matrix-grid"></div>
+            </div>
+            <div>
+              <strong style="font-size:0.78rem;">Matriz B / Vetor b (1ª col)</strong>
+              <div id="matrix-b-grid" class="scp-matrix-grid"></div>
+            </div>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            <button type="button" class="scp-subtab-btn" data-matrix-op="add">A + B</button>
+            <button type="button" class="scp-subtab-btn" data-matrix-op="sub">A − B</button>
+            <button type="button" class="scp-subtab-btn" data-matrix-op="mul">A × B</button>
+            <button type="button" class="scp-subtab-btn" data-matrix-op="scalar">k · A</button>
+            <button type="button" class="scp-subtab-btn" data-matrix-op="trans">Transposta Aᵀ</button>
+            <button type="button" class="scp-subtab-btn" data-matrix-op="det">det(A)</button>
+            <button type="button" class="scp-subtab-btn" data-matrix-op="trace">Traço tr(A)</button>
+            <button type="button" class="scp-subtab-btn" data-matrix-op="inv">Inversa A⁻¹</button>
+            <button type="button" class="scp-subtab-btn" data-matrix-op="solve">Sistema Linear A·x = b</button>
+          </div>
+          <div id="matrix-result-box" class="scp-result-card tabular-nums">det(A) = -2</div>
+        </div>
+
+        <!-- C. STATISTICS -->
+        <div data-expert-section="statistics" class="scp-tool-section hidden">
+          <label class="scp-field">Conjunto de Dados X (separados por vírgula ou espaço)
+            <input id="stats-input-x" type="text" class="scp-input" value="2, 4, 4, 4, 5, 5, 7, 9" />
+          </label>
+          <div class="scp-form-grid">
+            <label class="scp-field">Pesos W ou Dados Y (opcional p/ Regressão Linear)
+              <input id="stats-input-y" type="text" class="scp-input" value="1, 2, 2, 3, 3, 4, 5, 6" />
+            </label>
+            <label class="scp-field">Percentil P_k (0–100)
+              <input id="stats-percentile-k" type="number" min="0" max="100" class="scp-input" value="90" />
+            </label>
+          </div>
+          <button type="button" id="btn-run-stats" class="scp-icon-btn" style="align-self:flex-start;">Calcular Estatísticas e Regressão</button>
+          <div id="stats-result-box" class="scp-result-card tabular-nums"></div>
+        </div>
+
+        <!-- D. EQUATION SOLVER -->
+        <div data-expert-section="solver" class="scp-tool-section hidden">
+          <div class="scp-form-grid">
+            <label class="scp-field">Equação f(x) = 0
+              <input id="solver-expr" type="text" class="scp-input" value="x^3 - x - 2" />
+            </label>
+            <label class="scp-field">Método Numérico
+              <select id="solver-method" class="scp-select">
+                <option value="bisection">Bisseção [a, b]</option>
+                <option value="newton">Newton-Raphson (x₀ = a)</option>
+                <option value="secant">Secante [x₀, x₁]</option>
+              </select>
+            </label>
+            <label class="scp-field">Limite a / Estimativa x₀
+              <input id="solver-a" type="number" step="any" class="scp-input" value="1" />
+            </label>
+            <label class="scp-field">Limite b / x₁
+              <input id="solver-b" type="number" step="any" class="scp-input" value="2" />
+            </label>
+            <label class="scp-field">Tolerância
+              <input id="solver-tol" type="number" step="any" class="scp-input" value="0.0000001" />
+            </label>
+            <label class="scp-field">Máx. Iterações
+              <input id="solver-max-iter" type="number" min="5" max="500" class="scp-input" value="100" />
+            </label>
+          </div>
+          <button type="button" id="btn-run-solver" class="scp-icon-btn" style="align-self:flex-start;">Resolver f(x) = 0</button>
+          <div id="solver-result-box" class="scp-result-card tabular-nums"></div>
+        </div>
+
+        <!-- E. NUMERICAL CALCULUS -->
+        <div data-expert-section="calculus" class="scp-tool-section hidden">
+          <div class="scp-form-grid">
+            <label class="scp-field">Função f(x)
+              <input id="calc-tool-expr" type="text" class="scp-input" value="x^2" />
+            </label>
+            <label class="scp-field">Ponto x₀ (p/ Derivada)
+              <input id="calc-tool-x0" type="number" step="any" class="scp-input" value="3" />
+            </label>
+            <label class="scp-field">Limite Inferior a (∫)
+              <input id="calc-tool-a" type="number" step="any" class="scp-input" value="0" />
+            </label>
+            <label class="scp-field">Limite Superior b (∫)
+              <input id="calc-tool-b" type="number" step="any" class="scp-input" value="3" />
+            </label>
+            <label class="scp-field">Tolerância
+              <input id="calc-tool-tol" type="number" step="any" class="scp-input" value="0.0000001" />
+            </label>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" id="btn-run-derivative" class="scp-icon-btn">Derivada Numérica d/dx (x₀)</button>
+            <button type="button" id="btn-run-integral" class="scp-icon-btn">Integral Definida ∫[a,b] f(x)dx</button>
+          </div>
+          <div id="calculus-result-box" class="scp-result-card tabular-nums"></div>
+        </div>
+
+        <!-- F. UNIT CONVERTER (13 CATEGORIES) -->
+        <div data-expert-section="units" class="scp-tool-section hidden">
+          <div class="scp-form-grid">
+            <label class="scp-field">Categoria (13)
+              <select id="unit-category-select" class="scp-select"></select>
+            </label>
+            <label class="scp-field">Valor
+              <input id="unit-input-val" type="number" step="any" class="scp-input" value="100" />
+            </label>
+            <label class="scp-field">De
+              <select id="unit-from-select" class="scp-select"></select>
+            </label>
+            <label class="scp-field">Para
+              <select id="unit-to-select" class="scp-select"></select>
+            </label>
+          </div>
+          <button type="button" id="btn-swap-units" class="scp-subtab-btn" style="align-self:flex-start;">⇄ Inverter Unidades</button>
+          <div id="unit-result-box" class="scp-result-card tabular-nums"></div>
+        </div>
+
+        <!-- G. NUMBER THEORY, COMBINATORICS & BASES/BITWISE -->
+        <div data-expert-section="numberTheory" class="scp-tool-section hidden">
+          <div class="scp-form-grid">
+            <label class="scp-field">Inteiro A / n
+              <input id="nt-input-a" type="number" step="1" class="scp-input" value="360" />
+            </label>
+            <label class="scp-field">Inteiro B / r
+              <input id="nt-input-b" type="number" step="1" class="scp-input" value="4" />
+            </label>
+            <label class="scp-field">Valor p/ Conversão de Base
+              <input id="nt-base-input" type="text" class="scp-input" value="255" />
+            </label>
+            <label class="scp-field">Base de Origem
+              <select id="nt-base-select" class="scp-select">
+                <option value="10">Decimal (10)</option>
+                <option value="2">Binário (2)</option>
+                <option value="8">Octal (8)</option>
+                <option value="16">Hexadecimal (16)</option>
+              </select>
+            </label>
+            <label class="scp-field">Operação Bit a Bit
+              <select id="nt-bitwise-op" class="scp-select">
+                <option value="AND">AND (&)</option>
+                <option value="OR">OR (|)</option>
+                <option value="XOR">XOR (^)</option>
+                <option value="NOT">NOT (~A)</option>
+                <option value="LSHIFT">Shift Left (A &lt;&lt; B)</option>
+                <option value="RSHIFT">Shift Right (A &gt;&gt; B)</option>
+              </select>
+            </label>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            <button type="button" class="scp-subtab-btn" data-nt-op="gcd_lcm">MDC & MMC</button>
+            <button type="button" class="scp-subtab-btn" data-nt-op="comb">Permutação nPr & Combinação nCr</button>
+            <button type="button" class="scp-subtab-btn" data-nt-op="prime">Primalidade & Fatores Primos</button>
+            <button type="button" class="scp-subtab-btn" data-nt-op="base">Converter BIN / OCT / DEC / HEX</button>
+            <button type="button" class="scp-subtab-btn" data-nt-op="bitwise">Calcular Bitwise</button>
+          </div>
+          <div id="nt-result-box" class="scp-result-card tabular-nums"></div>
+        </div>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<!-- MODAL 1: AUTOMATED TEST SUITE (30 TESTS) -->
+<div id="modal-tests" class="scp-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-tests-title">
+  <div class="scp-modal">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h2 id="modal-tests-title" style="font-size:1.1rem;">Suíte de Testes Automatizados (30 Cenários Obrigatórios)</h2>
+      <button type="button" class="scp-icon-btn" data-close-modal="modal-tests">✕ Fechar</button>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <strong id="modal-tests-summary" style="color:var(--color-success);">30 / 30 PASS</strong>
+      <button type="button" id="btn-rerun-tests" class="scp-icon-btn">↻ Reexecutar Testes</button>
+    </div>
+    <div id="modal-tests-results" style="max-height:55vh; overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- MODAL 2: MASTER PROMPT VIEWER -->
+<div id="modal-prompt" class="scp-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-prompt-title">
+  <div class="scp-modal">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h2 id="modal-prompt-title" style="font-size:1.1rem;">Prompt Mestre — Scientific Calculator Pro</h2>
+      <div style="display:flex; gap:8px;">
+        <button type="button" id="btn-copy-master-prompt" class="scp-icon-btn">📋 Copiar Prompt</button>
+        <button type="button" class="scp-icon-btn" data-close-modal="modal-prompt">✕ Fechar</button>
+      </div>
+    </div>
+    <textarea id="master-prompt-textarea" class="scp-input" style="width:100%; height:55vh; font-family:monospace; font-size:0.8rem;" readonly># PROMPT MESTRE — SCIENTIFIC CALCULATOR PRO (WEB HTML5 / CSS3 / JS)
+
+Copie e utilize o prompt estruturado abaixo sempre que quiser recriar, auditar ou expandir a calculadora científica completa em qualquer ambiente de engenharia de software:
+
+```markdown
+Atue como um Engenheiro de Software Sênior e Arquiteto Front-End especialista em HTML5 Semântico, CSS3 Moderno (Custom Properties, Grid, Flexbox, Responsividade Mobile-First), JavaScript ES6+ Modular, Matemática Computacional (IEEE 754, Análise Numérica, Álgebra Linear), Internacionalização (i18n) e Acessibilidade (WCAG AA/AAA).
+
+Sua missão é PROJETAR, IMPLEMENTAR, TESTAR E ENTREGAR a aplicação web completa "Scientific Calculator Pro" — uma calculadora científica multimodo, responsiva e multilíngue, 100% funcional, sem uso de eval() ou new Function().
+
+### 1. MODOS DE OPERAÇÃO (COM PRESERVAÇÃO DE ESTADO)
+1. **Modo Simples**:
+   - Operações fundamentais (+, −, ×, ÷), porcentagem contextual (x% = x/100 e A ± B% = A ± A·B/100), inversão de sinal (±), parênteses, separador decimal regional (. ou ,) e separador de milhares via Intl.NumberFormat.
+   - Controles de limpeza (AC, CE, Backspace ⌫) e repetição da última operação ao pressionar `=`.
+   - Memória independente com indicador visual: MC, MR, M+, M−, MS e variável `ans`.
+2. **Modo Intermediário (Científico)**:
+   - Potências e raízes: x², x³, xʸ, 1/x, √x, ∛x, ⁿ√x, |x|, n!, mod, rem, floor, ceil, round e multiplicação implícita (2π, 3(4+5)).
+   - Trigonometria direta, inversa e hiperbólica: sin/sen, cos, tan, asin/arcsen, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh com alternância permanente entre Graus (DEG), Radianos (RAD) e Grados (GRAD).
+   - Logaritmos e exponenciais: ln(x), log10(x), log_b(x, b), eˣ, 10ˣ, 2ˣ, notação científica.
+   - Constantes de precisão documentada (π, e, φ, c) e conversor instantâneo Decimal ↔ Fração Racional Simplificada (algoritmo de frações contínuas).
+3. **Modo Expert (Laboratório Avançado em 7 Categorias)**:
+   - **A. Números Complexos (a + bi)**: soma, subtração, multiplicação, divisão, conjugado, módulo, argumento (respeitando DEG/RAD/GRAD), forma polar (r ∠ θ), conversão retangular ↔ polar, potências (De Moivre) e raízes n-ésimas.
+   - **B. Matrizes (1×1 a 6×6)**: grades editáveis para A e B, A+B, A−B, A×B, k·A, transposta Aᵀ, traço tr(A), determinante det(A), inversa A⁻¹ (Gauss-Jordan com pivoteamento parcial e detecção de matriz singular) e sistemas lineares A·x = b.
+   - **C. Estatística Descritiva e Regressão**: contagem (n), soma, soma dos quadrados, média aritmética, média ponderada, mediana, moda (unimodal, multimodal ou amodal), mín/máx, amplitude, variância e desvio-padrão (populacional σ e amostral s), quartis (Q1, Q2, Q3, IIQ), percentil configurável P_k, regressão linear simples (y = a + bx) e correlação de Pearson (r, R²).
+   - **D. Solução Numérica de Equações f(x) = 0**: métodos da Bisseção, Newton-Raphson e Secante com exibição da raiz aproximada, resíduo |f(x*)|, iterações e diagnóstico de convergência.
+   - **E. Cálculo Numérico**: derivada numérica f'(x₀) e f''(x₀) por diferenças finitas centrais de 5 pontos O(h⁴) e integral definida ∫[a,b] f(x) dx por Regra de Simpson Adaptativa.
+   - **F. Conversor de Unidades**: 13 categorias (Comprimento, Área, Volume, Massa, Tempo, Velocidade, Aceleração, Temperatura [°C, °F, K], Pressão, Energia, Potência, Frequência e Ângulo).
+   - **G. Teoria dos Números, Combinatória e Bases/Bitwise**: MDC, MMC, nPr, nCr, teste de primalidade, fatoração em primos, conversão entre bases (BIN, OCT, DEC, HEX) e operações bit a bit (AND, OR, XOR, NOT, <<, >>).
+
+### 2. TEMAS E INTERNACIONALIZAÇÃO (6 IDIOMAS)
+- **8 Temas via CSS Variables**: Claro, Escuro, Automático (sistema), Grafite, Azul Oceano, Roxo, Verde Esmeralda e Alto Contraste (WCAG AAA), mais seletor de cor de destaque personalizada.
+- **6 Idiomas Completos**: Inglês (`en`), Espanhol (`es`), Português (`pt-BR`), Italiano (`it`), Francês (`fr`) e Alemão (`de`), cobrindo toda a interface, rótulos trigonométricos, unidades, histórico, ajuda e mensagens de erro, mantendo o estado matemático canônico desacoplado da formatação visual.
+
+### 3. MOTOR MATEMÁTICO E TESTES AUTOMATIZADOS
+- Parser próprio baseado em Tokenização + Shunting-Yard + Avaliação RPN (proibido `eval()`).
+- Limpeza de ruído de ponto flutuante IEEE 754 (ex.: `0.1 + 0.2 = 0.3` e `sin(30°) = 0.5`).
+- Suíte executável com no mínimo 25 testes automatizados cobrindo aritmética, precedência, trigonometria, memória, erros de domínio, formatação nos 6 idiomas, persistência, matrizes, estatística, equações e cálculo numérico.
+```
+</textarea>
+  </div>
+</div>
+
+<!-- MODAL 3: SETTINGS -->
+<div id="modal-settings" class="scp-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-settings-title">
+  <div class="scp-modal">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <h2 id="modal-settings-title" style="font-size:1.1rem;">Configurações e Preferências</h2>
+      <button type="button" class="scp-icon-btn" data-close-modal="modal-settings">✕ Fechar</button>
+    </div>
+    <div class="scp-form-grid" style="margin-bottom:16px;">
+      <label class="scp-field">Modo de Precisão
+        <select id="setting-precision-mode" class="scp-select">
+          <option value="auto">Automático (Inteligente)</option>
+          <option value="fixed">Casas Decimais Fixas</option>
+        </select>
+      </label>
+      <label class="scp-field">Casas Decimais (0–12)
+        <input id="setting-decimal-places" type="number" min="0" max="12" class="scp-input" value="6" />
+      </label>
+      <label class="scp-field">Cor de Destaque Personalizada
+        <input id="setting-custom-accent" type="color" class="scp-input" value="#0ea5e9" style="height:38px;" />
+      </label>
+      <label class="scp-field">Limite do Histórico (10–500)
+        <input id="setting-history-limit" type="number" min="10" max="500" class="scp-input" value="100" />
+      </label>
+      <label class="scp-field" style="flex-direction:row; align-items:center; gap:8px; padding-top:18px;">
+        <input id="setting-sound-enabled" type="checkbox" /> Sons de Tecla (Web Audio)
+      </label>
+    </div>
+    <button type="button" id="btn-reset-preferences" class="scp-icon-btn">↺ Redefinir Preferências Padrão</button>
+  </div>
+</div>
+
+<!-- MODAL 4: KEYBOARD SHORTCUTS & HELP -->
+<div id="modal-help" class="scp-modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-help-title">
+  <div class="scp-modal">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h2 id="modal-help-title" style="font-size:1.1rem;">Atalhos de Teclado e Guia Matemático</h2>
+      <button type="button" class="scp-icon-btn" data-close-modal="modal-help">✕ Fechar</button>
+    </div>
+    <div class="scp-result-card" style="display:flex; flex-direction:column; gap:8px;">
+      <p><strong>0–9, ., ,</strong> : Inserir números e separador decimal regional</p>
+      <p><strong>+, -, *, /, ^, %, ( )</strong> : Operadores aritméticos, potências e agrupamentos</p>
+      <p><strong>Enter ou =</strong> : Calcular expressão ou repetir a última operação</p>
+      <p><strong>Backspace</strong> : Apagar o último caractere</p>
+      <p><strong>Delete</strong> : Limpar entrada atual (CE) • <strong>Escape</strong> : Limpar tudo (AC)</p>
+      <p><strong>Funções de 2 argumentos</strong> : Use ponto e vírgula ou vírgula: <code>nthRoot(27; 3)</code>, <code>logBase(64; 2)</code>, <code>gcd(360; 48)</code>, <code>lcm(12; 18)</code>.</p>
+    </div>
+  </div>
+</div>
+
+<div id="scp-toast" class="scp-toast hidden" role="status" aria-live="polite"></div>
+
+
+  <script type="module" src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

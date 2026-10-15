@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b132b"/>
+      <stop offset="50%" stop-color="#1c2541"/>
+      <stop offset="100%" stop-color="#0b132b"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <linearGradient id="btnGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2a3b66"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+  <!-- Calculator Body -->
+  <rect x="48" y="24" width="416" height="464" rx="44" fill="url(#bgGrad)" stroke="#334155" stroke-width="8" filter="url(#shadow)"/>
+  
+  <!-- Screen Display -->
+  <rect x="80" y="56" width="352" height="96" rx="20" fill="#090d16" stroke="#1e293b" stroke-width="4"/>
+  <text x="100" y="92" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" fill="#94a3b8" letter-spacing="1">sin(π/6) + 2^3</text>
+  <text x="412" y="132" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="bold" fill="#f8fafc" text-anchor="end">8.5</text>
+  
+  <!-- Keys Grid -->
+  <!-- Row 1: Scientific functions -->
+  <rect x="80" y="172" width="76" height="52" rx="14" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+  <text x="118" y="204" font-family="sans-serif" font-size="18" fill="#38bdf8" text-anchor="middle" font-weight="600">sin</text>
+  
+  <rect x="172" y="172" width="76" height="52" rx="14" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+  <text x="210" y="204" font-family="sans-serif" font-size="18" fill="#38bdf8" text-anchor="middle" font-weight="600">cos</text>
+  
+  <rect x="264" y="172" width="76" height="52" rx="14" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+  <text x="302" y="204" font-family="sans-serif" font-size="18" fill="#38bdf8" text-anchor="middle" font-weight="600">tan</text>
+  
+  <rect x="356" y="172" width="76" height="52" rx="14" fill="#dc2626" stroke="#ef4444" stroke-width="2"/>
+  <text x="394" y="204" font-family="sans-serif" font-size="18" fill="#ffffff" text-anchor="middle" font-weight="bold">AC</text>
+
+  <!-- Row 2 -->
+  <rect x="80" y="236" width="76" height="52" rx="14" fill="url(#btnGrad)" stroke="#334155" stroke-width="2"/>
+  <text x="118" y="269" font-family="sans-serif" font-size="22" fill="#f8fafc" text-anchor="middle" font-weight="bold">7</text>
+  
+  <rect x="172" y="236" width="76" height="52" rx="14" fill="url(#btnGrad)" stroke="#334155" stroke-width="2"/>
+  <text x="210" y="269" font-family="sans-serif" font-size="22" fill="#f8fafc" text-anchor="middle" font-weight="bold">8</text>
+  
+  <rect x="264" y="236" width="76" height="52" rx="14" fill="url(#btnGrad)" stroke="#334155" stroke-width="2"/>
+  <text x="302" y="269" font-family="sans-serif" font-size="22" fill="#f8fafc" text-anchor="middle" font-weight="bold">9</text>
+  
+  <rect x="356" y="236" width="76" height="52" rx="14" fill="#0284c7" stroke="#0ea5e9" stroke-width="2"/>
+  <text x="394" y="270" font-family="sans-serif" font-size="24" fill="#ffffff" text-anchor="middle" font-weight="bold">÷</text>
+
+  <!-- Row 3 -->
+  <rect x="80" y="300" width="76" height="52" rx="14" fill="url(#btnGrad)" stroke="#334155" stroke-width="2"/>
+  <text x="118" y="333" font-family="sans-serif" font-size="22" fill="#f8fafc" text-anchor="middle" font-weight="bold">4</text>
+  
+  <rect x="172" y="300" width="76" height="52" rx="14" fill="url(#btnGrad)" stroke="#334155" stroke-width="2"/>
+  <text x="210" y="333" font-family="sans-serif" font-size="22" fill="#f8fafc" text-anchor="middle" font-weight="bold">5</text>
+  
+  <rect x="264" y="300" width="76" height="52" rx="14" fill="url(#btnGrad)" stroke="#334155" stroke-width="2"/>
+  <text x="302" y="333" font-family="sans-serif" font-size="22" fill="#f8fafc" text-anchor="middle" font-weight="bold">6</text>
+  
+  <rect x="356" y="300" width="76" height="52" rx="14" fill="#0284c7" stroke="#0ea5e9" stroke-width="2"/>
+  <text x="394" y="334" font-family="sans-serif" font-size="24" fill="#ffffff" text-anchor="middle" font-weight="bold">×</text>
+
+  <!-- Row 4 -->
+  <rect x="80" y="364" width="76" height="52" rx="14" fill="url(#btnGrad)" stroke="#334155" stroke-width="2"/>
+  <text x="118" y="397" font-family="sans-serif" font-size="22" fill="#f8fafc" text-anchor="middle" font-weight="bold">1</text>
+  
+  <rect x="172" y="364" width="76" height="52" rx="14" fill="url(#btnGrad)" stroke="#334155" stroke-width="2"/>
+  <text x="210" y="397" font-family="sans-serif" font-size="22" fill="#f8fafc" text-anchor="middle" font-weight="bold">2</text>
+  
+  <rect x="264" y="364" width="76" height="52" rx="14" fill="url(#btnGrad)" stroke="#334155" stroke-width="2"/>
+  <text x="302" y="397" font-family="sans-serif" font-size="22" fill="#f8fafc" text-anchor="middle" font-weight="bold">3</text>
+  
+  <rect x="356" y="364" width="76" height="52" rx="14" fill="#0284c7" stroke="#0ea5e9" stroke-width="2"/>
+  <text x="394" y="398" font-family="sans-serif" font-size="26" fill="#ffffff" text-anchor="middle" font-weight="bold">−</text>
+
+  <!-- Row 5 -->
+  <rect x="80" y="428" width="76" height="44" rx="14" fill="url(#btnGrad)" stroke="#334155" stroke-width="2"/>
+  <text x="118" y="457" font-family="sans-serif" font-size="22" fill="#f8fafc" text-anchor="middle" font-weight="bold">0</text>
+  
+  <rect x="172" y="428" width="76" height="44" rx="14" fill="url(#btnGrad)" stroke="#334155" stroke-width="2"/>
+  <text x="210" y="457" font-family="sans-serif" font-size="22" fill="#f8fafc" text-anchor="middle" font-weight="bold">.</text>
+  
+  <rect x="264" y="428" width="76" height="44" rx="14" fill="#0284c7" stroke="#0ea5e9" stroke-width="2"/>
+  <text x="302" y="458" font-family="sans-serif" font-size="24" fill="#ffffff" text-anchor="middle" font-weight="bold">+</text>
+  
+  <rect x="356" y="428" width="76" height="44" rx="14" fill="url(#accentGrad)" stroke="#38bdf8" stroke-width="2"/>
+  <text x="394" y="458" font-family="sans-serif" font-size="26" fill="#ffffff" text-anchor="middle" font-weight="bold">=</text>
+</svg>

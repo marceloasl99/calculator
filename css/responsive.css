@@ -1,0 +1,91 @@
+/* ==========================================================================
+   Scientific Calculator Pro — Responsive Layouts & Breakpoints
+   Supports Desktop, Ultrawide, Tablet, Mobile (Portrait & Landscape)
+   ========================================================================== */
+
+@media (max-width: 960px) {
+  .scp-workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .scp-shell {
+    padding: 8px 10px 20px;
+  }
+  .scp-header {
+    padding: 10px 12px;
+  }
+  .scp-sci-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .scp-key {
+    min-height: 48px;
+    font-size: 1rem;
+  }
+  .scp-expr-input {
+    font-size: 1rem;
+  }
+}
+
+/* Touch and Pointer Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .scp-key {
+    min-height: 50px;
+    touch-action: manipulation;
+  }
+  .scp-seg-btn,
+  .scp-subtab-btn,
+  .scp-icon-btn {
+    min-height: 38px;
+    touch-action: manipulation;
+  }
+}
+
+/* Extra Small Phones */
+@media (max-width: 480px) {
+  .scp-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .scp-brand {
+    justify-content: space-between;
+  }
+  .scp-toolbar {
+    justify-content: flex-start;
+  }
+  .scp-result-value {
+    font-size: 1.65rem;
+  }
+  .scp-memory-bar {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+  }
+  .scp-memory-bar .scp-key {
+    min-height: 36px;
+    font-size: 0.72rem;
+    padding: 2px 4px;
+  }
+}
+
+/* Landscape Mode on Mobile */
+@media (orientation: landscape) and (max-height: 520px) {
+  .scp-workspace {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+  .scp-key {
+    min-height: 36px;
+    padding: 4px 2px;
+    font-size: 0.85rem;
+  }
+  .scp-display-box {
+    padding: 8px 10px;
+    margin-bottom: 8px;
+  }
+  .scp-result-row {
+    min-height: 32px;
+  }
+  .scp-result-value {
+    font-size: 1.4rem;
+  }
+}
