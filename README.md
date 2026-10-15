@@ -251,7 +251,7 @@ git init
 git add .
 git commit -m "feat: Scientific Calculator Pro - Complete Multi-Mode Web Application"
 git branch -M main
-git remote add origin https://github.com/marceloas199/calculator.git
+git remote add origin https://github.com/marceloasl99/calculator.git
 git push -u origin main
 ```
 
