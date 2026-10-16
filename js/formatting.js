@@ -29,7 +29,7 @@ function formatResult(value, options = {}) {
   if (value === null || value === undefined || Number.isNaN(value)) return '—';
   if (!Number.isFinite(value)) return value > 0 ? '∞' : '-∞';
 
-  const cleaned = cleanFloatingPoint(Number(value));
+  const cleaned = cleanFloatingPoint(Number(value), Math.abs(Number(value)));
 
   if (showFraction) {
     const frac = decimalToFraction(cleaned);
@@ -48,7 +48,9 @@ function formatResult(value, options = {}) {
     const { decimal } = getLocaleSeparators(locale);
     const localMantissa = mantissa.replace('.', decimal);
     const cleanExp = exponent.replace('+', '');
-    return `${localMantissa} × 10^(${cleanExp})`;
+    const SUPERSCRIPTS = { '-': '⁻', 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹' };
+    const supExp = String(Number(cleanExp)).replace(/[-0-9]/g, (ch) => SUPERSCRIPTS[ch]);
+    return `${localMantissa} × 10${supExp}`;
   }
 
   const fmtOptions = {
@@ -59,7 +61,7 @@ function formatResult(value, options = {}) {
     fmtOptions.minimumFractionDigits = Math.min(Math.max(decimalPlaces, 0), 12);
     fmtOptions.maximumFractionDigits = Math.min(Math.max(decimalPlaces, 0), 12);
   } else {
-    fmtOptions.maximumFractionDigits = 10;
+    fmtOptions.maximumFractionDigits = Number.isInteger(options.maxFractionDigits) ? options.maxFractionDigits : 10;
   }
 
   const formatted = new Intl.NumberFormat(locale, fmtOptions).format(cleaned);

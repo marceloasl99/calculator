@@ -5,6 +5,15 @@
  */
 function initKeyboardShortcuts(handlers) {
   window.addEventListener('keydown', (event) => {
+    const openModal = document.querySelector('.scp-modal-backdrop:not(.hidden)');
+    if (openModal) {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        if (handlers.onCloseModal) handlers.onCloseModal(openModal);
+      }
+      return;
+    }
+
     const active = document.activeElement;
     const isExprInput = active && active.id === 'calc-expression-input';
     const isOtherInput =
@@ -13,6 +22,16 @@ function initKeyboardShortcuts(handlers) {
       (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT' || active.isContentEditable);
 
     if (isOtherInput) return;
+    if (event.altKey || event.metaKey) return;
+
+    if (event.ctrlKey) {
+      const hasSelection = window.getSelection && String(window.getSelection()).length > 0;
+      if ((event.key === 'c' || event.key === 'C') && !isExprInput && !hasSelection && handlers.onCopyResult) {
+        event.preventDefault();
+        handlers.onCopyResult();
+      }
+      return;
+    }
 
     if (event.key === 'Enter' || event.key === '=') {
       event.preventDefault();
@@ -26,15 +45,26 @@ function initKeyboardShortcuts(handlers) {
       return;
     }
 
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      if (handlers.onHistoryNavigate) {
+        event.preventDefault();
+        handlers.onHistoryNavigate(event.key === 'ArrowUp' ? 1 : -1);
+      }
+      return;
+    }
+
     if (isExprInput) {
       // Let native input handle typing inside the main expression bar
       return;
     }
 
-    if (/^[0-9]$/.test(event.key)) {
+    if (event.key === '?' && handlers.onHelp) {
+      event.preventDefault();
+      handlers.onHelp();
+    } else if (/^[0-9]$/.test(event.key)) {
       event.preventDefault();
       handlers.onInsert(event.key);
-    } else if (['+', '-', '*', '/', '^', '(', ')', '%'].includes(event.key)) {
+    } else if (['+', '-', '*', '/', '^', '(', ')', '%', '!'].includes(event.key)) {
       event.preventDefault();
       handlers.onInsert(event.key);
     } else if (event.key === '.' || event.key === ',') {
@@ -51,6 +81,5 @@ function initKeyboardShortcuts(handlers) {
 }
 
 export {
-  initKeyboardShortcuts,
-  initKeyboardShortcuts as setupKeyboardShortcuts
+  initKeyboardShortcuts
 };

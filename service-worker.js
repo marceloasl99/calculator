@@ -1,4 +1,5 @@
-const CACHE_NAME = 'scicalc-pro-v2';
+// Bump on every release so old caches are dropped on activate
+const CACHE_NAME = 'scicalc-pro-2.0.0';
 
 const PRECACHE_ASSETS = [
   './',
@@ -25,6 +26,8 @@ const PRECACHE_ASSETS = [
   './js/tools/equation-solver.js',
   './js/tools/calculus.js',
   './js/tools/number-theory.js',
+  './js/tools/finance.js',
+  './js/tools/graphing.js',
   './locales/en.json',
   './locales/es.json',
   './locales/pt-BR.json',
@@ -47,19 +50,23 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Network-first for same-origin requests so deployed updates show up immediately;
+// the cache is the offline fallback.
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request).then((response) => {
-        if (!response || response.status !== 200 || response.type !== 'basic') {
-          return response;
+    fetch(event.request)
+      .then((response) => {
+        if (response && response.status === 200 && response.type === 'basic') {
+          const cloned = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cloned));
         }
-        const cloned = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cloned));
         return response;
-      }).catch(() => caches.match('./index.html'));
-    })
+      })
+      .catch(() =>
+        caches.match(event.request, { ignoreSearch: true }).then((cached) => cached || caches.match('./index.html'))
+      )
   );
 });

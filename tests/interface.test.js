@@ -43,7 +43,14 @@ test('index.html contains all essential UI container IDs', () => {
     'modal-tests',
     'modal-prompt',
     'modal-settings',
-    'modal-help'
+    'modal-help',
+    'calc-preview',
+    'variables-strip',
+    'tab-btn-library',
+    'panel-library',
+    'graph-canvas',
+    'btn-export-csv',
+    'btn-share-link'
   ];
 
   for (const id of requiredIds) {
@@ -95,13 +102,13 @@ test('manifest.json and service-worker.js are valid and offline-ready', () => {
   assert.ok(fs.existsSync(iconPath), `Icon exists at ${iconPath}`);
 });
 
-test('all 8 theme selectors exist in css/themes.css', () => {
+test('all 10 theme selectors exist in css/themes.css', () => {
   const themesCssPath = path.join(rootDir, 'css', 'themes.css');
   assert.ok(fs.existsSync(themesCssPath));
   const css = fs.readFileSync(themesCssPath, 'utf8');
 
-  const themes = ['ocean', 'light', 'dark', 'graphite', 'purple', 'emerald', 'high-contrast', 'auto'];
+  const themes = ['ocean', 'aurora', 'sunset', 'light', 'dark', 'graphite', 'purple', 'emerald', 'high-contrast', 'auto'];
   for (const theme of themes) {
-    assert.ok(css.includes(theme), `css/themes.css must define theme: ${theme}`);
+    assert.ok(css.includes(`[data-theme="${theme}"]`), `css/themes.css must define theme: ${theme}`);
   }
 });

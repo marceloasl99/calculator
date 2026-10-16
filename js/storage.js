@@ -6,7 +6,8 @@
 const STORAGE_KEYS = {
   PREFERENCES: 'scp_preferences_v1',
   HISTORY: 'scp_history_v1',
-  MEMORY: 'scp_memory_v1'
+  MEMORY: 'scp_memory_v1',
+  VARIABLES: 'scp_variables_v1'
 };
 
 const DEFAULT_PREFERENCES = {
@@ -20,11 +21,12 @@ const DEFAULT_PREFERENCES = {
   scientificNotation: false,
   showFraction: false,
   soundEnabled: false,
+  livePreview: true,
   historyLimit: 100
 };
 
 const VALID_LOCALES = ['en', 'es', 'pt-BR', 'it', 'fr', 'de'];
-const VALID_THEMES = ['light', 'dark', 'auto', 'graphite', 'ocean', 'purple', 'emerald', 'high-contrast'];
+const VALID_THEMES = ['light', 'dark', 'auto', 'graphite', 'ocean', 'purple', 'emerald', 'aurora', 'sunset', 'high-contrast'];
 const VALID_MODES = ['simple', 'intermediate', 'expert'];
 const VALID_ANGLES = ['DEG', 'RAD', 'GRAD'];
 
@@ -41,6 +43,7 @@ function validatePreferences(raw) {
     scientificNotation: Boolean(raw.scientificNotation),
     showFraction: Boolean(raw.showFraction),
     soundEnabled: Boolean(raw.soundEnabled),
+    livePreview: raw.livePreview === undefined ? true : Boolean(raw.livePreview),
     historyLimit: Number.isInteger(Number(raw.historyLimit)) ? Math.min(Math.max(Number(raw.historyLimit), 10), 500) : 100
   };
 }
@@ -104,6 +107,56 @@ class StorageManager {
     } catch (_) {
       return [];
     }
+  }
+
+  _read(key) {
+    const store = this._getStore();
+    return store ? store.getItem(key) : this.memoryFallback.get(key);
+  }
+
+  _write(key, serialized) {
+    try {
+      const store = this._getStore();
+      if (store) store.setItem(key, serialized);
+      else this.memoryFallback.set(key, serialized);
+    } catch (_) {
+      this.memoryFallback.set(key, serialized);
+    }
+  }
+
+  loadVariables() {
+    try {
+      const rawStr = this._read(STORAGE_KEYS.VARIABLES);
+      if (!rawStr) return {};
+      const parsed = JSON.parse(rawStr);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+      const clean = {};
+      for (const [name, value] of Object.entries(parsed)) {
+        if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name) && typeof value === 'number' && Number.isFinite(value)) {
+          clean[name] = value;
+        }
+      }
+      return clean;
+    } catch (_) {
+      return {};
+    }
+  }
+
+  saveVariables(variables) {
+    this._write(STORAGE_KEYS.VARIABLES, JSON.stringify(variables || {}));
+  }
+
+  loadMemory() {
+    try {
+      const value = Number(JSON.parse(this._read(STORAGE_KEYS.MEMORY) || '0'));
+      return Number.isFinite(value) ? value : 0;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  saveMemory(value) {
+    this._write(STORAGE_KEYS.MEMORY, JSON.stringify(Number(value) || 0));
   }
 
   saveHistory(items) {

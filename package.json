@@ -1,12 +1,14 @@
 {
   "name": "scientific-calculator-pro",
-  "version": "1.0.0",
-  "description": "Scientific Calculator Pro — High-precision multi-mode scientific calculator web application with desktop and mobile layouts, 8 themes, 6 languages, and expert engineering lab tools.",
+  "version": "2.0.0",
+  "description": "Scientific Calculator Pro v2 — high-precision multi-mode scientific calculator with function plotter, financial math, physical constants, user variables, 10 themes and 6 languages. Zero dependencies, zero eval().",
   "type": "module",
   "main": "js/app.js",
   "scripts": {
     "test": "node --test tests/*.test.js",
     "start": "node serve.js",
+    "build": "node scripts/build-standalone.mjs",
+    "sync-locales": "node scripts/sync-locales.mjs",
     "screenshots": "node scripts/capture.mjs"
   },
   "keywords": [
@@ -18,8 +20,17 @@
     "calculus",
     "complex-numbers",
     "pwa",
-    "i18n"
+    "i18n",
+    "graphing-calculator",
+    "function-plotter",
+    "finance",
+    "physical-constants"
   ],
-  "author": "Engineering Team",
-  "license": "MIT"
+  "author": "marceloasl99",
+  "license": "MIT",
+  "homepage": "https://marceloasl99.github.io/calculator/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marceloasl99/calculator.git"
+  }
 }

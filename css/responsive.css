@@ -1,37 +1,222 @@
 /* ==========================================================================
-   Scientific Calculator Pro — Responsive Layouts & Breakpoints
-   Supports Desktop, Ultrawide, Tablet, Mobile (Portrait & Landscape)
+   Scientific Calculator Pro v2 — Responsive Layouts & Breakpoints
+   Desktop, tablet and phone (portrait & landscape). Below 760px the app shows
+   one panel at a time and switches with a bottom navigation bar.
    ========================================================================== */
+
+@media (max-width: 1100px) {
+  .scp-workspace {
+    grid-template-columns: minmax(320px, 460px) minmax(0, 1fr);
+  }
+  .scp-subtitle {
+    display: none;
+  }
+}
 
 @media (max-width: 960px) {
   .scp-workspace {
     grid-template-columns: 1fr;
   }
+  .scp-calc-card {
+    max-width: 560px;
+    width: 100%;
+    justify-self: center;
+  }
 }
 
-@media (max-width: 600px) {
+/* Single-panel layout with bottom tab bar */
+@media (max-width: 760px) {
   .scp-shell {
-    padding: 8px 10px 20px;
+    padding: 10px 10px calc(84px + env(safe-area-inset-bottom));
+    gap: 10px;
   }
+  .scp-mobile-nav {
+    display: flex;
+  }
+  .scp-footer {
+    display: none;
+  }
+}
+
+.scp-shell.viewport-mobile {
+  padding-bottom: 12px;
+}
+
+.scp-shell.viewport-mobile .scp-mobile-nav {
+  display: flex;
+  position: sticky;
+  bottom: 0;
+  margin: 0 -2px;
+}
+
+.scp-shell.viewport-mobile .scp-footer {
+  display: none;
+}
+
+.scp-mobile-nav {
+  position: fixed;
+  left: 10px;
+  right: 10px;
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  z-index: 900;
+  justify-content: space-around;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 18px 40px -16px rgba(0, 0, 0, 0.6);
+}
+
+.scp-mobile-nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  padding: 6px 4px;
+  border-radius: 14px;
+  font-size: 0.66rem;
+  font-weight: 600;
+}
+
+.scp-mobile-nav-btn.active {
+  color: var(--color-secondary);
+  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+}
+
+@media (max-width: 760px) {
+  .scp-shell[data-mobile-view="calc"] .scp-side-card,
+  .scp-shell:not([data-mobile-view="calc"]) .scp-calc-card {
+    display: none;
+  }
+  .scp-shell:not([data-mobile-view="calc"]) .scp-panel-tabs {
+    display: none;
+  }
+}
+
+.scp-shell.viewport-mobile[data-mobile-view="calc"] .scp-side-card,
+.scp-shell.viewport-mobile:not([data-mobile-view="calc"]) .scp-calc-card,
+.scp-shell.viewport-mobile:not([data-mobile-view="calc"]) .scp-panel-tabs {
+  display: none;
+}
+
+@media (max-width: 760px) {
   .scp-header {
-    padding: 10px 12px;
+    padding: 8px 10px;
+    gap: 10px;
   }
-  .scp-sci-grid {
-    grid-template-columns: repeat(4, 1fr);
+  .scp-mode-switch {
+    order: 3;
+    width: 100%;
+  }
+  .scp-mode-switch .scp-seg-btn {
+    flex: 1;
+  }
+  .scp-toolbar .scp-select {
+    max-width: 128px;
+  }
+  .scp-calc-card,
+  .scp-side-card {
+    padding: 12px;
+    border-radius: 20px;
   }
   .scp-key {
     min-height: 48px;
-    font-size: 1rem;
   }
-  .scp-expr-input {
-    font-size: 1rem;
+  .scp-key-num {
+    min-height: 56px;
+  }
+  #badge-active-mode {
+    display: none;
+  }
+  .scp-expert-subtabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin: 0 -12px 4px;
+    padding: 0 12px 4px;
+    scrollbar-width: none;
+  }
+  .scp-subtab-btn {
+    flex-shrink: 0;
+  }
+  .scp-status-row {
+    flex-wrap: nowrap;
+  }
+  .scp-status-group {
+    flex-wrap: nowrap;
+    min-width: 0;
+  }
+  #badge-ans-val {
+    max-width: 92px;
+  }
+  .scp-toast {
+    bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+  .scp-graph-canvas {
+    height: 300px;
   }
 }
 
-/* Touch and Pointer Optimizations */
+.scp-shell.viewport-mobile .scp-mode-switch {
+  order: 3;
+  width: 100%;
+}
+
+.scp-shell.viewport-mobile .scp-mode-switch .scp-seg-btn {
+  flex: 1;
+}
+
+.scp-shell.viewport-mobile .scp-subtitle {
+  display: none;
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+  .scp-brand-text .scp-title {
+    font-size: 0.95rem;
+  }
+  .scp-toolbar {
+    gap: 6px;
+  }
+  .scp-toolbar .scp-icon-btn {
+    padding: 6px 8px;
+  }
+  .scp-toolbar .scp-select {
+    max-width: 104px;
+    padding: 7px 8px;
+  }
+  .scp-badge {
+    max-width: 110px;
+  }
+  .scp-result-value {
+    font-size: 2rem;
+  }
+  .scp-memory-bar {
+    gap: 4px;
+  }
+  .scp-sci-grid {
+    gap: 5px;
+  }
+  .scp-core-grid {
+    gap: 6px;
+  }
+  .scp-matrix-pair {
+    grid-template-columns: 1fr;
+  }
+  .scp-help-grid {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+/* Touch devices */
 @media (hover: none) and (pointer: coarse) {
   .scp-key {
-    min-height: 50px;
     touch-action: manipulation;
   }
   .scp-seg-btn,
@@ -40,52 +225,50 @@
     min-height: 38px;
     touch-action: manipulation;
   }
-}
-
-/* Extra Small Phones */
-@media (max-width: 480px) {
-  .scp-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .scp-brand {
-    justify-content: space-between;
-  }
-  .scp-toolbar {
-    justify-content: flex-start;
-  }
-  .scp-result-value {
-    font-size: 1.65rem;
-  }
-  .scp-memory-bar {
-    grid-template-columns: repeat(6, 1fr);
-    gap: 4px;
-  }
-  .scp-memory-bar .scp-key {
-    min-height: 36px;
-    font-size: 0.72rem;
-    padding: 2px 4px;
+  .scp-key:hover {
+    filter: none;
   }
 }
 
-/* Landscape Mode on Mobile */
+/* Landscape phones */
 @media (orientation: landscape) and (max-height: 520px) {
   .scp-workspace {
     grid-template-columns: 1.1fr 0.9fr;
   }
-  .scp-key {
-    min-height: 36px;
-    padding: 4px 2px;
-    font-size: 0.85rem;
+  .scp-calc-card,
+  .scp-side-card {
+    display: block !important;
+  }
+  .scp-mobile-nav {
+    display: none;
+  }
+  .scp-shell {
+    padding-bottom: 16px;
+  }
+  .scp-key,
+  .scp-key-num,
+  .scp-sci-grid .scp-key {
+    min-height: 34px;
+    padding: 2px;
+    font-size: 0.82rem;
   }
   .scp-display-box {
     padding: 8px 10px;
     margin-bottom: 8px;
   }
   .scp-result-row {
-    min-height: 32px;
+    min-height: 34px;
   }
   .scp-result-value {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
+  }
+}
+
+@media print {
+  .scp-backdrop,
+  .scp-mobile-nav,
+  .scp-toolbar,
+  .scp-calc-card {
+    display: none !important;
   }
 }

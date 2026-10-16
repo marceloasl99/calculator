@@ -1,182 +1,386 @@
 /* ==========================================================================
-   Scientific Calculator Pro — 8 Themes via CSS Custom Properties
-   Themes: Ocean (default), Light, Dark, Graphite, Purple, Emerald, High Contrast, Auto
+   Scientific Calculator Pro v2 — 10 Themes via CSS Custom Properties
+   Ocean (default), Aurora, Sunset, Light, Dark, Auto, Graphite, Purple,
+   Emerald and High Contrast. Every theme defines the full token set.
    ========================================================================== */
 
 :root,
 [data-theme="ocean"] {
-  --color-background: #0b132b;
-  --color-surface: #1c2541;
-  --color-surface-secondary: #253256;
-  --color-text: #f8fafc;
-  --color-text-muted: #94a3b8;
-  --color-border: #334155;
-  --color-primary: #0ea5e9;
-  --color-secondary: #38bdf8;
-  --color-operator: #0284c7;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-key-number: #29385c;
-  --color-key-function: #1e293b;
-  --shadow-elevated: 0 12px 32px -8px rgba(2, 6, 23, 0.55);
-  --focus-ring: 2px solid #38bdf8;
+  --color-background: #070d1f;
+  --color-surface: #0f1830;
+  --color-surface-secondary: #16223f;
+  --color-surface-raised: #1b2a4d;
+  --color-text: #eef4ff;
+  --color-text-muted: #8fa3c4;
+  --color-border: rgba(148, 178, 230, 0.14);
+  --color-border-strong: rgba(148, 178, 230, 0.28);
+  --color-primary: #38bdf8;
+  --color-secondary: #7dd3fc;
+  --color-on-primary: #04121f;
+  --color-operator: rgba(56, 189, 248, 0.16);
+  --color-on-operator: #7dd3fc;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  --color-key-number: #1a2747;
+  --color-key-function: #121d38;
+  --color-key-mem: transparent;
+  --display-bg: linear-gradient(180deg, #050a18 0%, #0a1328 100%);
+  --backdrop-1: rgba(56, 189, 248, 0.22);
+  --backdrop-2: rgba(99, 102, 241, 0.18);
+  --plot-1: #38bdf8;
+  --plot-2: #f472b6;
+  --plot-3: #a3e635;
+  --grid-line: rgba(148, 178, 230, 0.09);
+  --axis-line: rgba(148, 178, 230, 0.42);
+  --shadow-elevated: 0 24px 48px -24px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  --shadow-key: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --focus-ring: 2px solid #7dd3fc;
+  color-scheme: dark;
+}
+
+[data-theme="aurora"] {
+  --color-background: #05110f;
+  --color-surface: #0b1d1b;
+  --color-surface-secondary: #102825;
+  --color-surface-raised: #15332f;
+  --color-text: #ecfdf8;
+  --color-text-muted: #86b8ad;
+  --color-border: rgba(110, 231, 183, 0.13);
+  --color-border-strong: rgba(110, 231, 183, 0.28);
+  --color-primary: #2dd4bf;
+  --color-secondary: #a78bfa;
+  --color-on-primary: #022420;
+  --color-operator: rgba(167, 139, 250, 0.16);
+  --color-on-operator: #c4b5fd;
+  --color-success: #4ade80;
+  --color-warning: #facc15;
+  --color-error: #fb7185;
+  --color-key-number: #12302c;
+  --color-key-function: #0d2421;
+  --color-key-mem: transparent;
+  --display-bg: linear-gradient(180deg, #030c0b 0%, #081a18 100%);
+  --backdrop-1: rgba(45, 212, 191, 0.22);
+  --backdrop-2: rgba(167, 139, 250, 0.22);
+  --plot-1: #2dd4bf;
+  --plot-2: #c084fc;
+  --plot-3: #facc15;
+  --grid-line: rgba(110, 231, 183, 0.08);
+  --axis-line: rgba(110, 231, 183, 0.4);
+  --shadow-elevated: 0 24px 48px -24px rgba(0, 0, 0, 0.75), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  --shadow-key: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --focus-ring: 2px solid #5eead4;
+  color-scheme: dark;
+}
+
+[data-theme="sunset"] {
+  --color-background: #170b12;
+  --color-surface: #24121c;
+  --color-surface-secondary: #2f1824;
+  --color-surface-raised: #3a1e2c;
+  --color-text: #fff3ec;
+  --color-text-muted: #d2a397;
+  --color-border: rgba(251, 146, 60, 0.15);
+  --color-border-strong: rgba(251, 146, 60, 0.3);
+  --color-primary: #fb923c;
+  --color-secondary: #f472b6;
+  --color-on-primary: #2a1003;
+  --color-operator: rgba(244, 114, 182, 0.16);
+  --color-on-operator: #f9a8d4;
+  --color-success: #4ade80;
+  --color-warning: #fde047;
+  --color-error: #f87171;
+  --color-key-number: #391d2b;
+  --color-key-function: #2b1621;
+  --color-key-mem: transparent;
+  --display-bg: linear-gradient(180deg, #12070d 0%, #1f0e17 100%);
+  --backdrop-1: rgba(251, 146, 60, 0.22);
+  --backdrop-2: rgba(244, 114, 182, 0.2);
+  --plot-1: #fb923c;
+  --plot-2: #f472b6;
+  --plot-3: #facc15;
+  --grid-line: rgba(251, 146, 60, 0.08);
+  --axis-line: rgba(251, 191, 160, 0.42);
+  --shadow-elevated: 0 24px 48px -24px rgba(0, 0, 0, 0.75), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  --shadow-key: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --focus-ring: 2px solid #fdba74;
+  color-scheme: dark;
 }
 
 [data-theme="light"] {
-  --color-background: #f1f5f9;
+  --color-background: #eef2f8;
   --color-surface: #ffffff;
-  --color-surface-secondary: #f8fafc;
+  --color-surface-secondary: #f4f6fb;
+  --color-surface-raised: #ffffff;
   --color-text: #0f172a;
-  --color-text-muted: #475569;
-  --color-border: #cbd5e1;
+  --color-text-muted: #55657e;
+  --color-border: rgba(15, 23, 42, 0.09);
+  --color-border-strong: rgba(15, 23, 42, 0.18);
   --color-primary: #2563eb;
   --color-secondary: #1d4ed8;
-  --color-operator: #dbeafe;
+  --color-on-primary: #ffffff;
+  --color-operator: #e3ecff;
+  --color-on-operator: #1d4ed8;
   --color-success: #059669;
-  --color-warning: #d97706;
+  --color-warning: #b45309;
   --color-error: #dc2626;
   --color-key-number: #ffffff;
-  --color-key-function: #e2e8f0;
-  --shadow-elevated: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+  --color-key-function: #f1f4f9;
+  --color-key-mem: transparent;
+  --display-bg: linear-gradient(180deg, #f7f9fc 0%, #eef2f8 100%);
+  --backdrop-1: rgba(37, 99, 235, 0.12);
+  --backdrop-2: rgba(14, 165, 233, 0.1);
+  --plot-1: #2563eb;
+  --plot-2: #db2777;
+  --plot-3: #16a34a;
+  --grid-line: rgba(15, 23, 42, 0.06);
+  --axis-line: rgba(15, 23, 42, 0.38);
+  --shadow-elevated: 0 18px 40px -24px rgba(15, 23, 42, 0.25), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-key: 0 1px 0 rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.06);
   --focus-ring: 2px solid #2563eb;
+  color-scheme: light;
 }
 
 [data-theme="dark"] {
-  --color-background: #090d16;
-  --color-surface: #111827;
-  --color-surface-secondary: #1f2937;
-  --color-text: #f9fafb;
-  --color-text-muted: #9ca3af;
-  --color-border: #374151;
-  --color-primary: #6366f1;
-  --color-secondary: #818cf8;
-  --color-operator: #4f46e5;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
+  --color-background: #08090d;
+  --color-surface: #111318;
+  --color-surface-secondary: #181b22;
+  --color-surface-raised: #1e222b;
+  --color-text: #f4f5f7;
+  --color-text-muted: #9198a6;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.16);
+  --color-primary: #818cf8;
+  --color-secondary: #a5b4fc;
+  --color-on-primary: #0b0d24;
+  --color-operator: rgba(129, 140, 248, 0.15);
+  --color-on-operator: #a5b4fc;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
   --color-error: #f87171;
-  --color-key-number: #1f2937;
-  --color-key-function: #161f2e;
-  --shadow-elevated: 0 12px 32px -8px rgba(0, 0, 0, 0.65);
-  --focus-ring: 2px solid #818cf8;
+  --color-key-number: #1c1f27;
+  --color-key-function: #15171d;
+  --color-key-mem: transparent;
+  --display-bg: linear-gradient(180deg, #050608 0%, #0c0e12 100%);
+  --backdrop-1: rgba(129, 140, 248, 0.14);
+  --backdrop-2: rgba(56, 189, 248, 0.08);
+  --plot-1: #818cf8;
+  --plot-2: #f472b6;
+  --plot-3: #34d399;
+  --grid-line: rgba(255, 255, 255, 0.06);
+  --axis-line: rgba(255, 255, 255, 0.35);
+  --shadow-elevated: 0 24px 48px -24px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(255, 255, 255, 0.03) inset;
+  --shadow-key: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 2px 4px -2px rgba(0, 0, 0, 0.6);
+  --focus-ring: 2px solid #a5b4fc;
+  color-scheme: dark;
 }
 
 [data-theme="graphite"] {
-  --color-background: #18181b;
-  --color-surface: #27272a;
-  --color-surface-secondary: #3f3f46;
+  --color-background: #141416;
+  --color-surface: #1d1d20;
+  --color-surface-secondary: #26262a;
+  --color-surface-raised: #2e2e33;
   --color-text: #fafafa;
   --color-text-muted: #a1a1aa;
-  --color-border: #52525b;
+  --color-border: rgba(255, 255, 255, 0.09);
+  --color-border-strong: rgba(255, 255, 255, 0.18);
   --color-primary: #f97316;
-  --color-secondary: #fb923c;
-  --color-operator: #ea580c;
+  --color-secondary: #fdba74;
+  --color-on-primary: #1c0a00;
+  --color-operator: rgba(249, 115, 22, 0.16);
+  --color-on-operator: #fdba74;
   --color-success: #22c55e;
   --color-warning: #eab308;
   --color-error: #ef4444;
-  --color-key-number: #3f3f46;
-  --color-key-function: #2e2e33;
-  --shadow-elevated: 0 12px 28px -6px rgba(0, 0, 0, 0.6);
-  --focus-ring: 2px solid #fb923c;
+  --color-key-number: #2c2c31;
+  --color-key-function: #222226;
+  --color-key-mem: transparent;
+  --display-bg: linear-gradient(180deg, #0e0e10 0%, #161618 100%);
+  --backdrop-1: rgba(249, 115, 22, 0.12);
+  --backdrop-2: rgba(161, 161, 170, 0.08);
+  --plot-1: #f97316;
+  --plot-2: #38bdf8;
+  --plot-3: #a3e635;
+  --grid-line: rgba(255, 255, 255, 0.06);
+  --axis-line: rgba(255, 255, 255, 0.36);
+  --shadow-elevated: 0 24px 48px -24px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(255, 255, 255, 0.03) inset;
+  --shadow-key: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 2px 4px -2px rgba(0, 0, 0, 0.6);
+  --focus-ring: 2px solid #fdba74;
+  color-scheme: dark;
 }
 
 [data-theme="purple"] {
-  --color-background: #1a1025;
-  --color-surface: #261736;
-  --color-surface-secondary: #35204d;
+  --color-background: #120a1d;
+  --color-surface: #1c1229;
+  --color-surface-secondary: #251836;
+  --color-surface-raised: #2e1e43;
   --color-text: #faf5ff;
-  --color-text-muted: #c084fc;
-  --color-border: #4c1d95;
-  --color-primary: #a855f7;
-  --color-secondary: #c084fc;
-  --color-operator: #7e22ce;
+  --color-text-muted: #b9a2d6;
+  --color-border: rgba(192, 132, 252, 0.14);
+  --color-border-strong: rgba(192, 132, 252, 0.3);
+  --color-primary: #c084fc;
+  --color-secondary: #e9d5ff;
+  --color-on-primary: #1f0a33;
+  --color-operator: rgba(192, 132, 252, 0.16);
+  --color-on-operator: #e9d5ff;
   --color-success: #34d399;
   --color-warning: #fbbf24;
   --color-error: #fb7185;
-  --color-key-number: #3b2354;
-  --color-key-function: #2b193d;
-  --shadow-elevated: 0 12px 32px -8px rgba(18, 6, 31, 0.7);
-  --focus-ring: 2px solid #c084fc;
+  --color-key-number: #2c1d40;
+  --color-key-function: #211531;
+  --color-key-mem: transparent;
+  --display-bg: linear-gradient(180deg, #0c0614 0%, #160d22 100%);
+  --backdrop-1: rgba(192, 132, 252, 0.2);
+  --backdrop-2: rgba(236, 72, 153, 0.14);
+  --plot-1: #c084fc;
+  --plot-2: #f472b6;
+  --plot-3: #67e8f9;
+  --grid-line: rgba(192, 132, 252, 0.08);
+  --axis-line: rgba(233, 213, 255, 0.4);
+  --shadow-elevated: 0 24px 48px -24px rgba(0, 0, 0, 0.75), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  --shadow-key: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --focus-ring: 2px solid #e9d5ff;
+  color-scheme: dark;
 }
 
 [data-theme="emerald"] {
-  --color-background: #061f18;
-  --color-surface: #0b2e24;
-  --color-surface-secondary: #134638;
+  --color-background: #04140f;
+  --color-surface: #0a2019;
+  --color-surface-secondary: #0f2b22;
+  --color-surface-raised: #14362b;
   --color-text: #ecfdf5;
-  --color-text-muted: #6ee7b7;
-  --color-border: #047857;
-  --color-primary: #10b981;
-  --color-secondary: #34d399;
-  --color-operator: #059669;
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
+  --color-text-muted: #8cc7ad;
+  --color-border: rgba(52, 211, 153, 0.14);
+  --color-border-strong: rgba(52, 211, 153, 0.3);
+  --color-primary: #34d399;
+  --color-secondary: #a7f3d0;
+  --color-on-primary: #022c1c;
+  --color-operator: rgba(52, 211, 153, 0.15);
+  --color-on-operator: #a7f3d0;
+  --color-success: #4ade80;
+  --color-warning: #fbbf24;
   --color-error: #f87171;
-  --color-key-number: #164e3f;
-  --color-key-function: #0f392e;
-  --shadow-elevated: 0 12px 32px -8px rgba(2, 18, 13, 0.7);
-  --focus-ring: 2px solid #34d399;
+  --color-key-number: #12362a;
+  --color-key-function: #0d281f;
+  --color-key-mem: transparent;
+  --display-bg: linear-gradient(180deg, #020d09 0%, #071a13 100%);
+  --backdrop-1: rgba(52, 211, 153, 0.18);
+  --backdrop-2: rgba(20, 184, 166, 0.14);
+  --plot-1: #34d399;
+  --plot-2: #fbbf24;
+  --plot-3: #60a5fa;
+  --grid-line: rgba(52, 211, 153, 0.08);
+  --axis-line: rgba(167, 243, 208, 0.4);
+  --shadow-elevated: 0 24px 48px -24px rgba(0, 0, 0, 0.75), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  --shadow-key: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --focus-ring: 2px solid #a7f3d0;
+  color-scheme: dark;
 }
 
 [data-theme="high-contrast"] {
   --color-background: #000000;
-  --color-surface: #0a0a0a;
-  --color-surface-secondary: #141414;
+  --color-surface: #000000;
+  --color-surface-secondary: #0d0d0d;
+  --color-surface-raised: #141414;
   --color-text: #ffffff;
   --color-text-muted: #ffff00;
   --color-border: #ffffff;
+  --color-border-strong: #ffffff;
   --color-primary: #ffff00;
   --color-secondary: #00ffff;
-  --color-operator: #0044aa;
+  --color-on-primary: #000000;
+  --color-operator: #002266;
+  --color-on-operator: #ffffff;
   --color-success: #00ff66;
   --color-warning: #ffcc00;
-  --color-error: #ff3333;
-  --color-key-number: #1a1a1a;
-  --color-key-function: #0f0f0f;
+  --color-error: #ff4d4d;
+  --color-key-number: #111111;
+  --color-key-function: #000000;
+  --color-key-mem: #000000;
+  --display-bg: #000000;
+  --backdrop-1: transparent;
+  --backdrop-2: transparent;
+  --plot-1: #ffff00;
+  --plot-2: #00ffff;
+  --plot-3: #ff66ff;
+  --grid-line: rgba(255, 255, 255, 0.18);
+  --axis-line: #ffffff;
   --shadow-elevated: none;
-  --focus-ring: 3px solid #ffff00;
+  --shadow-key: none;
+  --focus-ring: 3px solid #00ffff;
+  color-scheme: dark;
 }
 
-/* System Automatic Theme Mapping */
+/* System Automatic Theme Mapping (auto = light or dark tokens) */
 @media (prefers-color-scheme: light) {
   [data-theme="auto"] {
-    --color-background: #f1f5f9;
+    --color-background: #eef2f8;
     --color-surface: #ffffff;
-    --color-surface-secondary: #f8fafc;
+    --color-surface-secondary: #f4f6fb;
+    --color-surface-raised: #ffffff;
     --color-text: #0f172a;
-    --color-text-muted: #475569;
-    --color-border: #cbd5e1;
+    --color-text-muted: #55657e;
+    --color-border: rgba(15, 23, 42, 0.09);
+    --color-border-strong: rgba(15, 23, 42, 0.18);
     --color-primary: #2563eb;
     --color-secondary: #1d4ed8;
-    --color-operator: #dbeafe;
+    --color-on-primary: #ffffff;
+    --color-operator: #e3ecff;
+    --color-on-operator: #1d4ed8;
     --color-success: #059669;
-    --color-warning: #d97706;
+    --color-warning: #b45309;
     --color-error: #dc2626;
     --color-key-number: #ffffff;
-    --color-key-function: #e2e8f0;
-    --shadow-elevated: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+    --color-key-function: #f1f4f9;
+    --color-key-mem: transparent;
+    --display-bg: linear-gradient(180deg, #f7f9fc 0%, #eef2f8 100%);
+    --backdrop-1: rgba(37, 99, 235, 0.12);
+    --backdrop-2: rgba(14, 165, 233, 0.1);
+    --plot-1: #2563eb;
+    --plot-2: #db2777;
+    --plot-3: #16a34a;
+    --grid-line: rgba(15, 23, 42, 0.06);
+    --axis-line: rgba(15, 23, 42, 0.38);
+    --shadow-elevated: 0 18px 40px -24px rgba(15, 23, 42, 0.25), 0 1px 2px rgba(15, 23, 42, 0.04);
+    --shadow-key: 0 1px 0 rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.06);
     --focus-ring: 2px solid #2563eb;
+    color-scheme: light;
   }
 }
 
 @media (prefers-color-scheme: dark) {
   [data-theme="auto"] {
-    --color-background: #090d16;
-    --color-surface: #111827;
-    --color-surface-secondary: #1f2937;
-    --color-text: #f9fafb;
-    --color-text-muted: #9ca3af;
-    --color-border: #374151;
-    --color-primary: #6366f1;
-    --color-secondary: #818cf8;
-    --color-operator: #4f46e5;
-    --color-success: #10b981;
-    --color-warning: #f59e0b;
+    --color-background: #08090d;
+    --color-surface: #111318;
+    --color-surface-secondary: #181b22;
+    --color-surface-raised: #1e222b;
+    --color-text: #f4f5f7;
+    --color-text-muted: #9198a6;
+    --color-border: rgba(255, 255, 255, 0.08);
+    --color-border-strong: rgba(255, 255, 255, 0.16);
+    --color-primary: #818cf8;
+    --color-secondary: #a5b4fc;
+    --color-on-primary: #0b0d24;
+    --color-operator: rgba(129, 140, 248, 0.15);
+    --color-on-operator: #a5b4fc;
+    --color-success: #34d399;
+    --color-warning: #fbbf24;
     --color-error: #f87171;
-    --color-key-number: #1f2937;
-    --color-key-function: #161f2e;
-    --shadow-elevated: 0 12px 32px -8px rgba(0, 0, 0, 0.65);
-    --focus-ring: 2px solid #818cf8;
+    --color-key-number: #1c1f27;
+    --color-key-function: #15171d;
+    --color-key-mem: transparent;
+    --display-bg: linear-gradient(180deg, #050608 0%, #0c0e12 100%);
+    --backdrop-1: rgba(129, 140, 248, 0.14);
+    --backdrop-2: rgba(56, 189, 248, 0.08);
+    --plot-1: #818cf8;
+    --plot-2: #f472b6;
+    --plot-3: #34d399;
+    --grid-line: rgba(255, 255, 255, 0.06);
+    --axis-line: rgba(255, 255, 255, 0.35);
+    --shadow-elevated: 0 24px 48px -24px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(255, 255, 255, 0.03) inset;
+    --shadow-key: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 2px 4px -2px rgba(0, 0, 0, 0.6);
+    --focus-ring: 2px solid #a5b4fc;
+    color-scheme: dark;
   }
 }
 

@@ -7,10 +7,16 @@ import {
   SUPPORTED_LOCALES
 } from './formatting.js';
 import { decimalToFraction, CalculatorEngine } from './calculator-engine.js';
+import {
+  PHYSICAL_CONSTANTS,
+  compileExpression,
+  gcdTwo,
+  lcmTwo,
+  nPrCalc,
+  nCrCalc
+} from './expression-parser.js';
 import { Complex } from './tools/complex.js';
 import {
-  MAX_MATRIX_DIM,
-  validateMatrix,
   matrixAdd,
   matrixSub,
   matrixScalar,
@@ -21,29 +27,22 @@ import {
   matrixTrace,
   solveLinearSystem
 } from './tools/matrices.js';
-import {
-  parseDataset,
-  computeQuantile,
-  analyzeDataset,
-  weightedMean,
-  linearRegression
-} from './tools/statistics.js';
+import { analyzeDataset, parseDataset } from './tools/statistics.js';
 import { solveEquation } from './tools/equation-solver.js';
 import { numericalDerivative, numericalIntegral } from './tools/calculus.js';
-import {
-  isPrime,
-  primeFactorization,
-  convertBase,
-  bitwiseOp
-} from './tools/number-theory.js';
+import { primeFactorization, convertBase, bitwiseOperation } from './tools/number-theory.js';
+import { compoundInterest, loanSchedule, convertRate } from './tools/finance.js';
+import { sampleFunction, niceStep } from './tools/graphing.js';
 import { UNIT_CATEGORIES, convertUnit } from './unit-conversions.js';
 import { DEFAULT_PREFERENCES, StorageManager } from './storage.js';
 import { HistoryManager } from './history.js';
 import { TRANSLATIONS } from './i18n.js';
 
+const APP_VERSION = '2.0.0';
+
 // --- tests/math-tests.js ---
 /**
- * Scientific Calculator Pro — Mandatory Mathematical & Expert Suite Tests (25+ Scenarios)
+ * Scientific Calculator Pro — In-browser mathematical & expert suite tests
  */
 
 function runMathTests() {
@@ -71,35 +70,23 @@ function runMathTests() {
     results.push({ id, name, pass, expected: expectedCode, actual: actualCode });
   }
 
-  // 1. 2 + 2 = 4
   assertApprox(1, 'Basic addition: 2 + 2 = 4', engine.evaluate('2 + 2'), 4);
-  // 2. 2 + 3 × 4 = 14
   assertApprox(2, 'Operator precedence: 2 + 3 × 4 = 14', engine.evaluate('2 + 3 × 4'), 14);
-  // 3. (2 + 3) × 4 = 20
   assertApprox(3, 'Parentheses precedence: (2 + 3) × 4 = 20', engine.evaluate('(2 + 3) × 4'), 20);
-  // 4. 2^10 = 1024
   assertApprox(4, 'Exponentiation: 2^10 = 1024', engine.evaluate('2^10'), 1024);
-  // 5. √81 = 9
   assertApprox(5, 'Square root: √81 = 9', engine.evaluate('√81'), 9);
-  // 6. log10(1000) = 3
   assertApprox(6, 'Base-10 logarithm: log10(1000) = 3', engine.evaluate('log10(1000)'), 3);
-  // 7. ln(e) = 1
   assertApprox(7, 'Natural logarithm: ln(e) = 1', engine.evaluate('ln(e)'), 1);
-  // 8. sin(30°) = 0.5
   engine.setAngleMode('DEG');
   assertApprox(8, 'Trigonometry in DEG: sin(30) = 0.5', engine.evaluate('sin(30)'), 0.5);
-  // 9. cos(60°) = 0.5
   assertApprox(9, 'Trigonometry in DEG: cos(60) = 0.5', engine.evaluate('cos(60)'), 0.5);
-  // 10. Angle mode change DEG -> RAD -> GRAD
   engine.setAngleMode('RAD');
   const sinPi2 = engine.evaluate('sin(pi / 2)');
   engine.setAngleMode('GRAD');
   const sin100Grad = engine.evaluate('sin(100)');
   engine.setAngleMode('DEG');
   assertEqual(10, 'Angle mode switching DEG -> RAD -> GRAD', [sinPi2, sin100Grad], [1, 1]);
-  // 11. Percentage conversion 25% -> 0.25 and contextual 200 + 10% = 220
   assertEqual(11, 'Percentage: 25% = 0.25 and 200 + 10% = 220', [engine.evaluate('25%'), engine.evaluate('200 + 10%')], [0.25, 220]);
-  // 12. Memory operations MS, M+, M-, MR, MC
   engine.memoryClear();
   engine.memoryStore(10);
   engine.memoryAdd(5);
@@ -107,33 +94,21 @@ function runMathTests() {
   const memRecalled = engine.memoryRecall();
   engine.memoryClear();
   assertEqual(12, 'Memory lifecycle (MS 10, M+ 5, M- 3 -> MR = 12, MC = 0)', [memRecalled, engine.memoryRecall()], [12, 0]);
-  // 13. Division by zero handling
   assertThrowsCode(13, 'Division by zero error handling', () => engine.evaluate('15 / 0'), 'ERR_DIV_ZERO');
-  // 14. Logarithm of negative number in real mode
   assertThrowsCode(14, 'Logarithm of negative number error handling', () => engine.evaluate('ln(-5)'), 'ERR_LOG_DOMAIN');
-  // 15. Unclosed parentheses error handling
   assertThrowsCode(15, 'Unclosed parentheses error handling', () => engine.evaluate('(2 + 3 * (4 - 1)'), 'ERR_UNCLOSED_PAREN');
-  // 16. Disallowed characters error handling
   assertThrowsCode(16, 'Invalid character error handling', () => engine.evaluate('2 + $3'), 'ERR_INVALID_CHAR');
-  // 20. Matrix multiplication with valid dimensions
   const matProd = matrixMultiply([[1, 2], [3, 4]], [[5, 6], [7, 8]]);
   assertEqual(20, 'Matrix multiplication [[1,2],[3,4]] × [[5,6],[7,8]]', matProd, [[19, 22], [43, 50]]);
-  // 21. Singular matrix inversion error
   assertThrowsCode(21, 'Singular matrix inversion error handling', () => matrixInverse([[1, 2], [2, 4]]), 'ERR_SINGULAR_MATRIX');
-  // 22. Statistics mean and standard deviation with reference dataset
   const stats = analyzeDataset([2, 4, 4, 4, 5, 5, 7, 9]);
   assertEqual(22, 'Statistics reference dataset (mean=5, popStdDev=2, median=4.5, mode=[4])', [stats.mean, stats.popStdDev, stats.median, stats.modes], [5, 2, 4.5, [4]]);
-  // 23. Numerical equation solver on known equation x^2 - 9 = 0 in [0, 5]
   const eqSol = solveEquation({ expression: 'x^2 - 9', variable: 'x', method: 'bisection', a: 0, b: 5, tolerance: 1e-8 });
   assertApprox(23, 'Numerical equation solver: x^2 - 9 = 0 on [0, 5] -> 3', eqSol.root, 3, 1e-6);
-  // 24. Numerical derivative of x^2 at x = 3 -> 6
   const deriv = numericalDerivative({ expression: 'x^2', variable: 'x', x0: 3 });
   assertApprox(24, 'Numerical derivative of x^2 at x = 3 -> 6', deriv.value, 6, 1e-8);
-  // 25. Numerical definite integral of x^2 on [0, 3] -> 9
   const integ = numericalIntegral({ expression: 'x^2', variable: 'x', a: 0, b: 3, tolerance: 1e-8 });
   assertApprox(25, 'Numerical definite integral of x^2 on [0, 3] -> 9', integ.value, 9, 1e-6);
-
-  // Additional Regression & Advanced Verification Tests (26-30)
   assertApprox(26, 'IEEE 754 cleanup: 0.1 + 0.2 = 0.3 exact', engine.evaluate('0.1 + 0.2'), 0.3, 0);
   assertApprox(27, 'Implicit multiplication & nested groups: 2(3 + 4(1 + 1)) = 22', engine.evaluate('2(3 + 4(1 + 1))'), 22);
   const cMul = Complex.mul(new Complex(3, 2), new Complex(1, 4));
@@ -142,27 +117,50 @@ function runMathTests() {
   const pf = primeFactorization(360);
   assertEqual(30, 'Prime factorization of 360 = 2^3 × 3^2 × 5 & fraction 0.75 = 3/4', [pf.formatted, decimalToFraction(0.75).str], ['2^3 × 3^2 × 5', '3/4']);
 
+  // v2 features
+  const varEngine = new CalculatorEngine({ angleMode: 'RAD' });
+  varEngine.run('r = 2');
+  assertApprox(31, 'Variables: r = 2 then π r^2 = 4π', varEngine.run('π r^2').value, 4 * Math.PI, 1e-9);
+  assertThrowsCode(32, 'Variables: reserved names are rejected (sin = 3)', () => varEngine.run('sin = 3'), 'ERR_RESERVED_NAME');
+  assertApprox(33, 'Physical constants: NA × kB = R', engine.evaluate('NA kB'), 8.31446261815, 1e-9);
+  const f = compileExpression('x^2 - 4', { variable: 'x' });
+  const plot = sampleFunction('x^2 - 4', { xMin: -5, xMax: 5, samples: 200 });
+  assertEqual(34, 'Plotter: compiled f(3) = 5 and roots of x^2 - 4 are ±2', [f(3), plot.roots.map(Math.round).sort((a, b) => a - b)], [5, [-2, 2]]);
+  const price = loanSchedule({ amount: 10000, ratePercent: 1, periods: 12, system: 'price' });
+  assertApprox(35, 'Finance: Price installment for 10 000 at 1% × 12 = 888.49', Math.round(price.firstPayment * 100) / 100, 888.49, 1e-9);
+  const ci = compoundInterest({ principal: 1000, ratePercent: 10, periods: 2 });
+  assertApprox(36, 'Finance: compound interest 1000 at 10% for 2 periods = 1210', ci.futureValue, 1210, 1e-9);
+
   return results;
 }
+
 // --- tests/localization-tests.js ---
 /**
- * Scientific Calculator Pro — Localization, Regional Formatting, Storage & History Tests (Scenarios 17, 18, 19)
+ * Scientific Calculator Pro — Localization, formatting, storage & history tests.
+ * Runs against an isolated in-memory store so it never touches the user's saved data.
  */
+
+function createMemoryStore() {
+  const data = new Map();
+  return {
+    getItem: (key) => (data.has(key) ? data.get(key) : null),
+    setItem: (key, value) => data.set(key, String(value)),
+    removeItem: (key) => data.delete(key)
+  };
+}
 
 function runLocalizationAndStateTests() {
   const results = [];
   const engine = new CalculatorEngine();
 
-  // 17. Regional formatting and comma decimal input across all 6 languages
   const formattedPerLocale = {};
   let allLocalesValid = true;
   for (const loc of SUPPORTED_LOCALES) {
     const str = formatResult(12345.67, { locale: loc, precisionMode: 'fixed', decimalPlaces: 2 });
     formattedPerLocale[loc] = str;
     if (!str || typeof str !== 'string') allLocalesValid = false;
-    // Also verify all 6 translation dictionaries have required sections
     const dict = TRANSLATIONS[loc];
-    if (!dict || !dict.modes || !dict.themes || !dict.errors || !dict.expertTabs) {
+    if (!dict || !dict.modes || !dict.themes || !dict.errors || !dict.expertTabs || !dict.lab || !dict.constants) {
       allLocalesValid = false;
     }
   }
@@ -176,51 +174,42 @@ function runLocalizationAndStateTests() {
     actual: `Locales OK=${allLocalesValid}, commaSum=${valComma}, pt-BR=${formattedPerLocale['pt-BR']}, en=${formattedPerLocale.en}`
   });
 
-  // 18. Persistence of theme and language + corrupted local data recovery
-  const storage = new StorageManager();
+  const memStore = createMemoryStore();
+  const storage = new StorageManager(memStore);
   storage.savePreferences({ locale: 'fr', theme: 'emerald', mode: 'expert', angleMode: 'RAD' });
   const loaded = storage.loadPreferences();
-  // Simulate corrupted data
-  storage.memoryFallback.set('scp_preferences_v1', '{corrupted_json');
+  memStore.setItem('scp_preferences_v1', '{corrupted_json');
   const recovered = storage.loadPreferences();
-  const pass18 = loaded.locale === 'fr' && loaded.theme === 'emerald' && recovered.locale === 'pt-BR';
   results.push({
     id: 18,
     name: 'Persistence of theme & language + corrupted storage fallback recovery',
-    pass: pass18,
-    expected: 'Saved (fr, emerald) & recovered (pt-BR)',
+    pass: loaded.locale === 'fr' && loaded.theme === 'emerald' && recovered.locale === DEFAULT_PREFERENCES.locale,
+    expected: `Saved (fr, emerald) & recovered (${DEFAULT_PREFERENCES.locale})`,
     actual: `Saved=(${loaded.locale}, ${loaded.theme}), Recovered=(${recovered.locale})`
   });
 
-  // 19. History addition, retrieval, search, and deletion
   const hist = new HistoryManager(storage, 50);
-  hist.clearAll();
   const item1 = hist.addEntry({ expression: '2 + 3 * 4', result: 14, mode: 'simple', angleMode: 'DEG' });
-  const item2 = hist.addEntry({ expression: 'sin(30)', result: 0.5, mode: 'intermediate', angleMode: 'DEG' });
+  hist.addEntry({ expression: 'sin(30)', result: 0.5, mode: 'intermediate', angleMode: 'DEG' });
   const retrieved = hist.getEntry(item1.id);
   const searchSin = hist.search('sin');
   hist.removeEntry(item1.id);
   const countAfterDelete = hist.items.length;
   hist.clearAll();
-  const pass19 =
-    retrieved &&
-    retrieved.result === 14 &&
-    searchSin.length === 1 &&
-    countAfterDelete === 1 &&
-    hist.items.length === 0;
   results.push({
     id: 19,
     name: 'Calculation history add, retrieve, search, delete, and clear',
-    pass: pass19,
+    pass: retrieved && retrieved.result === 14 && searchSin.length === 1 && countAfterDelete === 1 && hist.items.length === 0,
     expected: 'retrieved=14, search=1, afterDelete=1, afterClear=0',
     actual: `retrieved=${retrieved?.result}, search=${searchSin.length}, afterDelete=${countAfterDelete}, afterClear=${hist.items.length}`
   });
 
   return results;
 }
+
 // --- UI Controller ---
 /**
- * Scientific Calculator Pro — Complete Interactive UI Controller
+ * Scientific Calculator Pro v2 — Interactive UI Controller
  */
 
 function createAudioFeedback() {
@@ -247,68 +236,111 @@ function createAudioFeedback() {
   };
 }
 
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function hexLuminance(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+  if (!m) return 0;
+  const n = parseInt(m[1], 16);
+  const channel = (c) => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  };
+  return 0.2126 * channel((n >> 16) & 255) + 0.7152 * channel((n >> 8) & 255) + 0.0722 * channel(n & 255);
+}
+
+const OPERATOR_START = /^[+\-×÷*/^%!]|^\^|^ mod /;
+const TRIG_LABEL_KEYS = { sin: 'trigSin', cos: 'trigCos', tan: 'trigTan', asin: 'trigAsin', acos: 'trigAcos', atan: 'trigAtan' };
+
 function bootstrapApp() {
   const state = new AppState();
   const playBeep = createAudioFeedback();
+  const $ = (id) => document.getElementById(id);
 
   // Matrix state in UI
-  let matADims = { rows: 2, cols: 2 };
-  let matBDims = { rows: 2, cols: 2 };
-  let matAData = [[1, 2], [3, 4]];
-  let matBData = [[5, 6], [7, 8]];
-  let vecBData = [5, 11];
+  const matADims = { rows: 2, cols: 2 };
+  const matBDims = { rows: 2, cols: 2 };
+  const matAData = [[1, 2], [3, 4]];
+  const matBData = [[5, 6], [7, 8]];
+
+  // Keypad layers, caret & history navigation
+  let layer2nd = false;
+  let layerHyp = false;
+  let caret = null; // null = end of expression
+  let justEvaluated = false;
+  let historyCursor = -1;
 
   // DOM Elements
-  const shellEl = document.getElementById('scp-app-shell');
-  const titleEl = document.getElementById('scp-app-title');
-  const subtitleEl = document.getElementById('scp-app-subtitle');
-  const exprInput = document.getElementById('calc-expression-input');
-  const resultDisplay = document.getElementById('calc-result-display');
-  const fractionBadge = document.getElementById('calc-fraction-badge');
-  const errorBanner = document.getElementById('calc-error-banner');
-  const badgeMode = document.getElementById('badge-active-mode');
-  const badgeAngle = document.getElementById('badge-active-angle');
-  const badgeMemory = document.getElementById('badge-memory-val');
-  const badgeAns = document.getElementById('badge-ans-val');
-  const sciGrid = document.getElementById('scp-scientific-keypad');
-  const decimalKeyBtn = document.getElementById('key-decimal-sep');
+  const shellEl = $('scp-app-shell');
+  const titleEl = $('scp-app-title');
+  const subtitleEl = $('scp-app-subtitle');
+  const exprInput = $('calc-expression-input');
+  const previewEl = $('calc-preview');
+  const resultDisplay = $('calc-result-display');
+  const fractionBadge = $('calc-fraction-badge');
+  const errorBanner = $('calc-error-banner');
+  const badgeMode = $('badge-active-mode');
+  const badgeAngle = $('badge-active-angle');
+  const badgeMemory = $('badge-memory-val');
+  const badgeAns = $('badge-ans-val');
+  const sciGrid = $('scp-scientific-keypad');
+  const decimalKeyBtn = $('key-decimal-sep');
+  const variablesStrip = $('variables-strip');
 
-  const langSelect = document.getElementById('select-locale');
-  const themeSelect = document.getElementById('select-theme');
-  const viewportSelect = document.getElementById('select-viewport');
+  const langSelect = $('select-locale');
+  const themeSelect = $('select-theme');
+  const viewportSelect = $('select-viewport');
 
-  const historyTabBtn = document.getElementById('tab-btn-history');
-  const expertTabBtn = document.getElementById('tab-btn-expert');
-  const historyPanel = document.getElementById('panel-history');
-  const expertPanel = document.getElementById('panel-expert');
-  const historySearchInput = document.getElementById('input-history-search');
-  const historyListEl = document.getElementById('history-list-container');
-  const clearHistoryBtn = document.getElementById('btn-clear-history');
+  const historyTabBtn = $('tab-btn-history');
+  const expertTabBtn = $('tab-btn-expert');
+  const libraryTabBtn = $('tab-btn-library');
+  const historyPanel = $('panel-history');
+  const expertPanel = $('panel-expert');
+  const libraryPanel = $('panel-library');
+  const historySearchInput = $('input-history-search');
+  const historyListEl = $('history-list-container');
+  const clearHistoryBtn = $('btn-clear-history');
 
-  const toastEl = document.getElementById('scp-toast');
+  const toastEl = $('scp-toast');
   let toastTimer = null;
+
+  const t = (key, fallback) => state.i18n.t(key, fallback);
+  const tf = (key, params = {}) => String(t(key)).replace(/\{(\w+)\}/g, (_, k) => (params[k] !== undefined ? params[k] : `{${k}}`));
+  const fmt = (v, extra = {}) => (v === null || v === undefined ? '—' : formatResult(v, { locale: state.preferences.locale, ...extra }));
+  // Lab result cards favour readability over full precision
+  const fmtLab = (v) => fmt(v, { maxFractionDigits: 6 });
+  const SUPER_DIGITS = { '⁻': '-', '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9' };
+  // Escapes a formatted number and renders "× 10⁻³⁴" exponents as <sup> (monospace fonts lack most superscript glyphs)
+  const numHtml = (text) => escapeHtml(text).replace(/× 10([⁻⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g, (_, exp) => `× 10<sup>${exp.replace(/./g, (ch) => SUPER_DIGITS[ch])}</sup>`);
+
+  // Remember the factory labels of dual-layer keys
+  document.querySelectorAll('[data-insert-2nd]').forEach(btn => {
+    btn.dataset.label1st = btn.textContent;
+  });
 
   function showToast(msg) {
     if (!toastEl) return;
     toastEl.textContent = msg;
     toastEl.classList.remove('hidden');
     if (toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => {
-      toastEl.classList.add('hidden');
-    }, 2400);
+    toastTimer = setTimeout(() => toastEl.classList.add('hidden'), 2400);
   }
 
-  function copyTextToClipboard(text) {
+  function copyTextToClipboard(text, message = t('labels.copied')) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(String(text)).then(() => {
-        showToast(state.i18n.t('labels.copied'));
-      }).catch(() => fallbackCopy(text));
+      navigator.clipboard.writeText(String(text)).then(() => showToast(message)).catch(() => fallbackCopy(text, message));
     } else {
-      fallbackCopy(text);
+      fallbackCopy(text, message);
     }
   }
 
-  function fallbackCopy(text) {
+  function fallbackCopy(text, message) {
     const ta = document.createElement('textarea');
     ta.value = String(text);
     ta.style.position = 'fixed';
@@ -317,28 +349,120 @@ function bootstrapApp() {
     ta.select();
     try {
       document.execCommand('copy');
-      showToast(state.i18n.t('labels.copied'));
+      showToast(message);
     } catch (_) {}
     document.body.removeChild(ta);
   }
 
+  function downloadFile(filename, content, mime) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function openModal(id) {
+    const el = $(id);
+    if (!el) return;
+    el.classList.remove('hidden');
+    const focusable = el.querySelector('button, input, select, textarea');
+    if (focusable) focusable.focus();
+  }
+
+  function closeModal(el) {
+    if (el) el.classList.add('hidden');
+  }
+
+  // ==================== THEME, VIEWPORT & LAYOUT ====================
   function applyTheme() {
     const theme = state.preferences.theme || 'ocean';
-    document.documentElement.setAttribute('data-theme', theme);
-    if (state.preferences.customAccent) {
-      document.documentElement.style.setProperty('--color-primary', state.preferences.customAccent);
+    const root = document.documentElement;
+    root.setAttribute('data-theme', theme);
+    const accent = state.preferences.customAccent;
+    if (accent) {
+      root.style.setProperty('--color-primary', accent);
+      root.style.setProperty('--color-on-primary', hexLuminance(accent) > 0.45 ? '#0b1020' : '#ffffff');
     } else {
-      document.documentElement.style.removeProperty('--color-primary');
+      root.style.removeProperty('--color-primary');
+      root.style.removeProperty('--color-on-primary');
     }
     if (themeSelect) themeSelect.value = theme;
+    const accentInput = $('setting-custom-accent');
+    if (accentInput) {
+      accentInput.value = accent || toHexColor(getComputedStyle(root).getPropertyValue('--color-primary')) || '#38bdf8';
+    }
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.setAttribute('content', getComputedStyle(root).getPropertyValue('--color-background').trim() || '#0b1020');
+    requestGraphRender();
+  }
+
+  function toHexColor(value) {
+    const v = String(value || '').trim();
+    return /^#[0-9a-f]{6}$/i.test(v) ? v : '';
   }
 
   function applyViewportMode() {
     if (!shellEl) return;
     shellEl.classList.toggle('viewport-mobile', state.viewportMode === 'mobile');
     if (viewportSelect) viewportSelect.value = state.viewportMode;
+    requestGraphRender();
   }
 
+  function setMobileView(view) {
+    state.mobileView = view;
+    if (shellEl) shellEl.setAttribute('data-mobile-view', view);
+    document.querySelectorAll('[data-mobile-nav]').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-mobile-nav') === view);
+    });
+    if (view !== 'calc') setSideTab(view);
+    window.scrollTo({ top: 0 });
+  }
+
+  function setSideTab(tabName) {
+    const valid = ['history', 'expert', 'library'];
+    const tab = valid.includes(tabName) ? tabName : 'history';
+    state.sideTab = tab;
+    if (historyTabBtn) historyTabBtn.classList.toggle('active', tab === 'history');
+    if (expertTabBtn) expertTabBtn.classList.toggle('active', tab === 'expert');
+    if (libraryTabBtn) libraryTabBtn.classList.toggle('active', tab === 'library');
+    if (historyPanel) historyPanel.classList.toggle('hidden', tab !== 'history');
+    if (expertPanel) expertPanel.classList.toggle('hidden', tab !== 'expert');
+    if (libraryPanel) libraryPanel.classList.toggle('hidden', tab !== 'library');
+    if (state.mobileView !== 'calc' && state.mobileView !== tab) {
+      state.mobileView = tab;
+      if (shellEl) shellEl.setAttribute('data-mobile-view', tab);
+      document.querySelectorAll('[data-mobile-nav]').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-mobile-nav') === tab);
+      });
+    }
+    if (tab === 'expert') requestGraphRender();
+  }
+
+  function setExpertCategory(catKey) {
+    const exists = document.querySelector(`[data-expert-section="${catKey}"]`);
+    const key = exists ? catKey : 'graph';
+    state.expertCategory = key;
+    document.querySelectorAll('[data-expert-tab]').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-expert-tab') === key);
+    });
+    document.querySelectorAll('[data-expert-section]').forEach(sec => {
+      sec.classList.toggle('hidden', sec.getAttribute('data-expert-section') !== key);
+    });
+    if (key === 'graph') requestGraphRender();
+  }
+
+  function updateModeLayout() {
+    const mode = state.preferences.mode;
+    if (sciGrid) sciGrid.classList.toggle('hidden', mode === 'simple');
+    if (mode === 'expert' && state.sideTab !== 'expert') setSideTab('expert');
+  }
+
+  // ==================== DISPLAY ====================
   function showError(err) {
     state.errorCode = err && err.code ? err.code : 'ERR_SYNTAX';
     if (errorBanner) {
@@ -362,7 +486,6 @@ function bootstrapApp() {
 
     if (exprInput && document.activeElement !== exprInput) {
       exprInput.value = state.expression;
-      exprInput.placeholder = state.i18n.t('labels.expression');
     }
 
     const formattedRes = formatResult(state.lastResult, {
@@ -372,90 +495,109 @@ function bootstrapApp() {
       scientificNotation: prefs.scientificNotation,
       showFraction: prefs.showFraction
     });
-    if (resultDisplay) resultDisplay.textContent = formattedRes;
-
-    // Show rational fraction badge whenever a non-integer rational representation exists
-    if (fractionBadge) {
-      const frac = decimalToFraction(state.lastResult);
-      if (frac && !frac.isInteger) {
-        fractionBadge.textContent = `≈ ${frac.str}`;
-      } else {
-        fractionBadge.textContent = '';
-      }
+    if (resultDisplay && resultDisplay.dataset.value !== formattedRes) {
+      resultDisplay.dataset.value = formattedRes;
+      resultDisplay.innerHTML = numHtml(formattedRes);
+      resultDisplay.classList.toggle('long', formattedRes.length > 13);
+      resultDisplay.classList.toggle('very-long', formattedRes.length > 20);
+      resultDisplay.classList.remove('flash');
+      void resultDisplay.offsetWidth;
+      resultDisplay.classList.add('flash');
     }
 
-    if (badgeMode) badgeMode.textContent = state.i18n.t(`modes.${prefs.mode}`);
+    if (fractionBadge) {
+      const frac = prefs.showFraction ? null : decimalToFraction(state.lastResult, 10000);
+      fractionBadge.textContent = frac && !frac.isInteger ? `= ${frac.str}` : '';
+    }
+
+    if (badgeMode) badgeMode.textContent = t(`modes.${prefs.mode}`);
     if (badgeAngle) badgeAngle.textContent = prefs.angleMode;
     if (badgeMemory) {
-      const memFmt = formatResult(state.engine.memory, { locale: prefs.locale });
-      badgeMemory.textContent = `M: ${memFmt}`;
+      badgeMemory.textContent = `M: ${fmt(state.engine.memory)}`;
       badgeMemory.classList.toggle('active-toggle', state.engine.memory !== 0);
     }
-    if (badgeAns) {
-      const ansFmt = formatResult(state.engine.ans, { locale: prefs.locale });
-      badgeAns.textContent = `ans: ${ansFmt}`;
-    }
+    if (badgeAns) badgeAns.textContent = `ans: ${fmt(state.engine.ans)}`;
 
-    const btnFrac = document.getElementById('btn-toggle-fraction');
+    const btnFrac = $('btn-toggle-fraction');
     if (btnFrac) btnFrac.classList.toggle('active-toggle', Boolean(prefs.showFraction));
-    const btnSci = document.getElementById('btn-toggle-sci');
+    const btnSci = $('btn-toggle-sci');
     if (btnSci) btnSci.classList.toggle('active-toggle', Boolean(prefs.scientificNotation));
+
+    updatePreview();
   }
 
+  function updatePreview() {
+    if (!previewEl) return;
+    const expr = state.expression.trim();
+    if (!state.preferences.livePreview || !expr || justEvaluated) {
+      previewEl.textContent = '';
+      return;
+    }
+    try {
+      const value = state.engine.preview(expr, { angleMode: state.preferences.angleMode });
+      const formatted = fmt(value, {
+        precisionMode: state.preferences.precisionMode,
+        decimalPlaces: state.preferences.decimalPlaces,
+        scientificNotation: state.preferences.scientificNotation
+      });
+      previewEl.innerHTML = `= ${numHtml(formatted)}`;
+    } catch (_) {
+      previewEl.textContent = '';
+    }
+  }
+
+  function setExpression(expr, newCaret = null) {
+    state.expression = expr;
+    justEvaluated = false;
+    caret = newCaret;
+    if (exprInput) {
+      exprInput.value = expr;
+      if (document.activeElement === exprInput) {
+        const pos = newCaret === null ? expr.length : newCaret;
+        exprInput.setSelectionRange(pos, pos);
+      }
+    }
+    updateDisplay();
+  }
+
+  function currentCaret() {
+    const len = state.expression.length;
+    if (caret === null || caret > len) return len;
+    return caret;
+  }
+
+  // ==================== TRANSLATIONS ====================
   function applyTranslations() {
-    const t = (k) => state.i18n.t(k);
-    if (titleEl) titleEl.textContent = t('appTitle');
+    document.documentElement.lang = state.preferences.locale;
+    if (titleEl && titleEl.firstChild) titleEl.firstChild.nodeValue = `${t('appTitle')} `;
     if (subtitleEl) subtitleEl.textContent = t('appSubtitle');
     if (langSelect) langSelect.value = state.preferences.locale;
 
-    // Mode buttons
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      el.textContent = t(el.getAttribute('data-i18n'));
+    });
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+      const text = t(el.getAttribute('data-i18n-title'));
+      el.setAttribute('title', text);
+      el.setAttribute('aria-label', text);
+    });
+
     document.querySelectorAll('[data-mode-select]').forEach(btn => {
       const m = btn.getAttribute('data-mode-select');
       btn.textContent = t(`modes.${m}`);
       btn.classList.toggle('active', state.preferences.mode === m);
     });
-    updateModeLayout();
 
-    // Angle buttons
     document.querySelectorAll('[data-angle-select]').forEach(btn => {
-      const a = btn.getAttribute('data-angle-select');
-      btn.classList.toggle('active', state.preferences.angleMode === a);
+      btn.classList.toggle('active', state.preferences.angleMode === btn.getAttribute('data-angle-select'));
     });
 
-    // Localized trig labels on buttons
-    const trigMap = {
-      'fn-sin': t('labels.trigSin'),
-      'fn-cos': t('labels.trigCos'),
-      'fn-tan': t('labels.trigTan'),
-      'fn-asin': t('labels.trigAsin'),
-      'fn-acos': t('labels.trigAcos'),
-      'fn-atan': t('labels.trigAtan')
-    };
-    Object.entries(trigMap).forEach(([id, label]) => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = label;
-    });
-
-    // Theme options text
     if (themeSelect) {
       Array.from(themeSelect.options).forEach(opt => {
         opt.textContent = t(`themes.${opt.value}`);
       });
     }
 
-    // Header & Side Tabs
-    if (historyTabBtn) historyTabBtn.textContent = t('labels.history');
-    if (expertTabBtn) expertTabBtn.textContent = t('labels.expertTools');
-    const openTestsBtn = document.getElementById('btn-open-tests');
-    if (openTestsBtn) openTestsBtn.textContent = t('labels.tests');
-    const openPromptBtn = document.getElementById('btn-open-prompt');
-    if (openPromptBtn) openPromptBtn.textContent = t('labels.masterPrompt');
-    const openSettingsBtn = document.getElementById('btn-open-settings');
-    if (openSettingsBtn) openSettingsBtn.textContent = t('labels.settings');
-    const openHelpBtn = document.getElementById('btn-open-help');
-    if (openHelpBtn) openHelpBtn.textContent = t('labels.help');
-
-    // Expert Subtabs
     document.querySelectorAll('[data-expert-tab]').forEach(btn => {
       const key = btn.getAttribute('data-expert-tab');
       btn.textContent = t(`expertTabs.${key}`);
@@ -463,14 +605,12 @@ function bootstrapApp() {
     });
 
     if (historySearchInput) historySearchInput.placeholder = t('labels.searchHistory');
-    if (clearHistoryBtn) {
-      clearHistoryBtn.textContent = state.confirmingClearHistory
-        ? t('labels.confirmClearHistory')
-        : t('labels.clearHistory');
-    }
+    const constSearch = $('input-constants-search');
+    if (constSearch) constSearch.placeholder = t('library.filter');
+    if (exprInput) exprInput.placeholder = t('labels.expression');
+    updateClearHistoryButton();
 
-    // Populate unit category selector with translated names
-    const unitCatSelect = document.getElementById('unit-category-select');
+    const unitCatSelect = $('unit-category-select');
     if (unitCatSelect) {
       const currentVal = unitCatSelect.value || 'length';
       unitCatSelect.innerHTML = '';
@@ -483,98 +623,124 @@ function bootstrapApp() {
       unitCatSelect.value = currentVal;
     }
 
-    if (state.errorCode) {
-      showError({ code: state.errorCode });
-    }
+    if (state.errorCode) showError({ code: state.errorCode });
 
+    updateKeypadLayers();
     updateModeLayout();
     updateDisplay();
     renderHistoryList();
+    renderLibrary();
+    renderVariablesStrip();
+    rerunLabs();
   }
 
-  function updateModeLayout() {
-    const mode = state.preferences.mode;
-    if (sciGrid) {
-      sciGrid.classList.toggle('hidden', mode === 'simple');
-    }
-    if (mode === 'expert' && state.sideTab !== 'expert') {
-      setSideTab('expert');
-    }
+  // ==================== KEYPAD ====================
+  function trigFunctionName(base) {
+    let name = base;
+    if (layer2nd) name = `a${name}`;
+    if (layerHyp) name = `${name}h`;
+    return name;
   }
 
-  function setSideTab(tabName) {
-    state.sideTab = tabName;
-    if (historyTabBtn) historyTabBtn.classList.toggle('active', tabName === 'history');
-    if (expertTabBtn) expertTabBtn.classList.toggle('active', tabName === 'expert');
-    if (historyPanel) historyPanel.classList.toggle('hidden', tabName !== 'history');
-    if (expertPanel) expertPanel.classList.toggle('hidden', tabName !== 'expert');
-  }
+  function updateKeypadLayers() {
+    if (!sciGrid) return;
+    sciGrid.classList.toggle('layer-2nd', layer2nd);
+    sciGrid.classList.toggle('layer-hyp', layerHyp);
+    const k2 = $('key-2nd');
+    const kh = $('key-hyp');
+    if (k2) k2.setAttribute('aria-pressed', String(layer2nd));
+    if (kh) kh.setAttribute('aria-pressed', String(layerHyp));
 
-  function setExpertCategory(catKey) {
-    state.expertCategory = catKey;
-    document.querySelectorAll('[data-expert-tab]').forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-expert-tab') === catKey);
+    sciGrid.querySelectorAll('[data-trig]').forEach(btn => {
+      const name = trigFunctionName(btn.getAttribute('data-trig'));
+      btn.textContent = TRIG_LABEL_KEYS[name] ? t(`labels.${TRIG_LABEL_KEYS[name]}`) : name;
     });
-    document.querySelectorAll('[data-expert-section]').forEach(sec => {
-      sec.classList.toggle('hidden', sec.getAttribute('data-expert-section') !== catKey);
+    sciGrid.querySelectorAll('[data-insert-2nd]').forEach(btn => {
+      btn.textContent = layer2nd ? btn.getAttribute('data-label-2nd') : btn.dataset.label1st;
     });
+    const gcdKey = $('fn-gcd');
+    if (gcdKey && !layer2nd) gcdKey.textContent = state.preferences.locale === 'pt-BR' ? 'MDC' : 'gcd';
+    if (gcdKey && layer2nd) gcdKey.textContent = state.preferences.locale === 'pt-BR' ? 'MMC' : 'lcm';
+  }
+
+  function releaseLayers() {
+    if (layer2nd || layerHyp) {
+      layer2nd = false;
+      layerHyp = false;
+      updateKeypadLayers();
+    }
   }
 
   function insertIntoExpression(token) {
     if (state.preferences.soundEnabled) playBeep(540);
     clearError();
-    if (token === '.') {
-      const { decimal } = getLocaleSeparators(state.preferences.locale);
-      state.expression += decimal;
-    } else {
-      state.expression += token;
+    historyCursor = -1;
+    let text = token;
+    if (token === '.') text = getLocaleSeparators(state.preferences.locale).decimal;
+
+    let expr = state.expression;
+    let pos = currentCaret();
+    if (justEvaluated) {
+      justEvaluated = false;
+      if (OPERATOR_START.test(text)) {
+        expr = 'ans';
+      } else {
+        expr = '';
+      }
+      pos = expr.length;
     }
-    if (exprInput) exprInput.value = state.expression;
-    updateDisplay();
+    const next = expr.slice(0, pos) + text + expr.slice(pos);
+    const newPos = pos + text.length;
+    setExpression(next, newPos === next.length ? null : newPos);
   }
 
   function handleClearAll() {
     if (state.preferences.soundEnabled) playBeep(340);
     clearError();
-    state.expression = '';
+    justEvaluated = false;
+    historyCursor = -1;
     state.lastResult = 0;
-    if (exprInput) exprInput.value = '';
-    updateDisplay();
+    setExpression('');
   }
 
   function handleClearEntry() {
     if (state.preferences.soundEnabled) playBeep(380);
     clearError();
-    // Remove last number or identifier token from expression
-    state.expression = state.expression.replace(/([a-zA-Z0-9.,_]+|\s*[+\-*/^×÷]\s*)$/, '').trimEnd();
-    if (exprInput) exprInput.value = state.expression;
-    updateDisplay();
+    justEvaluated = false;
+    setExpression(state.expression.replace(/([a-zA-Z0-9.,_π]+|\s*[+\-*/^×÷]\s*)$/, '').trimEnd());
   }
 
   function handleBackspace() {
     if (state.preferences.soundEnabled) playBeep(410);
     clearError();
-    state.expression = state.expression.slice(0, -1);
-    if (exprInput) exprInput.value = state.expression;
-    updateDisplay();
+    justEvaluated = false;
+    const pos = currentCaret();
+    if (pos === 0) return;
+    const before = state.expression.slice(0, pos);
+    const after = state.expression.slice(pos);
+    const fnMatch = before.match(/[a-zA-Z]+\($/) || before.match(/ mod $/);
+    const cut = fnMatch ? fnMatch[0].length : 1;
+    const next = before.slice(0, -cut) + after;
+    const newPos = pos - cut;
+    setExpression(next, newPos === next.length ? null : newPos);
   }
 
   function handleToggleSign() {
     clearError();
-    if (!state.expression.trim()) {
+    const expr = state.expression.trim();
+    if (!expr || justEvaluated) {
+      justEvaluated = false;
       if (state.lastResult !== 0) {
         state.lastResult = -state.lastResult;
-        state.expression = String(state.lastResult);
+        setExpression(String(state.lastResult));
       } else {
-        state.expression = '-';
+        setExpression('-');
       }
-    } else if (state.expression.startsWith('-(') && state.expression.endsWith(')')) {
-      state.expression = state.expression.slice(2, -1);
+    } else if (expr.startsWith('-(') && expr.endsWith(')')) {
+      setExpression(expr.slice(2, -1));
     } else {
-      state.expression = `-(${state.expression})`;
+      setExpression(`-(${expr})`);
     }
-    if (exprInput) exprInput.value = state.expression;
-    updateDisplay();
   }
 
   function handleCalculate() {
@@ -582,16 +748,18 @@ function bootstrapApp() {
     clearError();
     const raw = exprInput ? exprInput.value.trim() : state.expression.trim();
     state.expression = raw;
+    historyCursor = -1;
 
     try {
       let res;
-      if (!raw && state.engine.lastAction) {
+      let assigned = null;
+      if ((!raw || justEvaluated) && state.engine.lastAction) {
         res = state.engine.repeatLast(state.lastResult);
         state.expression = `${state.lastResult} ${state.engine.lastAction}`;
       } else {
-        res = state.engine.evaluate(raw, {
-          angleMode: state.preferences.angleMode
-        });
+        const outcome = state.engine.run(raw, { angleMode: state.preferences.angleMode });
+        res = outcome.value;
+        assigned = outcome.assigned;
       }
       state.lastResult = res;
       state.history.addEntry({
@@ -601,11 +769,60 @@ function bootstrapApp() {
         angleMode: state.preferences.angleMode,
         precisionMode: state.preferences.precisionMode
       });
+      if (assigned) {
+        state.persistEngine();
+        showToast(tf('labels.variableSaved', { name: assigned }));
+        renderVariablesStrip();
+        renderLibrary();
+      }
+      justEvaluated = true;
+      caret = null;
+      if (exprInput) exprInput.value = state.expression;
       updateDisplay();
       renderHistoryList();
     } catch (err) {
       showError(err);
     }
+  }
+
+  function navigateHistory(direction) {
+    const items = state.history.items;
+    if (items.length === 0) return;
+    historyCursor = Math.min(Math.max(historyCursor + direction, -1), items.length - 1);
+    justEvaluated = false;
+    setExpression(historyCursor === -1 ? '' : items[historyCursor].expression);
+  }
+
+  function copyResult() {
+    copyTextToClipboard(String(state.lastResult));
+  }
+
+  function shareLink() {
+    const base = window.location.href.split(/[?#]/)[0];
+    const params = new URLSearchParams();
+    const expr = state.expression.trim();
+    if (expr) params.set('expr', expr);
+    params.set('mode', state.preferences.mode);
+    params.set('angle', state.preferences.angleMode);
+    copyTextToClipboard(`${base}?${params.toString()}`, t('labels.linkCopied'));
+  }
+
+  // ==================== HISTORY ====================
+  function updateClearHistoryButton() {
+    if (!clearHistoryBtn) return;
+    clearHistoryBtn.textContent = state.confirmingClearHistory ? t('labels.confirmClearHistory') : t('labels.clearHistory');
+    clearHistoryBtn.classList.toggle('confirming', state.confirmingClearHistory);
+  }
+
+  function iconButton(icon, title, onClick, extraClass = '') {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `scp-mini-btn ${extraClass}`.trim();
+    btn.title = title;
+    btn.setAttribute('aria-label', title);
+    btn.innerHTML = `<svg class="ico"><use href="#${icon}"/></svg>`;
+    btn.addEventListener('click', onClick);
+    return btn;
   }
 
   function renderHistoryList() {
@@ -616,8 +833,8 @@ function bootstrapApp() {
 
     if (items.length === 0) {
       const empty = document.createElement('div');
-      empty.className = 'scp-result-card';
-      empty.textContent = state.i18n.t('labels.emptyHistory');
+      empty.className = 'scp-empty';
+      empty.textContent = t('labels.emptyHistory');
       historyListEl.appendChild(empty);
       return;
     }
@@ -626,168 +843,533 @@ function bootstrapApp() {
       const row = document.createElement('div');
       row.className = 'scp-history-item';
 
-      const topRow = document.createElement('div');
-      topRow.style.display = 'flex';
-      topRow.style.justifyContent = 'space-between';
-      topRow.style.fontSize = '0.73rem';
-      topRow.style.color = 'var(--color-text-muted)';
+      const meta = document.createElement('div');
+      meta.className = 'scp-history-meta';
+      const dateStr = new Date(item.timestamp).toLocaleTimeString(state.preferences.locale, { hour: '2-digit', minute: '2-digit' });
+      meta.textContent = `${dateStr} · ${t(`modes.${item.mode}`, item.mode)} · ${item.angleMode}`;
 
-      const metaSpan = document.createElement('span');
-      const dateStr = new Date(item.timestamp).toLocaleTimeString(state.preferences.locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      metaSpan.textContent = `${dateStr} • ${item.mode.toUpperCase()} • ${item.angleMode}`;
+      const exprBtn = document.createElement('button');
+      exprBtn.type = 'button';
+      exprBtn.className = 'scp-history-expr';
+      exprBtn.title = t('labels.reuse');
+      exprBtn.textContent = formatExpressionForDisplay(item.expression, state.preferences.locale);
+      exprBtn.addEventListener('click', () => {
+        justEvaluated = false;
+        state.lastResult = item.result;
+        setExpression(item.expression);
+        if (state.mobileView !== 'calc') setMobileView('calc');
+      });
 
-      const delBtn = document.createElement('button');
-      delBtn.className = 'scp-subtab-btn';
-      delBtn.textContent = state.i18n.t('labels.delete');
-      delBtn.addEventListener('click', () => {
+      const resBtn = document.createElement('button');
+      resBtn.type = 'button';
+      resBtn.className = 'scp-history-res';
+      resBtn.title = t('labels.reuse');
+      resBtn.innerHTML = `= ${numHtml(fmt(item.result))}`;
+      resBtn.addEventListener('click', () => {
+        insertIntoExpression(String(item.result));
+        if (state.mobileView !== 'calc') setMobileView('calc');
+      });
+
+      const actions = document.createElement('div');
+      actions.className = 'scp-history-actions';
+      actions.appendChild(iconButton('i-copy', t('labels.copyRes'), () => copyTextToClipboard(item.result)));
+      actions.appendChild(iconButton('i-trash', t('labels.delete'), () => {
         state.history.removeEntry(item.id);
         renderHistoryList();
-      });
+      }, 'danger'));
 
-      topRow.appendChild(metaSpan);
-      topRow.appendChild(delBtn);
-
-      const exprDiv = document.createElement('div');
-      exprDiv.className = 'tabular-nums';
-      exprDiv.style.fontSize = '0.88rem';
-      exprDiv.style.color = 'var(--color-text-muted)';
-      exprDiv.textContent = formatExpressionForDisplay(item.expression, state.preferences.locale);
-
-      const resDiv = document.createElement('div');
-      resDiv.className = 'tabular-nums';
-      resDiv.style.fontSize = '1.08rem';
-      resDiv.style.fontWeight = '700';
-      resDiv.textContent = `= ${formatResult(item.result, { locale: state.preferences.locale })}`;
-
-      const actionsRow = document.createElement('div');
-      actionsRow.style.display = 'flex';
-      actionsRow.style.flexWrap = 'wrap';
-      actionsRow.style.gap = '6px';
-
-      const btnReuseExpr = document.createElement('button');
-      btnReuseExpr.className = 'scp-subtab-btn';
-      btnReuseExpr.textContent = state.i18n.t('labels.reuse');
-      btnReuseExpr.addEventListener('click', () => {
-        state.expression = item.expression;
-        state.lastResult = item.result;
-        if (exprInput) exprInput.value = item.expression;
-        updateDisplay();
-      });
-
-      const btnCopyExpr = document.createElement('button');
-      btnCopyExpr.className = 'scp-subtab-btn';
-      btnCopyExpr.textContent = state.i18n.t('labels.copyExpr');
-      btnCopyExpr.addEventListener('click', () => copyTextToClipboard(item.expression));
-
-      const btnCopyRes = document.createElement('button');
-      btnCopyRes.className = 'scp-subtab-btn';
-      btnCopyRes.textContent = state.i18n.t('labels.copyRes');
-      btnCopyRes.addEventListener('click', () => copyTextToClipboard(item.result));
-
-      actionsRow.appendChild(btnReuseExpr);
-      actionsRow.appendChild(btnCopyExpr);
-      actionsRow.appendChild(btnCopyRes);
-
-      row.appendChild(topRow);
-      row.appendChild(exprDiv);
-      row.appendChild(resDiv);
-      row.appendChild(actionsRow);
+      row.appendChild(meta);
+      row.appendChild(actions);
+      row.appendChild(exprBtn);
+      row.appendChild(resBtn);
       historyListEl.appendChild(row);
     });
   }
 
-  // ==================== EXPERT MODULE A: COMPLEX NUMBERS ====================
-  function runComplexTool() {
-    const outEl = document.getElementById('complex-result-box');
-    if (!outEl) return;
-    try {
-      const a = Number(document.getElementById('cx-z1-re').value || 0);
-      const b = Number(document.getElementById('cx-z1-im').value || 0);
-      const c = Number(document.getElementById('cx-z2-re').value || 0);
-      const d = Number(document.getElementById('cx-z2-im').value || 0);
-      const n = Number(document.getElementById('cx-power-n').value || 2);
-      const op = document.getElementById('cx-operation').value;
-      const angleMode = state.preferences.angleMode;
+  function exportHistory(kind) {
+    const items = state.history.items;
+    const stamp = new Date().toISOString().slice(0, 10);
+    if (kind === 'json') {
+      downloadFile(`calculator-history-${stamp}.json`, JSON.stringify(items, null, 2), 'application/json');
+    } else {
+      const quote = (v) => `"${String(v).replace(/"/g, '""')}"`;
+      const lines = ['timestamp,expression,result,mode,angle'];
+      items.forEach(i => lines.push([i.timestamp, quote(i.expression), i.result, i.mode, i.angleMode].join(',')));
+      downloadFile(`calculator-history-${stamp}.csv`, lines.join('\n'), 'text/csv');
+    }
+    showToast(t('labels.exported'));
+  }
 
-      const z1 = new Complex(a, b);
-      const z2 = new Complex(c, d);
-      let summary = '';
+  // ==================== LIBRARY: CONSTANTS & VARIABLES ====================
+  function renderLibrary() {
+    const constList = $('library-constants');
+    if (constList) {
+      const query = ($('input-constants-search')?.value || '').trim().toLowerCase();
+      constList.innerHTML = '';
+      Object.entries(PHYSICAL_CONSTANTS).forEach(([symbol, info]) => {
+        const name = t(`constants.${info.key}`);
+        if (query && !`${symbol} ${name}`.toLowerCase().includes(query)) return;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'scp-const-item';
+        btn.innerHTML = `<span class="scp-const-symbol">${escapeHtml(symbol)}</span><span class="scp-const-name">${escapeHtml(name)}</span><span class="scp-const-value">${numHtml(fmt(info.value))} ${escapeHtml(info.unit)}</span>`;
+        btn.addEventListener('click', () => insertSymbol(symbol));
+        constList.appendChild(btn);
+      });
+    }
 
-      if (op === 'add') {
-        const res = Complex.add(z1, z2);
-        summary = `(${z1.format()}) + (${z2.format()}) = ${res.format()} | |z| = ${res.modulus()}`;
-      } else if (op === 'sub') {
-        const res = Complex.sub(z1, z2);
-        summary = `(${z1.format()}) − (${z2.format()}) = ${res.format()} | |z| = ${res.modulus()}`;
-      } else if (op === 'mul') {
-        const res = Complex.mul(z1, z2);
-        summary = `(${z1.format()}) × (${z2.format()}) = ${res.format()} | |z| = ${res.modulus()}`;
-      } else if (op === 'div') {
-        const res = Complex.div(z1, z2);
-        summary = `(${z1.format()}) ÷ (${z2.format()}) = ${res.format()} | |z| = ${res.modulus()}`;
-      } else if (op === 'conj') {
-        const res = z1.conjugate();
-        const pol = z1.toPolar(angleMode);
-        summary = `z̄₁ = ${res.format()} | |z₁| = ${pol.r} | arg(z₁) = ${pol.theta} (${angleMode}) | Polar: ${pol.r} ∠ ${pol.theta}`;
-      } else if (op === 'polar2rect') {
-        const rect = Complex.fromPolar(a, b, angleMode);
-        summary = `Polar (${a} ∠ ${b} ${angleMode}) → Retangular: ${rect.format()}`;
-      } else if (op === 'pow') {
-        const res = z1.pow(n);
-        summary = `(${z1.format()})^${n} = ${res.format()} | |z| = ${res.modulus()}`;
-      } else if (op === 'roots') {
-        const roots = z1.nthRoots(n, angleMode);
-        summary = roots.map(r => `w_${r.index} = ${r.formatted} (∠ ${r.polarAngle} ${angleMode})`).join(' • ');
+    const varList = $('library-variables');
+    if (varList) {
+      varList.innerHTML = '';
+      const entries = Object.entries(state.engine.variables);
+      if (entries.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'scp-empty';
+        empty.textContent = t('library.noVariables');
+        varList.appendChild(empty);
       }
-      outEl.textContent = summary;
-    } catch (err) {
-      outEl.textContent = state.i18n.translateError(err);
+      entries.forEach(([name, value]) => {
+        const row = document.createElement('div');
+        row.className = 'scp-var-item';
+        const label = document.createElement('button');
+        label.type = 'button';
+        label.className = 'scp-mini-btn';
+        label.innerHTML = `<span><b>${escapeHtml(name)}</b> = ${numHtml(fmt(value))}</span>`;
+        label.addEventListener('click', () => insertSymbol(name));
+        row.appendChild(label);
+        row.appendChild(iconButton('i-trash', t('labels.deleteVar'), () => {
+          state.engine.deleteVariable(name);
+          state.persistEngine();
+          renderLibrary();
+          renderVariablesStrip();
+        }, 'danger'));
+        varList.appendChild(row);
+      });
     }
   }
 
-  // ==================== EXPERT MODULE B: MATRICES ====================
+  function renderVariablesStrip() {
+    if (!variablesStrip) return;
+    const entries = Object.entries(state.engine.variables);
+    variablesStrip.classList.toggle('hidden', entries.length === 0);
+    variablesStrip.innerHTML = '';
+    entries.forEach(([name, value]) => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'scp-var-chip';
+      chip.innerHTML = `<b>${escapeHtml(name)}</b> = ${numHtml(fmt(value))}`;
+      chip.addEventListener('click', () => insertIntoExpression(name));
+      variablesStrip.appendChild(chip);
+    });
+  }
+
+  function insertSymbol(symbol) {
+    insertIntoExpression(symbol);
+    showToast(tf('labels.inserted', { name: symbol }));
+    if (state.mobileView !== 'calc') setMobileView('calc');
+  }
+
+  // ==================== RESULT RENDERING HELPERS ====================
+  function renderMetrics(items, accentIndex = -1) {
+    return `<div class="scp-metrics">${items
+      .map(([label, value], i) => `<div class="scp-metric${i === accentIndex ? ' accent' : ''}"><span>${escapeHtml(label)}</span><strong>${numHtml(value)}</strong></div>`)
+      .join('')}</div>`;
+  }
+
+  function renderMatrixTable(matrix) {
+    return `<table class="scp-matrix-table">${matrix
+      .map(row => `<tr>${row.map(v => `<td>${escapeHtml(fmt(v))}</td>`).join('')}</tr>`)
+      .join('')}</table>`;
+  }
+
+  function renderError(outEl, err) {
+    outEl.innerHTML = `<div class="scp-result-error">${escapeHtml(state.i18n.translateError(err))}</div>`;
+  }
+
+  function svgLineChart(values, { height = 120, color = 'var(--color-primary)' } = {}) {
+    if (values.length < 2) return '';
+    const width = 600;
+    const max = Math.max(...values);
+    const min = Math.min(0, ...values);
+    const span = max - min || 1;
+    const pts = values.map((v, i) => [(i / (values.length - 1)) * width, height - ((v - min) / span) * (height - 8) - 4]);
+    const line = pts.map(p => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+    const area = `0,${height} ${line} ${width},${height}`;
+    return `<svg class="scp-chart" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img">
+      <defs><linearGradient id="chartFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity="0.35"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
+      <polygon points="${area}" fill="url(#chartFill)"/>
+      <polyline points="${line}" fill="none" stroke="${color}" stroke-width="2.5" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+    </svg>`;
+  }
+
+  function svgHistogram(data) {
+    const n = data.length;
+    if (n < 2) return '';
+    const min = Math.min(...data);
+    const max = Math.max(...data);
+    const bins = Math.min(Math.max(Math.ceil(Math.sqrt(n)), 4), 12);
+    const width = (max - min) / bins || 1;
+    const counts = new Array(bins).fill(0);
+    data.forEach(v => {
+      const idx = Math.min(Math.floor((v - min) / width), bins - 1);
+      counts[idx]++;
+    });
+    const top = Math.max(...counts);
+    const W = 600;
+    const H = 140;
+    const barW = W / bins;
+    const bars = counts.map((c, i) => {
+      const h = (c / top) * (H - 40);
+      return `<rect x="${(i * barW + 3).toFixed(1)}" y="${(H - 18 - h).toFixed(1)}" width="${(barW - 6).toFixed(1)}" height="${h.toFixed(1)}" rx="4" fill="var(--color-primary)" opacity="0.85"/>
+        <text x="${(i * barW + barW / 2).toFixed(1)}" y="${(H - 22 - h).toFixed(1)}" text-anchor="middle" font-size="11" fill="var(--color-text-muted)">${c || ''}</text>`;
+    }).join('');
+    const labels = `<text x="2" y="${H - 3}" font-size="11" fill="var(--color-text-muted)">${escapeHtml(fmt(min))}</text><text x="${W - 2}" y="${H - 3}" font-size="11" text-anchor="end" fill="var(--color-text-muted)">${escapeHtml(fmt(max))}</text>`;
+    return `<svg class="scp-chart" viewBox="0 0 ${W} ${H}" role="img">${bars}${labels}</svg>`;
+  }
+
+  // ==================== EXPERT: GRAPH ====================
+  const graphState = { xMin: -10, xMax: 10, yMin: -6, yMax: 6, compiled: [], frame: 0 };
+  const graphCanvas = $('graph-canvas');
+  const graphTooltip = $('graph-tooltip');
+  const GRAPH_INPUT_IDS = ['graph-fn-1', 'graph-fn-2', 'graph-fn-3'];
+  const GRAPH_NAMES = ['f', 'g', 'h'];
+
+  function readGraphInputs() {
+    const read = (id, fallback) => {
+      const v = Number($(id)?.value);
+      return Number.isFinite(v) ? v : fallback;
+    };
+    const xMin = read('graph-xmin', -10);
+    const xMax = read('graph-xmax', 10);
+    const yMin = read('graph-ymin', -6);
+    const yMax = read('graph-ymax', 6);
+    if (xMax > xMin && yMax > yMin) Object.assign(graphState, { xMin, xMax, yMin, yMax });
+  }
+
+  function writeGraphInputs() {
+    const round = (v) => Number(v.toPrecision(5));
+    const set = (id, v) => {
+      const el = $(id);
+      if (el) el.value = round(v);
+    };
+    set('graph-xmin', graphState.xMin);
+    set('graph-xmax', graphState.xMax);
+    set('graph-ymin', graphState.yMin);
+    set('graph-ymax', graphState.yMax);
+  }
+
+  function requestGraphRender() {
+    if (graphState.frame) return;
+    graphState.frame = requestAnimationFrame(() => {
+      graphState.frame = 0;
+      drawGraph();
+    });
+  }
+
+  function formatTick(v) {
+    const clean = Math.abs(v) < 1e-12 ? 0 : Number(v.toPrecision(6));
+    const { decimal } = getLocaleSeparators(state.preferences.locale);
+    return String(clean).replace('.', decimal);
+  }
+
+  function drawGraph(updateSummary = false) {
+    if (!graphCanvas) return;
+    const rect = graphCanvas.getBoundingClientRect();
+    if (rect.width < 10 || rect.height < 10) return;
+    const dpr = window.devicePixelRatio || 1;
+    const W = Math.round(rect.width);
+    const H = Math.round(rect.height);
+    if (graphCanvas.width !== W * dpr || graphCanvas.height !== H * dpr) {
+      graphCanvas.width = W * dpr;
+      graphCanvas.height = H * dpr;
+    }
+    const ctx = graphCanvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    const css = getComputedStyle(document.documentElement);
+    const color = (name) => css.getPropertyValue(name).trim();
+    const { xMin, xMax, yMin, yMax } = graphState;
+    const sx = (x) => ((x - xMin) / (xMax - xMin)) * W;
+    const sy = (y) => H - ((y - yMin) / (yMax - yMin)) * H;
+
+    // Grid
+    const stepX = niceStep(xMax - xMin, Math.max(4, Math.round(W / 80)));
+    const stepY = niceStep(yMax - yMin, Math.max(4, Math.round(H / 60)));
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = color('--grid-line');
+    ctx.beginPath();
+    for (let x = Math.ceil(xMin / stepX) * stepX; x <= xMax; x += stepX) {
+      ctx.moveTo(Math.round(sx(x)) + 0.5, 0);
+      ctx.lineTo(Math.round(sx(x)) + 0.5, H);
+    }
+    for (let y = Math.ceil(yMin / stepY) * stepY; y <= yMax; y += stepY) {
+      ctx.moveTo(0, Math.round(sy(y)) + 0.5);
+      ctx.lineTo(W, Math.round(sy(y)) + 0.5);
+    }
+    ctx.stroke();
+
+    // Axes
+    const axisX = Math.min(Math.max(sy(0), 0), H);
+    const axisY = Math.min(Math.max(sx(0), 0), W);
+    ctx.strokeStyle = color('--axis-line');
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(0, Math.round(axisX) + 0.5);
+    ctx.lineTo(W, Math.round(axisX) + 0.5);
+    ctx.moveTo(Math.round(axisY) + 0.5, 0);
+    ctx.lineTo(Math.round(axisY) + 0.5, H);
+    ctx.stroke();
+
+    // Tick labels
+    ctx.fillStyle = color('--color-text-muted');
+    ctx.font = '11px "JetBrains Mono", ui-monospace, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    const labelY = Math.min(Math.max(axisX + 4, 2), H - 14);
+    for (let x = Math.ceil(xMin / stepX) * stepX; x <= xMax; x += stepX) {
+      if (Math.abs(x) < stepX / 2 || sx(x) < 16 || sx(x) > W - 16) continue;
+      ctx.fillText(formatTick(x), sx(x), labelY);
+    }
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    const labelX = Math.min(Math.max(axisY + 5, 2), W - 40);
+    for (let y = Math.ceil(yMin / stepY) * stepY; y <= yMax; y += stepY) {
+      if (Math.abs(y) < stepY / 2 || sy(y) < 10 || sy(y) > H - 10) continue;
+      ctx.fillText(formatTick(y), labelX, sy(y));
+    }
+
+    // Curves
+    const summaries = [];
+    graphState.compiled = [];
+    GRAPH_INPUT_IDS.forEach((id, idx) => {
+      const expr = ($(id)?.value || '').trim();
+      if (!expr) return;
+      const stroke = color(`--plot-${idx + 1}`);
+      try {
+        const sampled = sampleFunction(expr, {
+          xMin, xMax, samples: Math.min(Math.max(W, 200), 1600), angleMode: 'RAD',
+          yRange: yMax - yMin, variables: state.engine.variables
+        });
+        graphState.compiled.push({ name: GRAPH_NAMES[idx], fn: compileExpression(expr, { variable: 'x', angleMode: 'RAD', variables: state.engine.variables }), stroke });
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 2.4;
+        ctx.lineJoin = 'round';
+        ctx.shadowColor = stroke;
+        ctx.shadowBlur = 6;
+        sampled.segments.forEach(seg => {
+          ctx.beginPath();
+          seg.forEach((p, i) => {
+            const py = Math.min(Math.max(sy(p.y), -H), 2 * H);
+            if (i === 0) ctx.moveTo(sx(p.x), py);
+            else ctx.lineTo(sx(p.x), py);
+          });
+          ctx.stroke();
+        });
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = stroke;
+        sampled.roots.forEach(r => {
+          ctx.beginPath();
+          ctx.arc(sx(r), sy(0), 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 1.5;
+        sampled.extrema.forEach(e => {
+          ctx.beginPath();
+          ctx.arc(sx(e.x), sy(e.y), 4, 0, Math.PI * 2);
+          ctx.stroke();
+        });
+        summaries.push({ idx, expr, stroke, ...sampled });
+      } catch (err) {
+        summaries.push({ idx, expr, stroke, error: err });
+      }
+    });
+
+    if (updateSummary || graphState.summaryDirty) {
+      graphState.summaryDirty = false;
+      renderGraphSummary(summaries);
+    }
+  }
+
+  function renderGraphSummary(summaries) {
+    const outEl = $('graph-result-box');
+    if (!outEl) return;
+    outEl.innerHTML = summaries.map(s => {
+      const head = `<span class="scp-fn-dot" style="--dot:${s.stroke}"></span><b>${GRAPH_NAMES[s.idx]}(x) = ${escapeHtml(s.expr)}</b>`;
+      if (s.error) return `<div class="scp-legend-row">${head}<span class="scp-result-error">${escapeHtml(state.i18n.translateError(s.error))}</span></div>`;
+      const roots = s.roots.length ? s.roots.map(r => `<span class="scp-pill">x = ${escapeHtml(fmt(r, { precisionMode: 'fixed', decimalPlaces: 4 }))}</span>`).join('') : `<span class="scp-hint">${escapeHtml(t('lab.noRoots'))}</span>`;
+      const extrema = s.extrema.slice(0, 4).map(e => `<span class="scp-pill">${escapeHtml(t(`lab.${e.kind}`))} (${escapeHtml(fmt(e.x, { precisionMode: 'fixed', decimalPlaces: 3 }))}; ${escapeHtml(fmt(e.y, { precisionMode: 'fixed', decimalPlaces: 3 }))})</span>`).join('');
+      return `<div class="scp-legend-row">${head}</div>
+        <div class="scp-legend-row"><span class="scp-hint">${escapeHtml(t('lab.roots'))}:</span>${roots}</div>
+        ${extrema ? `<div class="scp-legend-row"><span class="scp-hint">${escapeHtml(t('lab.extrema'))}:</span>${extrema}</div>` : ''}`;
+    }).join('');
+  }
+
+  function runGraphTool() {
+    readGraphInputs();
+    graphState.summaryDirty = true;
+    drawGraph(true);
+  }
+
+  function zoomGraph(factor, cx = 0.5, cy = 0.5) {
+    const { xMin, xMax, yMin, yMax } = graphState;
+    const px = xMin + (xMax - xMin) * cx;
+    const py = yMax - (yMax - yMin) * cy;
+    graphState.xMin = px - (px - xMin) * factor;
+    graphState.xMax = px + (xMax - px) * factor;
+    graphState.yMin = py - (py - yMin) * factor;
+    graphState.yMax = py + (yMax - py) * factor;
+    writeGraphInputs();
+    graphState.summaryDirty = true;
+    requestGraphRender();
+  }
+
+  if (graphCanvas) {
+    let drag = null;
+    graphCanvas.addEventListener('pointerdown', (e) => {
+      drag = { x: e.clientX, y: e.clientY, view: { ...graphState } };
+      graphCanvas.setPointerCapture(e.pointerId);
+      graphCanvas.classList.add('dragging');
+    });
+    graphCanvas.addEventListener('pointermove', (e) => {
+      const rect = graphCanvas.getBoundingClientRect();
+      if (drag) {
+        const dx = ((e.clientX - drag.x) / rect.width) * (drag.view.xMax - drag.view.xMin);
+        const dy = ((e.clientY - drag.y) / rect.height) * (drag.view.yMax - drag.view.yMin);
+        graphState.xMin = drag.view.xMin - dx;
+        graphState.xMax = drag.view.xMax - dx;
+        graphState.yMin = drag.view.yMin + dy;
+        graphState.yMax = drag.view.yMax + dy;
+        writeGraphInputs();
+        requestGraphRender();
+        if (graphTooltip) graphTooltip.classList.add('hidden');
+        return;
+      }
+      if (!graphTooltip || graphState.compiled.length === 0) return;
+      const x = graphState.xMin + ((e.clientX - rect.left) / rect.width) * (graphState.xMax - graphState.xMin);
+      const lines = [`x = ${fmt(x, { precisionMode: 'fixed', decimalPlaces: 4 })}`];
+      graphState.compiled.forEach(c => {
+        let y;
+        try { y = c.fn(x); } catch (_) { y = NaN; }
+        lines.push(`<span style="color:${c.stroke}">●</span> ${c.name}(x) = ${Number.isFinite(y) ? escapeHtml(fmt(y, { precisionMode: 'fixed', decimalPlaces: 4 })) : '—'}`);
+      });
+      graphTooltip.innerHTML = lines.join('<br>');
+      graphTooltip.classList.remove('hidden');
+      const left = e.clientX - rect.left + 14;
+      const top = e.clientY - rect.top + 14;
+      graphTooltip.style.left = `${Math.min(left, rect.width - graphTooltip.offsetWidth - 6)}px`;
+      graphTooltip.style.top = `${Math.min(top, rect.height - graphTooltip.offsetHeight - 6)}px`;
+    });
+    const endDrag = () => {
+      if (drag) {
+        drag = null;
+        graphCanvas.classList.remove('dragging');
+        graphState.summaryDirty = true;
+        requestGraphRender();
+      }
+    };
+    graphCanvas.addEventListener('pointerup', endDrag);
+    graphCanvas.addEventListener('pointercancel', endDrag);
+    graphCanvas.addEventListener('pointerleave', () => graphTooltip && graphTooltip.classList.add('hidden'));
+    graphCanvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const rect = graphCanvas.getBoundingClientRect();
+      zoomGraph(Math.exp(e.deltaY * 0.0015), (e.clientX - rect.left) / rect.width, (e.clientY - rect.top) / rect.height);
+    }, { passive: false });
+    if (typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(() => requestGraphRender()).observe(graphCanvas);
+    }
+  }
+
+  function plotCurrentExpression() {
+    const expr = state.expression.trim();
+    if (!/(^|[^a-zA-Z_])x([^a-zA-Z0-9_]|$)/.test(expr)) {
+      showToast(t('labels.noPlotVar'));
+      return;
+    }
+    const input = $('graph-fn-1');
+    if (input) input.value = expr;
+    setSideTab('expert');
+    setExpertCategory('graph');
+    if (window.matchMedia('(max-width: 760px)').matches || state.viewportMode === 'mobile') setMobileView('expert');
+    runGraphTool();
+  }
+
+  // ==================== EXPERT: COMPLEX ====================
+  function runComplexTool() {
+    const outEl = $('complex-result-box');
+    if (!outEl) return;
+    try {
+      const a = Number($('cx-z1-re').value || 0);
+      const b = Number($('cx-z1-im').value || 0);
+      const c = Number($('cx-z2-re').value || 0);
+      const d = Number($('cx-z2-im').value || 0);
+      const n = Number($('cx-power-n').value || 2);
+      const op = $('cx-operation').value;
+      const angleMode = state.preferences.angleMode;
+      const z1 = new Complex(a, b);
+      const z2 = new Complex(c, d);
+
+      const describe = (z, headline) => {
+        const pol = z.toPolar(angleMode);
+        return `<div class="scp-result-headline">${escapeHtml(headline)}</div>${renderMetrics([
+          [t('lab.modulus'), fmtLab(pol.r)],
+          [`${t('lab.argument')} (${angleMode})`, fmtLab(pol.theta)],
+          [t('lab.polar'), `${fmtLab(pol.r)} ∠ ${fmtLab(pol.theta)}`],
+          [t('lab.conjugate'), z.conjugate().format()]
+        ])}`;
+      };
+
+      if (op === 'add') outEl.innerHTML = describe(Complex.add(z1, z2), `(${z1.format()}) + (${z2.format()}) = ${Complex.add(z1, z2).format()}`);
+      else if (op === 'sub') outEl.innerHTML = describe(Complex.sub(z1, z2), `(${z1.format()}) − (${z2.format()}) = ${Complex.sub(z1, z2).format()}`);
+      else if (op === 'mul') outEl.innerHTML = describe(Complex.mul(z1, z2), `(${z1.format()}) × (${z2.format()}) = ${Complex.mul(z1, z2).format()}`);
+      else if (op === 'div') {
+        const res = Complex.div(z1, z2);
+        outEl.innerHTML = describe(res, `(${z1.format()}) ÷ (${z2.format()}) = ${res.format()}`);
+      } else if (op === 'conj') outEl.innerHTML = describe(z1, `z₁ = ${z1.format()}`);
+      else if (op === 'polar2rect') {
+        const rect = Complex.fromPolar(a, b, angleMode);
+        outEl.innerHTML = describe(rect, `${a} ∠ ${b} ${angleMode} = ${rect.format()}`);
+      } else if (op === 'pow') {
+        const res = z1.pow(n);
+        outEl.innerHTML = describe(res, `(${z1.format()})^${n} = ${res.format()}`);
+      } else if (op === 'roots') {
+        const roots = z1.nthRoots(n, angleMode);
+        outEl.innerHTML = `<div class="scp-result-headline">ⁿ√(${escapeHtml(z1.format())}), n = ${n}</div>${renderMetrics(
+          roots.map(r => [`w${r.index}  ∠ ${fmtLab(r.polarAngle)} ${angleMode}`, r.formatted])
+        )}`;
+      }
+    } catch (err) {
+      renderError(outEl, err);
+    }
+  }
+
+  // ==================== EXPERT: MATRICES ====================
   function renderMatrixGrids() {
-    const gridA = document.getElementById('matrix-a-grid');
-    const gridB = document.getElementById('matrix-b-grid');
-    if (!gridA || !gridB) return;
-
-    gridA.style.gridTemplateColumns = `repeat(${matADims.cols}, 1fr)`;
-    gridA.innerHTML = '';
-    for (let r = 0; r < matADims.rows; r++) {
-      if (!matAData[r]) matAData[r] = [];
-      for (let c = 0; c < matADims.cols; c++) {
-        if (matAData[r][c] === undefined) matAData[r][c] = r === c ? 1 : 0;
-        const inp = document.createElement('input');
-        inp.type = 'number';
-        inp.step = 'any';
-        inp.className = 'scp-matrix-cell tabular-nums';
-        inp.value = matAData[r][c];
-        inp.setAttribute('aria-label', `A[${r + 1},${c + 1}]`);
-        inp.addEventListener('input', () => {
-          matAData[r][c] = Number(inp.value || 0);
-        });
-        gridA.appendChild(inp);
+    const build = (gridEl, dims, data, label) => {
+      if (!gridEl) return;
+      gridEl.style.gridTemplateColumns = `repeat(${dims.cols}, minmax(0, 1fr))`;
+      gridEl.innerHTML = '';
+      for (let r = 0; r < dims.rows; r++) {
+        if (!data[r]) data[r] = [];
+        for (let c = 0; c < dims.cols; c++) {
+          if (data[r][c] === undefined) data[r][c] = r === c ? 1 : 0;
+          const inp = document.createElement('input');
+          inp.type = 'number';
+          inp.step = 'any';
+          inp.className = 'scp-matrix-cell tabular-nums';
+          inp.value = data[r][c];
+          inp.setAttribute('aria-label', `${label}[${r + 1},${c + 1}]`);
+          inp.addEventListener('input', () => {
+            data[r][c] = Number(inp.value || 0);
+          });
+          gridEl.appendChild(inp);
+        }
       }
-    }
-
-    gridB.style.gridTemplateColumns = `repeat(${matBDims.cols}, 1fr)`;
-    gridB.innerHTML = '';
-    for (let r = 0; r < matBDims.rows; r++) {
-      if (!matBData[r]) matBData[r] = [];
-      for (let c = 0; c < matBDims.cols; c++) {
-        if (matBData[r][c] === undefined) matBData[r][c] = r === c ? 1 : 0;
-        const inp = document.createElement('input');
-        inp.type = 'number';
-        inp.step = 'any';
-        inp.className = 'scp-matrix-cell tabular-nums';
-        inp.value = matBData[r][c];
-        inp.setAttribute('aria-label', `B[${r + 1},${c + 1}]`);
-        inp.addEventListener('input', () => {
-          matBData[r][c] = Number(inp.value || 0);
-        });
-        gridB.appendChild(inp);
-      }
-    }
+    };
+    build($('matrix-a-grid'), matADims, matAData, 'A');
+    build($('matrix-b-grid'), matBDims, matBData, 'B');
   }
 
   function getActiveMatrix(data, dims) {
@@ -797,12 +1379,29 @@ function bootstrapApp() {
   }
 
   function runMatrixOperation(op) {
-    const outEl = document.getElementById('matrix-result-box');
+    const outEl = $('matrix-result-box');
     if (!outEl) return;
+    state.lastMatrixOp = op;
     try {
       const A = getActiveMatrix(matAData, matADims);
       const B = getActiveMatrix(matBData, matBDims);
-      const k = Number(document.getElementById('matrix-scalar-k').value || 2);
+      const k = Number($('matrix-scalar-k').value || 2);
+      const labels = { add: 'A + B', sub: 'A − B', mul: 'A × B', scalar: `${k} · A`, trans: 'Aᵀ', inv: 'A⁻¹' };
+
+      if (op === 'det') {
+        outEl.innerHTML = `<div class="scp-result-headline">det(A) = ${escapeHtml(fmt(matrixDeterminant(A)))}<small>${escapeHtml(t('lab.determinant'))}</small></div>`;
+        return;
+      }
+      if (op === 'trace') {
+        outEl.innerHTML = `<div class="scp-result-headline">tr(A) = ${escapeHtml(fmt(matrixTrace(A)))}<small>${escapeHtml(t('lab.trace'))}</small></div>`;
+        return;
+      }
+      if (op === 'solve') {
+        const bVec = Array.from({ length: matADims.rows }, (_, r) => Number(B[r]?.[0] || 0));
+        const xSol = solveLinearSystem(A, bVec);
+        outEl.innerHTML = `<div class="scp-result-headline">A·x = b<small>${escapeHtml(t('lab.solution'))}</small></div>${renderMetrics(xSol.map((v, i) => [`x${i + 1}`, fmt(v)]))}`;
+        return;
+      }
 
       let res;
       if (op === 'add') res = matrixAdd(A, B);
@@ -810,276 +1409,306 @@ function bootstrapApp() {
       else if (op === 'mul') res = matrixMultiply(A, B);
       else if (op === 'scalar') res = matrixScalar(A, k);
       else if (op === 'trans') res = matrixTranspose(A);
-      else if (op === 'det') {
-        const d = matrixDeterminant(A);
-        outEl.textContent = `det(A) = ${formatResult(d, { locale: state.preferences.locale })}`;
-        return;
-      } else if (op === 'trace') {
-        const tr = matrixTrace(A);
-        outEl.textContent = `tr(A) = ${formatResult(tr, { locale: state.preferences.locale })}`;
-        return;
-      } else if (op === 'inv') {
-        res = matrixInverse(A);
-      } else if (op === 'solve') {
-        // Use first column of B as vector b in A*x = b
-        const bVec = Array.from({ length: matADims.rows }, (_, r) => Number(B[r]?.[0] || 0));
-        const xSol = solveLinearSystem(A, bVec);
-        outEl.textContent = `A·x = b → x = [ ${xSol.map(v => formatResult(v, { locale: state.preferences.locale })).join(' ; ')} ]`;
-        return;
-      }
-
-      if (Array.isArray(res)) {
-        const formattedRows = res.map(row =>
-          `[ ${row.map(v => formatResult(v, { locale: state.preferences.locale })).join(' , ')} ]`
-        );
-        outEl.textContent = formattedRows.join('  |  ');
-      }
+      else if (op === 'inv') res = matrixInverse(A);
+      outEl.innerHTML = `<div class="scp-result-headline">${escapeHtml(labels[op])} =</div>${renderMatrixTable(res)}`;
     } catch (err) {
-      outEl.textContent = state.i18n.translateError(err);
+      renderError(outEl, err);
     }
   }
 
-  // ==================== EXPERT MODULE C: STATISTICS ====================
+  // ==================== EXPERT: STATISTICS ====================
   function runStatisticsTool() {
-    const outEl = document.getElementById('stats-result-box');
+    const outEl = $('stats-result-box');
     if (!outEl) return;
     try {
-      const xRaw = document.getElementById('stats-input-x').value;
-      const yRaw = document.getElementById('stats-input-y').value.trim();
-      const pRank = Number(document.getElementById('stats-percentile-k').value || 90);
-      const res = analyzeDataset(xRaw, {
-        secondaryData: yRaw || null,
-        percentile: pRank
-      });
-      const loc = state.preferences.locale;
-      const fmt = (v) => (v === null || v === undefined ? '—' : formatResult(v, { locale: loc }));
-      const modeStr = res.modes.length > 0 ? res.modes.map(fmt).join(', ') : 'Amodal';
-
-      let text = `n = ${res.count} | ∑x = ${fmt(res.sum)} | ∑x² = ${fmt(res.sumSquares)} | x̄ = ${fmt(res.mean)} | Mediana = ${fmt(res.median)} | Moda = ${modeStr} | Min = ${fmt(res.min)} | Max = ${fmt(res.max)} | Amp = ${fmt(res.range)} | σ² (Pop) = ${fmt(res.popVariance)} | σ (Pop) = ${fmt(res.popStdDev)} | s² (Amostral) = ${fmt(res.sampleVariance)} | s (Amostral) = ${fmt(res.sampleStdDev)} | Q1 = ${fmt(res.q1)} | Q2 = ${fmt(res.q2)} | Q3 = ${fmt(res.q3)} | IIQ = ${fmt(res.iqr)} | P_${res.percentileRank} = ${fmt(res.customPercentile)}`;
-
-      if (res.weightedMean !== null) {
-        text += ` | Média Pond. = ${fmt(res.weightedMean)}`;
-      }
+      const xRaw = $('stats-input-x').value;
+      const yRaw = $('stats-input-y').value.trim();
+      const pRank = Number($('stats-percentile-k').value || 90);
+      const res = analyzeDataset(xRaw, { secondaryData: yRaw || null, percentile: pRank });
+      const modeStr = res.modes.length > 0 ? res.modes.map(v => fmtLab(v)).join(', ') : t('lab.amodal');
+      const items = [
+        [t('lab.count'), String(res.count)],
+        [t('lab.mean'), fmtLab(res.mean)],
+        [t('lab.median'), fmtLab(res.median)],
+        [t('lab.mode'), modeStr],
+        [t('lab.stdPop'), fmtLab(res.popStdDev)],
+        [t('lab.stdSample'), fmtLab(res.sampleStdDev)],
+        [t('lab.varPop'), fmtLab(res.popVariance)],
+        [t('lab.varSample'), fmtLab(res.sampleVariance)],
+        [t('lab.min'), fmtLab(res.min)],
+        [t('lab.max'), fmtLab(res.max)],
+        [t('lab.range'), fmtLab(res.range)],
+        [t('lab.sum'), fmtLab(res.sum)],
+        [t('lab.sumSquares'), fmtLab(res.sumSquares)],
+        ['Q1', fmtLab(res.q1)],
+        ['Q3', fmtLab(res.q3)],
+        [t('lab.iqr'), fmtLab(res.iqr)],
+        [`P${res.percentileRank}`, fmtLab(res.customPercentile)]
+      ];
+      if (res.weightedMean !== null) items.push([t('lab.weightedMean'), fmtLab(res.weightedMean)]);
+      let html = renderMetrics(items, 1);
+      html += `<div class="scp-subhead">${escapeHtml(t('lab.histogram'))}</div>${svgHistogram(parseDataset(xRaw))}`;
       if (res.regression) {
-        text += ` | Regressão: ${res.regression.equation} (r = ${fmt(res.regression.r)}, R² = ${fmt(res.regression.r2)})`;
+        html += `<div class="scp-subhead">${escapeHtml(t('lab.regression'))}</div>${renderMetrics([
+          ['y = a + bx', `y = ${fmtLab(res.regression.intercept)} ${res.regression.slope >= 0 ? '+' : '−'} ${fmtLab(Math.abs(res.regression.slope))}x`],
+          ['r', fmtLab(res.regression.r)],
+          ['R²', fmtLab(res.regression.r2)]
+        ], 0)}`;
       }
-      outEl.textContent = text;
+      outEl.innerHTML = html;
     } catch (err) {
-      outEl.textContent = state.i18n.translateError(err);
+      renderError(outEl, err);
     }
   }
 
-  // ==================== EXPERT MODULE D: EQUATION SOLVER ====================
+  // ==================== EXPERT: SOLVER ====================
   function runSolverTool() {
-    const outEl = document.getElementById('solver-result-box');
+    const outEl = $('solver-result-box');
     if (!outEl) return;
     try {
-      const expr = document.getElementById('solver-expr').value;
-      const method = document.getElementById('solver-method').value;
-      const a = Number(document.getElementById('solver-a').value);
-      const b = Number(document.getElementById('solver-b').value);
-      const tol = Number(document.getElementById('solver-tol').value || 1e-7);
-      const maxIter = Number(document.getElementById('solver-max-iter').value || 100);
-
       const res = solveEquation({
-        expression: expr,
+        expression: $('solver-expr').value,
         variable: 'x',
-        method,
-        a,
-        b,
-        x0: a,
-        tolerance: tol,
-        maxIterations: maxIter,
+        method: $('solver-method').value,
+        a: Number($('solver-a').value),
+        b: Number($('solver-b').value),
+        x0: Number($('solver-a').value),
+        tolerance: Number($('solver-tol').value || 1e-7),
+        maxIterations: Number($('solver-max-iter').value || 100),
         angleMode: state.preferences.angleMode
       });
-
       if (!res.converged) {
-        const msg = state.i18n.translateError({ code: res.reasonCode || 'ERR_MAX_ITER' });
-        outEl.textContent = `${res.method}: ${msg} (Iter: ${res.iterations})`;
+        renderError(outEl, { code: res.reasonCode || 'ERR_MAX_ITER' });
         return;
       }
-
-      outEl.textContent = `x* ≈ ${formatResult(res.root, { locale: state.preferences.locale })} | |f(x*)| = ${res.residual.toExponential(2)} | Iterações: ${res.iterations} | Método: ${res.method} • ${state.i18n.t('labels.approxNotice')}`;
+      outEl.innerHTML = `<div class="scp-result-headline">x* ≈ ${escapeHtml(fmtLab(res.root))}<small>${escapeHtml(res.method)}</small></div>${renderMetrics([
+        [t('lab.residual'), res.residual.toExponential(2)],
+        [t('lab.iterations'), String(res.iterations)]
+      ])}<p class="scp-hint" style="margin-top:8px">${escapeHtml(t('labels.approxNotice'))}</p>`;
     } catch (err) {
-      outEl.textContent = state.i18n.translateError(err);
+      renderError(outEl, err);
     }
   }
 
-  // ==================== EXPERT MODULE E: NUMERICAL CALCULUS ====================
+  // ==================== EXPERT: CALCULUS ====================
   function runCalculusTool(kind) {
-    const outEl = document.getElementById('calculus-result-box');
+    const outEl = $('calculus-result-box');
     if (!outEl) return;
+    state.lastCalculusKind = kind;
     try {
-      const expr = document.getElementById('calc-tool-expr').value;
-      const x0 = Number(document.getElementById('calc-tool-x0').value || 2);
-      const a = Number(document.getElementById('calc-tool-a').value || 0);
-      const b = Number(document.getElementById('calc-tool-b').value || 3);
-      const tol = Number(document.getElementById('calc-tool-tol').value || 1e-7);
-
+      const expr = $('calc-tool-expr').value;
+      const x0 = Number($('calc-tool-x0').value || 0);
+      const a = Number($('calc-tool-a').value || 0);
+      const b = Number($('calc-tool-b').value || 1);
+      const tol = Number($('calc-tool-tol').value || 1e-7);
       if (kind === 'derivative') {
-        const d = numericalDerivative({
-          expression: expr,
-          variable: 'x',
-          x0,
-          angleMode: state.preferences.angleMode
-        });
-        outEl.textContent = `f'(${x0}) ≈ ${formatResult(d.value, { locale: state.preferences.locale })} | f''(${x0}) ≈ ${formatResult(d.secondDerivative, { locale: state.preferences.locale })} | f(${x0}) = ${formatResult(d.fAtPoint, { locale: state.preferences.locale })} | Erro est.: ${d.estimatedError.toExponential(2)} (${d.method})`;
+        const d = numericalDerivative({ expression: expr, variable: 'x', x0, angleMode: state.preferences.angleMode });
+        outEl.innerHTML = `<div class="scp-result-headline">f′(${escapeHtml(fmtLab(x0))}) ≈ ${escapeHtml(fmtLab(d.value))}<small>${escapeHtml(t('lab.derivative'))}</small></div>${renderMetrics([
+          [t('lab.secondDerivative'), fmtLab(d.secondDerivative)],
+          [t('lab.fAtPoint'), fmtLab(d.fAtPoint)],
+          [t('lab.estError'), d.estimatedError.toExponential(2)]
+        ])}`;
       } else {
-        const integ = numericalIntegral({
-          expression: expr,
-          variable: 'x',
-          a,
-          b,
-          tolerance: tol,
-          angleMode: state.preferences.angleMode
-        });
-        outEl.textContent = `∫[${a}, ${b}] f(x) dx ≈ ${formatResult(integ.value, { locale: state.preferences.locale })} | Erro est.: ${integ.estimatedError.toExponential(2)} | Avaliações: ${integ.evaluations} (${integ.method})`;
+        const integ = numericalIntegral({ expression: expr, variable: 'x', a, b, tolerance: tol, angleMode: state.preferences.angleMode });
+        outEl.innerHTML = `<div class="scp-result-headline">∫[${escapeHtml(fmtLab(a))}, ${escapeHtml(fmtLab(b))}] ≈ ${escapeHtml(fmtLab(integ.value))}<small>${escapeHtml(t('lab.integral'))}</small></div>${renderMetrics([
+          [t('lab.estError'), integ.estimatedError.toExponential(2)],
+          [t('lab.evaluations'), String(integ.evaluations)]
+        ])}`;
       }
     } catch (err) {
-      outEl.textContent = state.i18n.translateError(err);
+      renderError(outEl, err);
     }
   }
 
-  // ==================== EXPERT MODULE F: UNIT CONVERTER ====================
+  // ==================== EXPERT: FINANCE ====================
+  function runFinanceTool(op) {
+    const outEl = $('finance-result-box');
+    if (!outEl) return;
+    state.lastFinanceOp = op;
+    const money = (v) => fmt(v, { precisionMode: 'fixed', decimalPlaces: 2 });
+    try {
+      const principal = Number($('fin-principal').value || 0);
+      const ratePercent = Number($('fin-rate').value || 0);
+      const periods = Number($('fin-periods').value || 1);
+      const contribution = Number($('fin-contribution').value || 0);
+
+      if (op === 'compound') {
+        const res = compoundInterest({ principal, ratePercent, periods, contribution });
+        outEl.innerHTML = `<div class="scp-result-headline">${escapeHtml(money(res.futureValue))}<small>${escapeHtml(t('lab.futureValue'))}</small></div>${renderMetrics([
+          [t('lab.invested'), money(res.invested)],
+          [t('lab.interestEarned'), money(res.interest)]
+        ])}<div class="scp-subhead">${escapeHtml(t('lab.growth'))}</div>${svgLineChart([principal, ...res.series])}`;
+      } else {
+        const res = loanSchedule({ amount: principal, ratePercent, periods, system: op });
+        const rows = res.rows.map(r => `<tr><td>${r.period}</td><td>${escapeHtml(money(r.payment))}</td><td>${escapeHtml(money(r.interest))}</td><td>${escapeHtml(money(r.amortization))}</td><td>${escapeHtml(money(r.balance))}</td></tr>`).join('');
+        outEl.innerHTML = `<div class="scp-result-headline">${escapeHtml(money(res.firstPayment))}<small>${escapeHtml(t('lab.firstInstallment'))} · ${op === 'sac' ? 'SAC' : 'Price'}</small></div>${renderMetrics([
+          [t('lab.lastInstallment'), money(res.lastPayment)],
+          [t('lab.totalPaid'), money(res.totalPaid)],
+          [t('lab.totalInterest'), money(res.totalInterest)]
+        ])}<div class="scp-subhead">${escapeHtml(t('lab.balance'))}</div>${svgLineChart([principal, ...res.rows.map(r => r.balance)])}
+        <div class="scp-subhead">${escapeHtml(t('lab.schedule'))}</div>
+        <div class="scp-table-scroll"><table class="scp-data-table"><thead><tr><th>${escapeHtml(t('lab.period'))}</th><th>${escapeHtml(t('lab.payment'))}</th><th>${escapeHtml(t('lab.interest'))}</th><th>${escapeHtml(t('lab.amortization'))}</th><th>${escapeHtml(t('lab.balance'))}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      }
+    } catch (err) {
+      renderError(outEl, err);
+    }
+  }
+
+  function runRateConversion() {
+    const out = $('fin-conv-result');
+    if (!out) return;
+    try {
+      const value = convertRate(Number($('fin-conv-rate').value), Number($('fin-conv-from').value), Number($('fin-conv-to').value));
+      out.textContent = `= ${fmt(value, { precisionMode: 'fixed', decimalPlaces: 4 })} %`;
+    } catch (_) {
+      out.textContent = '—';
+    }
+  }
+
+  // ==================== EXPERT: UNITS ====================
   function populateUnitsForCategory() {
-    const catSelect = document.getElementById('unit-category-select');
-    const fromSelect = document.getElementById('unit-from-select');
-    const toSelect = document.getElementById('unit-to-select');
+    const catSelect = $('unit-category-select');
+    const fromSelect = $('unit-from-select');
+    const toSelect = $('unit-to-select');
     if (!catSelect || !fromSelect || !toSelect) return;
-
-    const catKey = catSelect.value || 'length';
-    const cat = UNIT_CATEGORIES[catKey];
+    const cat = UNIT_CATEGORIES[catSelect.value || 'length'];
     if (!cat) return;
-
-    const unitKeys = Object.keys(cat.units);
     fromSelect.innerHTML = '';
     toSelect.innerHTML = '';
-    unitKeys.forEach((uKey, idx) => {
-      const symbol = cat.units[uKey].symbol;
-      const opt1 = document.createElement('option');
-      opt1.value = uKey;
-      opt1.textContent = `${uKey} (${symbol})`;
-      fromSelect.appendChild(opt1);
-
-      const opt2 = document.createElement('option');
-      opt2.value = uKey;
-      opt2.textContent = `${uKey} (${symbol})`;
-      toSelect.appendChild(opt2);
+    Object.keys(cat.units).forEach((uKey, idx) => {
+      const label = `${cat.units[uKey].symbol} · ${uKey}`;
+      fromSelect.appendChild(new Option(label, uKey));
+      toSelect.appendChild(new Option(label, uKey));
       if (idx === 1) toSelect.value = uKey;
     });
     runUnitConversion();
   }
 
   function runUnitConversion() {
-    const outEl = document.getElementById('unit-result-box');
+    const outEl = $('unit-result-box');
     if (!outEl) return;
     try {
-      const catKey = document.getElementById('unit-category-select').value || 'length';
-      const fromU = document.getElementById('unit-from-select').value;
-      const toU = document.getElementById('unit-to-select').value;
-      const val = Number(document.getElementById('unit-input-val').value || 0);
-
-      const res = convertUnit(val, catKey, fromU, toU);
+      const catKey = $('unit-category-select').value || 'length';
+      const fromU = $('unit-from-select').value;
+      const toU = $('unit-to-select').value;
+      const val = Number($('unit-input-val').value || 0);
       const cat = UNIT_CATEGORIES[catKey];
-      const fromSym = cat.units[fromU]?.symbol || fromU;
-      const toSym = cat.units[toU]?.symbol || toU;
-
-      // Also build quick summary across other units in category
-      const allConversions = Object.keys(cat.units)
-        .slice(0, 6)
-        .map(u => `${formatResult(convertUnit(val, catKey, fromU, u), { locale: state.preferences.locale })} ${cat.units[u].symbol}`)
-        .join(' • ');
-
-      outEl.textContent = `${formatResult(val, { locale: state.preferences.locale })} ${fromSym} = ${formatResult(res, { locale: state.preferences.locale })} ${toSym}  |  [${allConversions}]`;
+      const res = convertUnit(val, catKey, fromU, toU);
+      const rows = Object.keys(cat.units).map(u => {
+        let converted;
+        try { converted = fmt(convertUnit(val, catKey, fromU, u)); } catch (_) { converted = '—'; }
+        return `<tr class="${u === toU ? 'highlight' : ''}"><td>${escapeHtml(u)}</td><td>${escapeHtml(converted)} ${escapeHtml(cat.units[u].symbol)}</td></tr>`;
+      }).join('');
+      outEl.innerHTML = `<div class="scp-result-headline">${escapeHtml(fmt(val))} ${escapeHtml(cat.units[fromU]?.symbol || fromU)} = ${escapeHtml(fmt(res))} ${escapeHtml(cat.units[toU]?.symbol || toU)}</div>
+        <div class="scp-subhead">${escapeHtml(t('lab.allUnits'))}</div><div class="scp-table-scroll"><table class="scp-data-table"><tbody>${rows}</tbody></table></div>`;
     } catch (err) {
-      outEl.textContent = state.i18n.translateError(err);
+      renderError(outEl, err);
     }
   }
 
-  // ==================== EXPERT MODULE G: NUMBER THEORY & BASES ====================
+  // ==================== EXPERT: NUMBER THEORY ====================
   function runNumberTheoryTool(action) {
-    const outEl = document.getElementById('nt-result-box');
+    const outEl = $('nt-result-box');
     if (!outEl) return;
+    state.lastNtOp = action;
     try {
-      const a = Number(document.getElementById('nt-input-a').value || 360);
-      const b = Number(document.getElementById('nt-input-b').value || 48);
-
+      const a = Math.trunc(Number($('nt-input-a').value || 0));
+      const b = Math.trunc(Number($('nt-input-b').value || 0));
       if (action === 'gcd_lcm') {
-        const g = gcdTwo(a, b);
-        const l = lcmTwo(a, b);
-        outEl.textContent = `MDC(${a}, ${b}) = ${g}  |  MMC(${a}, ${b}) = ${l}`;
+        outEl.innerHTML = renderMetrics([
+          [`gcd(${a}, ${b})`, String(gcdTwo(a, b))],
+          [`lcm(${a}, ${b})`, String(lcmTwo(a, b))]
+        ], 0);
       } else if (action === 'comb') {
-        const p = nPrCalc(a, b);
-        const c = nCrCalc(a, b);
-        outEl.textContent = `P(${a}, ${b}) = ${formatResult(p, { locale: state.preferences.locale })}  |  C(${a}, ${b}) = ${formatResult(c, { locale: state.preferences.locale })}`;
+        outEl.innerHTML = renderMetrics([
+          [`P(${a}, ${b})`, fmt(nPrCalc(a, b))],
+          [`C(${a}, ${b})`, fmt(nCrCalc(a, b))]
+        ], 1);
       } else if (action === 'prime') {
         const pf = primeFactorization(a);
-        const primeLabel = pf.isPrime ? 'PRIMO' : 'COMPOSTO';
-        outEl.textContent = `${a} (${primeLabel}) = ${pf.formatted}`;
+        outEl.innerHTML = `<div class="scp-result-headline">${a} = ${escapeHtml(pf.formatted)}<small>${escapeHtml(pf.isPrime ? t('lab.prime') : t('lab.composite'))}</small></div>`;
       } else if (action === 'base') {
-        const baseStr = document.getElementById('nt-base-input').value || '255';
-        const fromB = Number(document.getElementById('nt-base-select').value || 10);
-        const conv = convertBase(baseStr, fromB);
-        outEl.textContent = `DEC: ${conv.dec} | HEX: 0x${conv.hex} | BIN: 0b${conv.bin} | OCT: 0o${conv.oct}`;
+        const conv = convertBase($('nt-base-input').value || '0', Number($('nt-base-select').value || 10));
+        outEl.innerHTML = renderMetrics([
+          ['DEC', conv.dec],
+          ['HEX', `0x${conv.hex}`],
+          ['OCT', `0o${conv.oct}`],
+          ['BIN', `0b${conv.bin}`]
+        ]);
       } else if (action === 'bitwise') {
-        const bitOp = document.getElementById('nt-bitwise-op').value || 'AND';
-        const bw = bitwiseOperation(a, b, bitOp);
-        outEl.textContent = `${a} ${bitOp} ${b} = ${bw.result} (BIN: ${bw.bases.bin} | HEX: 0x${bw.bases.hex})`;
+        const op = $('nt-bitwise-op').value || 'AND';
+        const bw = bitwiseOperation(a, b, op);
+        outEl.innerHTML = `<div class="scp-result-headline">${op === 'NOT' ? `NOT ${a}` : `${a} ${op} ${b}`} = ${bw.result}</div>${renderMetrics([
+          ['HEX', `0x${bw.bases.hex}`],
+          ['BIN', `0b${bw.bases.bin}`]
+        ])}`;
       }
     } catch (err) {
-      outEl.textContent = state.i18n.translateError(err);
+      renderError(outEl, err);
     }
   }
 
-  // ==================== IN-APP AUTOMATED TEST SUITE RUNNER ====================
-  function executeInAppTests() {
-    const container = document.getElementById('modal-tests-results');
-    const summaryEl = document.getElementById('modal-tests-summary');
-    if (!container || !summaryEl) return;
+  function rerunLabs() {
+    runComplexTool();
+    runMatrixOperation(state.lastMatrixOp || 'det');
+    runStatisticsTool();
+    runSolverTool();
+    runCalculusTool(state.lastCalculusKind || 'derivative');
+    runFinanceTool(state.lastFinanceOp || 'compound');
+    runRateConversion();
+    runUnitConversion();
+    runNumberTheoryTool(state.lastNtOp || 'gcd_lcm');
+    graphState.summaryDirty = true;
+    requestGraphRender();
+  }
 
+  // ==================== IN-APP TEST RUNNER ====================
+  function executeInAppTests() {
+    const container = $('modal-tests-results');
+    const summaryEl = $('modal-tests-summary');
+    if (!container || !summaryEl) return;
     const all = [...runMathTests(), ...runLocalizationAndStateTests()].sort((a, b) => a.id - b.id);
     const passed = all.filter(r => r.pass).length;
-    summaryEl.textContent = `${passed} / ${all.length} — ${state.i18n.t('labels.allPassed')}`;
-
-    container.innerHTML = '';
-    all.forEach(r => {
-      const item = document.createElement('div');
-      item.className = 'scp-result-card';
-      item.style.marginBottom = '6px';
-      item.style.borderLeft = r.pass ? '4px solid var(--color-success)' : '4px solid var(--color-error)';
-      item.textContent = `[${r.pass ? 'PASS' : 'FAIL'}] #${String(r.id).padStart(2, '0')} ${r.name} — Result: ${JSON.stringify(r.actual)}`;
-      container.appendChild(item);
-    });
+    summaryEl.textContent = tf('labels.testsPassed', { passed, total: all.length });
+    summaryEl.classList.toggle('fail', passed !== all.length);
+    container.innerHTML = all.map(r => `<div class="scp-test-item${r.pass ? '' : ' fail'}">
+        <span class="scp-test-status">${r.pass ? 'PASS' : 'FAIL'}</span><span>#${String(r.id).padStart(2, '0')} ${escapeHtml(r.name)}</span>
+        <code>${escapeHtml(JSON.stringify(r.actual))}</code></div>`).join('');
   }
 
-  // ==================== EVENT LISTENERS & DELEGATION ====================
+  // ==================== EVENT DELEGATION ====================
   document.addEventListener('click', (event) => {
     const btn = event.target.closest('button');
-    if (!btn) return;
+    if (!btn) {
+      if (event.target.classList && event.target.classList.contains('scp-modal-backdrop')) closeModal(event.target);
+      return;
+    }
 
-    // Mode switch
     if (btn.hasAttribute('data-mode-select')) {
-      const m = btn.getAttribute('data-mode-select');
-      state.updatePreferences({ mode: m });
+      state.updatePreferences({ mode: btn.getAttribute('data-mode-select') });
       applyTranslations();
       return;
     }
 
-    // Angle switch
     if (btn.hasAttribute('data-angle-select')) {
-      const a = btn.getAttribute('data-angle-select');
-      state.updatePreferences({ angleMode: a });
+      state.updatePreferences({ angleMode: btn.getAttribute('data-angle-select') });
       applyTranslations();
       return;
     }
 
-    // Keypad insertion
-    if (btn.hasAttribute('data-insert')) {
-      insertIntoExpression(btn.getAttribute('data-insert'));
+    if (btn.hasAttribute('data-trig')) {
+      insertIntoExpression(`${trigFunctionName(btn.getAttribute('data-trig'))}(`);
+      releaseLayers();
       return;
     }
 
-    // Keypad actions
+    if (btn.hasAttribute('data-insert')) {
+      const token = layer2nd && btn.hasAttribute('data-insert-2nd') ? btn.getAttribute('data-insert-2nd') : btn.getAttribute('data-insert');
+      insertIntoExpression(token);
+      if (btn.closest('#scp-scientific-keypad')) releaseLayers();
+      return;
+    }
+
     if (btn.hasAttribute('data-calc-action')) {
       const act = btn.getAttribute('data-calc-action');
       if (act === 'clear-all') handleClearAll();
@@ -1087,54 +1716,78 @@ function bootstrapApp() {
       else if (act === 'backspace') handleBackspace();
       else if (act === 'toggle-sign') handleToggleSign();
       else if (act === 'equals') handleCalculate();
-      else if (act === 'mc') { state.engine.memoryClear(); updateDisplay(); }
+      else if (act === 'toggle-2nd') { layer2nd = !layer2nd; updateKeypadLayers(); }
+      else if (act === 'toggle-hyp') { layerHyp = !layerHyp; updateKeypadLayers(); }
+      else if (act === 'mc') { state.engine.memoryClear(); state.persistEngine(); updateDisplay(); }
       else if (act === 'mr') { insertIntoExpression(String(state.engine.memoryRecall())); }
-      else if (act === 'mplus') { state.engine.memoryAdd(state.lastResult); updateDisplay(); }
-      else if (act === 'mminus') { state.engine.memorySubtract(state.lastResult); updateDisplay(); }
-      else if (act === 'ms') { state.engine.memoryStore(state.lastResult); updateDisplay(); }
+      else if (act === 'mplus') { state.engine.memoryAdd(state.lastResult); state.persistEngine(); updateDisplay(); }
+      else if (act === 'mminus') { state.engine.memorySubtract(state.lastResult); state.persistEngine(); updateDisplay(); }
+      else if (act === 'ms') { state.engine.memoryStore(state.lastResult); state.persistEngine(); updateDisplay(); }
       return;
     }
 
-    // Side panel tabs
     if (btn.id === 'tab-btn-history') { setSideTab('history'); return; }
     if (btn.id === 'tab-btn-expert') { setSideTab('expert'); return; }
+    if (btn.id === 'tab-btn-library') { setSideTab('library'); return; }
 
-    // Expert category tabs
+    if (btn.hasAttribute('data-mobile-nav')) {
+      setMobileView(btn.getAttribute('data-mobile-nav'));
+      return;
+    }
+
     if (btn.hasAttribute('data-expert-tab')) {
       setExpertCategory(btn.getAttribute('data-expert-tab'));
       return;
     }
 
-    // Matrix operation buttons
     if (btn.hasAttribute('data-matrix-op')) {
       runMatrixOperation(btn.getAttribute('data-matrix-op'));
       return;
     }
 
-    // Number theory buttons
     if (btn.hasAttribute('data-nt-op')) {
       runNumberTheoryTool(btn.getAttribute('data-nt-op'));
       return;
     }
 
-    // Modal triggers & close buttons
-    if (btn.hasAttribute('data-close-modal')) {
-      const modalId = btn.getAttribute('data-close-modal');
-      const mEl = document.getElementById(modalId);
-      if (mEl) mEl.classList.add('hidden');
+    if (btn.hasAttribute('data-fin-op')) {
+      runFinanceTool(btn.getAttribute('data-fin-op'));
       return;
+    }
+
+    if (btn.hasAttribute('data-graph-action')) {
+      const action = btn.getAttribute('data-graph-action');
+      if (action === 'zoom-in') zoomGraph(0.7);
+      else if (action === 'zoom-out') zoomGraph(1 / 0.7);
+      else if (action === 'reset') {
+        Object.assign(graphState, { xMin: -10, xMax: 10, yMin: -6, yMax: 6 });
+        writeGraphInputs();
+        graphState.summaryDirty = true;
+        requestGraphRender();
+      }
+      return;
+    }
+
+    if (btn.hasAttribute('data-close-modal')) {
+      closeModal($(btn.getAttribute('data-close-modal')));
     }
   });
 
-  // Expression direct typing
+  // Expression typing & caret tracking
   if (exprInput) {
     exprInput.addEventListener('input', () => {
       state.expression = exprInput.value;
+      caret = exprInput.selectionStart;
+      justEvaluated = false;
       clearError();
+      updatePreview();
     });
+    ['click', 'keyup', 'select'].forEach(evt => exprInput.addEventListener(evt, () => {
+      caret = exprInput.selectionStart;
+    }));
   }
 
-  // Selects & Toggles
+  // Selects & toggles
   if (langSelect) {
     langSelect.addEventListener('change', () => {
       state.updatePreferences({ locale: langSelect.value });
@@ -1156,175 +1809,147 @@ function bootstrapApp() {
     });
   }
 
-  const btnToggleFrac = document.getElementById('btn-toggle-fraction');
-  if (btnToggleFrac) {
-    btnToggleFrac.addEventListener('click', () => {
-      state.updatePreferences({ showFraction: !state.preferences.showFraction });
-      updateDisplay();
-    });
-  }
+  $('btn-toggle-fraction')?.addEventListener('click', () => {
+    state.updatePreferences({ showFraction: !state.preferences.showFraction });
+    updateDisplay();
+  });
+  $('btn-toggle-sci')?.addEventListener('click', () => {
+    state.updatePreferences({ scientificNotation: !state.preferences.scientificNotation });
+    updateDisplay();
+  });
 
-  const btnToggleSci = document.getElementById('btn-toggle-sci');
-  if (btnToggleSci) {
-    btnToggleSci.addEventListener('click', () => {
-      state.updatePreferences({ scientificNotation: !state.preferences.scientificNotation });
-      updateDisplay();
-    });
-  }
+  $('btn-copy-result')?.addEventListener('click', copyResult);
+  $('btn-share-link')?.addEventListener('click', shareLink);
+  $('btn-plot-expression')?.addEventListener('click', plotCurrentExpression);
 
-  if (historySearchInput) {
-    historySearchInput.addEventListener('input', () => renderHistoryList());
-  }
+  historySearchInput?.addEventListener('input', renderHistoryList);
+  $('input-constants-search')?.addEventListener('input', renderLibrary);
+  $('btn-export-csv')?.addEventListener('click', () => exportHistory('csv'));
+  $('btn-export-json')?.addEventListener('click', () => exportHistory('json'));
 
   if (clearHistoryBtn) {
+    let confirmTimer = null;
     clearHistoryBtn.addEventListener('click', () => {
       if (!state.confirmingClearHistory) {
         state.confirmingClearHistory = true;
-        applyTranslations();
-        setTimeout(() => {
+        updateClearHistoryButton();
+        confirmTimer = setTimeout(() => {
           state.confirmingClearHistory = false;
-          applyTranslations();
+          updateClearHistoryButton();
         }, 3500);
       } else {
+        clearTimeout(confirmTimer);
         state.confirmingClearHistory = false;
         state.history.clearAll();
-        applyTranslations();
+        updateClearHistoryButton();
+        renderHistoryList();
       }
     });
   }
 
-  // Expert Tools button bindings
-  const btnRunComplex = document.getElementById('btn-run-complex');
-  if (btnRunComplex) btnRunComplex.addEventListener('click', runComplexTool);
-
-  const btnApplyMatDims = document.getElementById('btn-apply-matrix-dims');
-  if (btnApplyMatDims) {
-    btnApplyMatDims.addEventListener('click', () => {
-      matADims.rows = Math.min(Math.max(Number(document.getElementById('mat-a-rows').value || 2), 1), 6);
-      matADims.cols = Math.min(Math.max(Number(document.getElementById('mat-a-cols').value || 2), 1), 6);
-      matBDims.rows = Math.min(Math.max(Number(document.getElementById('mat-b-rows').value || 2), 1), 6);
-      matBDims.cols = Math.min(Math.max(Number(document.getElementById('mat-b-cols').value || 2), 1), 6);
+  // Expert tool bindings
+  $('btn-run-graph')?.addEventListener('click', runGraphTool);
+  [...GRAPH_INPUT_IDS, 'graph-xmin', 'graph-xmax', 'graph-ymin', 'graph-ymax'].forEach(id => {
+    $(id)?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') runGraphTool();
+    });
+    $(id)?.addEventListener('change', runGraphTool);
+  });
+  $('btn-run-complex')?.addEventListener('click', runComplexTool);
+  $('cx-operation')?.addEventListener('change', runComplexTool);
+  ['mat-a-rows', 'mat-a-cols', 'mat-b-rows', 'mat-b-cols'].forEach(id => {
+    $(id)?.addEventListener('change', () => {
+      const clamp = (el) => Math.min(Math.max(Math.round(Number($(el).value) || 1), 1), 6);
+      matADims.rows = clamp('mat-a-rows');
+      matADims.cols = clamp('mat-a-cols');
+      matBDims.rows = clamp('mat-b-rows');
+      matBDims.cols = clamp('mat-b-cols');
       renderMatrixGrids();
     });
-  }
+  });
+  $('btn-run-stats')?.addEventListener('click', runStatisticsTool);
+  $('btn-run-solver')?.addEventListener('click', runSolverTool);
+  $('btn-run-derivative')?.addEventListener('click', () => runCalculusTool('derivative'));
+  $('btn-run-integral')?.addEventListener('click', () => runCalculusTool('integral'));
+  ['fin-conv-rate', 'fin-conv-from', 'fin-conv-to'].forEach(id => {
+    $(id)?.addEventListener('input', runRateConversion);
+    $(id)?.addEventListener('change', runRateConversion);
+  });
 
-  const btnRunStats = document.getElementById('btn-run-stats');
-  if (btnRunStats) btnRunStats.addEventListener('click', runStatisticsTool);
-
-  const btnRunSolver = document.getElementById('btn-run-solver');
-  if (btnRunSolver) btnRunSolver.addEventListener('click', runSolverTool);
-
-  const btnRunDeriv = document.getElementById('btn-run-derivative');
-  if (btnRunDeriv) btnRunDeriv.addEventListener('click', () => runCalculusTool('derivative'));
-
-  const btnRunInteg = document.getElementById('btn-run-integral');
-  if (btnRunInteg) btnRunInteg.addEventListener('click', () => runCalculusTool('integral'));
-
-  const unitCatSelect = document.getElementById('unit-category-select');
-  if (unitCatSelect) unitCatSelect.addEventListener('change', populateUnitsForCategory);
-  const unitFromSelect = document.getElementById('unit-from-select');
-  if (unitFromSelect) unitFromSelect.addEventListener('change', runUnitConversion);
-  const unitToSelect = document.getElementById('unit-to-select');
-  if (unitToSelect) unitToSelect.addEventListener('change', runUnitConversion);
-  const unitValInput = document.getElementById('unit-input-val');
-  if (unitValInput) unitValInput.addEventListener('input', runUnitConversion);
-  const btnSwapUnits = document.getElementById('btn-swap-units');
-  if (btnSwapUnits) {
-    btnSwapUnits.addEventListener('click', () => {
-      const f = unitFromSelect.value;
-      unitFromSelect.value = unitToSelect.value;
-      unitToSelect.value = f;
-      runUnitConversion();
-    });
-  }
+  const unitFromSelect = $('unit-from-select');
+  const unitToSelect = $('unit-to-select');
+  $('unit-category-select')?.addEventListener('change', populateUnitsForCategory);
+  unitFromSelect?.addEventListener('change', runUnitConversion);
+  unitToSelect?.addEventListener('change', runUnitConversion);
+  $('unit-input-val')?.addEventListener('input', runUnitConversion);
+  $('btn-swap-units')?.addEventListener('click', () => {
+    const f = unitFromSelect.value;
+    unitFromSelect.value = unitToSelect.value;
+    unitToSelect.value = f;
+    runUnitConversion();
+  });
 
   // Modals
-  const btnOpenTests = document.getElementById('btn-open-tests');
-  if (btnOpenTests) {
-    btnOpenTests.addEventListener('click', () => {
-      document.getElementById('modal-tests').classList.remove('hidden');
-      executeInAppTests();
-    });
-  }
-  const btnRerunTests = document.getElementById('btn-rerun-tests');
-  if (btnRerunTests) btnRerunTests.addEventListener('click', executeInAppTests);
+  $('btn-open-tests')?.addEventListener('click', () => {
+    openModal('modal-tests');
+    executeInAppTests();
+  });
+  $('btn-rerun-tests')?.addEventListener('click', executeInAppTests);
+  $('btn-open-prompt')?.addEventListener('click', () => {
+    closeModal($('modal-settings'));
+    openModal('modal-prompt');
+  });
+  $('btn-copy-master-prompt')?.addEventListener('click', () => copyTextToClipboard($('master-prompt-textarea').value));
+  $('btn-open-settings')?.addEventListener('click', () => openModal('modal-settings'));
+  $('btn-open-help')?.addEventListener('click', () => openModal('modal-help'));
 
-  const btnOpenPrompt = document.getElementById('btn-open-prompt');
-  if (btnOpenPrompt) {
-    btnOpenPrompt.addEventListener('click', () => {
-      document.getElementById('modal-prompt').classList.remove('hidden');
-    });
-  }
-  const btnCopyMasterPrompt = document.getElementById('btn-copy-master-prompt');
-  if (btnCopyMasterPrompt) {
-    btnCopyMasterPrompt.addEventListener('click', () => {
-      const promptText = document.getElementById('master-prompt-textarea').value;
-      copyTextToClipboard(promptText);
-    });
-  }
+  // Settings
+  const setPrecisionSelect = $('setting-precision-mode');
+  const setDecimalsInput = $('setting-decimal-places');
+  const setAccentInput = $('setting-custom-accent');
+  const setSoundCheck = $('setting-sound-enabled');
+  const setPreviewCheck = $('setting-live-preview');
+  const setHistLimitInput = $('setting-history-limit');
 
-  const btnOpenSettings = document.getElementById('btn-open-settings');
-  if (btnOpenSettings) {
-    btnOpenSettings.addEventListener('click', () => {
-      document.getElementById('modal-settings').classList.remove('hidden');
-    });
+  function syncSettingsForm() {
+    if (setPrecisionSelect) setPrecisionSelect.value = state.preferences.precisionMode;
+    if (setDecimalsInput) setDecimalsInput.value = state.preferences.decimalPlaces;
+    if (setSoundCheck) setSoundCheck.checked = state.preferences.soundEnabled;
+    if (setPreviewCheck) setPreviewCheck.checked = state.preferences.livePreview;
+    if (setHistLimitInput) setHistLimitInput.value = state.preferences.historyLimit;
   }
 
-  const btnOpenHelp = document.getElementById('btn-open-help');
-  if (btnOpenHelp) {
-    btnOpenHelp.addEventListener('click', () => {
-      document.getElementById('modal-help').classList.remove('hidden');
-    });
-  }
-
-  // Settings controls
-  const setPrecisionSelect = document.getElementById('setting-precision-mode');
-  const setDecimalsInput = document.getElementById('setting-decimal-places');
-  const setAccentInput = document.getElementById('setting-custom-accent');
-  const setSoundCheck = document.getElementById('setting-sound-enabled');
-  const setHistLimitInput = document.getElementById('setting-history-limit');
-  const btnResetPrefs = document.getElementById('btn-reset-preferences');
-
-  if (setPrecisionSelect) {
-    setPrecisionSelect.value = state.preferences.precisionMode;
-    setPrecisionSelect.addEventListener('change', () => {
-      state.updatePreferences({ precisionMode: setPrecisionSelect.value });
-      updateDisplay();
-    });
-  }
-  if (setDecimalsInput) {
-    setDecimalsInput.value = state.preferences.decimalPlaces;
-    setDecimalsInput.addEventListener('input', () => {
-      state.updatePreferences({ decimalPlaces: Number(setDecimalsInput.value) });
-      updateDisplay();
-    });
-  }
-  if (setAccentInput) {
-    setAccentInput.addEventListener('input', () => {
-      state.updatePreferences({ customAccent: setAccentInput.value });
-      applyTheme();
-    });
-  }
-  if (setSoundCheck) {
-    setSoundCheck.checked = state.preferences.soundEnabled;
-    setSoundCheck.addEventListener('change', () => {
-      state.updatePreferences({ soundEnabled: setSoundCheck.checked });
-    });
-  }
-  if (setHistLimitInput) {
-    setHistLimitInput.value = state.preferences.historyLimit;
-    setHistLimitInput.addEventListener('change', () => {
-      state.updatePreferences({ historyLimit: Number(setHistLimitInput.value) });
-      renderHistoryList();
-    });
-  }
-  if (btnResetPrefs) {
-    btnResetPrefs.addEventListener('click', () => {
-      state.updatePreferences(DEFAULT_PREFERENCES);
-      applyTheme();
-      applyTranslations();
-    });
-  }
+  setPrecisionSelect?.addEventListener('change', () => {
+    state.updatePreferences({ precisionMode: setPrecisionSelect.value });
+    updateDisplay();
+  });
+  setDecimalsInput?.addEventListener('input', () => {
+    state.updatePreferences({ decimalPlaces: Number(setDecimalsInput.value) });
+    updateDisplay();
+  });
+  setAccentInput?.addEventListener('input', () => {
+    state.updatePreferences({ customAccent: setAccentInput.value });
+    applyTheme();
+  });
+  $('btn-clear-accent')?.addEventListener('click', () => {
+    state.updatePreferences({ customAccent: '' });
+    applyTheme();
+  });
+  setSoundCheck?.addEventListener('change', () => state.updatePreferences({ soundEnabled: setSoundCheck.checked }));
+  setPreviewCheck?.addEventListener('change', () => {
+    state.updatePreferences({ livePreview: setPreviewCheck.checked });
+    updatePreview();
+  });
+  setHistLimitInput?.addEventListener('change', () => {
+    state.updatePreferences({ historyLimit: Number(setHistLimitInput.value) });
+    renderHistoryList();
+  });
+  $('btn-reset-preferences')?.addEventListener('click', () => {
+    state.updatePreferences(DEFAULT_PREFERENCES);
+    syncSettingsForm();
+    applyTheme();
+    applyTranslations();
+  });
 
   // Keyboard shortcuts
   initKeyboardShortcuts({
@@ -1332,61 +1957,72 @@ function bootstrapApp() {
     onClearAll: handleClearAll,
     onClearEntry: handleClearEntry,
     onBackspace: handleBackspace,
-    onInsert: insertIntoExpression
+    onInsert: insertIntoExpression,
+    onHistoryNavigate: navigateHistory,
+    onCopyResult: copyResult,
+    onHelp: () => openModal('modal-help'),
+    onCloseModal: closeModal
   });
 
   // Initial setup
+  syncSettingsForm();
   applyTheme();
   applyViewportMode();
-  updateModeLayout();
   renderMatrixGrids();
-  applyTranslations();
+  setExpertCategory(state.expertCategory);
   populateUnitsForCategory();
-  runComplexTool();
-  runStatisticsTool();
-  runSolverTool();
-  runCalculusTool('derivative');
-  runNumberTheoryTool('gcd_lcm');
+  applyTranslations();
 
-  // URL parameters support for deep linking, automation and screenshots
-  if (typeof window !== 'undefined' && window.location && window.location.search) {
-    const params = new URLSearchParams(window.location.search);
-    if (params.has('theme')) {
-      state.updatePreferences({ theme: params.get('theme') });
-      applyTheme();
-    }
-    if (params.has('lang') || params.has('locale')) {
-      state.updatePreferences({ locale: params.get('lang') || params.get('locale') });
-      applyTranslations();
-    }
-    if (params.has('mode')) {
-      state.updatePreferences({ mode: params.get('mode') });
-      updateModeLayout();
-      applyTranslations();
-    }
-    if (params.has('angle')) {
-      state.updatePreferences({ angleMode: params.get('angle') });
-      applyTranslations();
-    }
-    if (params.has('tab')) {
-      setSideTab(params.get('tab'));
-    }
-    if (params.has('expertTab')) {
-      setSideTab('expert');
-      setExpertCategory(params.get('expertTab'));
-    }
-    if (params.has('expr')) {
-      const e = params.get('expr');
-      if (exprInput) exprInput.value = e;
-      state.expression = e;
-      handleCalculate();
-    }
-    if (params.has('tests')) {
-      openModal('modal-tests');
-      const btn = document.getElementById('btn-run-all-tests');
-      if (btn) btn.click();
-    }
+  // URL parameters: deep linking, automation and screenshots
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('theme')) {
+    state.updatePreferences({ theme: params.get('theme') });
+    applyTheme();
   }
+  if (params.has('lang') || params.has('locale')) {
+    state.updatePreferences({ locale: params.get('lang') || params.get('locale') });
+  }
+  if (params.has('mode')) state.updatePreferences({ mode: params.get('mode') });
+  if (params.has('angle')) state.updatePreferences({ angleMode: params.get('angle') });
+  if (params.has('viewport')) {
+    state.viewportMode = params.get('viewport');
+    applyViewportMode();
+  }
+  if (params.has('lang') || params.has('locale') || params.has('mode') || params.has('angle')) applyTranslations();
+  if (params.has('tab')) {
+    const tab = params.get('tab');
+    if (tab === 'keypad' || tab === 'calc') setMobileView('calc');
+    else setSideTab(tab);
+  }
+  if (params.has('view')) setMobileView(params.get('view'));
+  if (params.has('expertTab')) {
+    setSideTab('expert');
+    setExpertCategory(params.get('expertTab'));
+  }
+  if (params.has('expr')) {
+    setExpression(params.get('expr'));
+    handleCalculate();
+  }
+  if (params.has('tests')) {
+    openModal('modal-tests');
+    executeInAppTests();
+  }
+
+  // Expose a tiny automation surface for screenshots and debugging
+  window.scpApp = {
+    version: APP_VERSION,
+    state,
+    setExpression,
+    calculate: handleCalculate,
+    setSideTab,
+    setExpertCategory,
+    setMobileView,
+    runGraphTool,
+    runFinanceTool,
+    runMatrixOperation,
+    openModal,
+    executeInAppTests
+  };
 }
 
 if (typeof document !== 'undefined') {
@@ -1398,6 +2034,7 @@ if (typeof document !== 'undefined') {
 }
 
 export {
+  APP_VERSION,
   bootstrapApp,
   runMathTests,
   runLocalizationAndStateTests

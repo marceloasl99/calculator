@@ -1,11 +1,11 @@
 {
   "name": "Scientific Calculator Pro",
   "short_name": "SciCalc Pro",
-  "description": "High-precision multi-mode scientific calculator web application with desktop and mobile layouts, 8 themes, 6 languages, and expert engineering lab.",
+  "description": "High-precision multi-mode scientific calculator with function plotter, financial math, physical constants, 10 themes and 6 languages.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0b132b",
-  "theme_color": "#0ea5e9",
+  "background_color": "#070d1f",
+  "theme_color": "#0b1020",
   "orientation": "any",
   "icons": [
     {
@@ -14,5 +14,6 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "version": "2.0.0"
 }

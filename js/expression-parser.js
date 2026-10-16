@@ -25,6 +25,37 @@ const CONSTANTS = {
   '∞': Infinity
 };
 
+// Case-sensitive CODATA 2018 physical constants (SI units), insertable from the Constants library
+const PHYSICAL_CONSTANTS = {
+  c: { value: 299792458, unit: 'm/s', key: 'speedOfLight' },
+  h: { value: 6.62607015e-34, unit: 'J·s', key: 'planck' },
+  hbar: { value: 1.054571817e-34, unit: 'J·s', key: 'reducedPlanck' },
+  G: { value: 6.6743e-11, unit: 'm³/(kg·s²)', key: 'gravitational' },
+  g0: { value: 9.80665, unit: 'm/s²', key: 'standardGravity' },
+  NA: { value: 6.02214076e23, unit: 'mol⁻¹', key: 'avogadro' },
+  kB: { value: 1.380649e-23, unit: 'J/K', key: 'boltzmann' },
+  R: { value: 8.314462618, unit: 'J/(mol·K)', key: 'gasConstant' },
+  qe: { value: 1.602176634e-19, unit: 'C', key: 'elementaryCharge' },
+  me: { value: 9.1093837015e-31, unit: 'kg', key: 'electronMass' },
+  mp: { value: 1.67262192369e-27, unit: 'kg', key: 'protonMass' },
+  eps0: { value: 8.8541878128e-12, unit: 'F/m', key: 'vacuumPermittivity' },
+  mu0: { value: 1.25663706212e-6, unit: 'N/A²', key: 'vacuumPermeability' },
+  sigma: { value: 5.670374419e-8, unit: 'W/(m²·K⁴)', key: 'stefanBoltzmann' },
+  atm: { value: 101325, unit: 'Pa', key: 'standardAtmosphere' }
+};
+
+const RESERVED_IDENTIFIERS = new Set(['ans', 'mod', 'rem']);
+
+function isReservedIdentifier(name) {
+  const lower = String(name).toLowerCase();
+  return (
+    RESERVED_IDENTIFIERS.has(lower) ||
+    Object.prototype.hasOwnProperty.call(CONSTANTS, lower) ||
+    Object.prototype.hasOwnProperty.call(PHYSICAL_CONSTANTS, name) ||
+    Object.prototype.hasOwnProperty.call(FUNCTION_ALIASES, lower)
+  );
+}
+
 // Map localized and canonical function names to internal canonical function identifiers
 const FUNCTION_ALIASES = {
   sin: 'sin', sen: 'sin',
@@ -66,9 +97,14 @@ const FUNCTION_ALIASES = {
 
 const MULTI_ARG_FUNCS = new Set(['nthRoot', 'logBase', 'gcd', 'lcm', 'nPr', 'nCr', 'modFunc', 'remFunc']);
 
-function cleanFloatingPoint(val) {
+/**
+ * Remove IEEE 754 noise. `scale` is the magnitude of the operands that produced `val`:
+ * results smaller than 1e-15 × scale are rounding residue (e.g. 0.1 + 0.2 - 0.3) and become 0,
+ * while genuinely tiny quantities such as Planck's constant are preserved.
+ */
+function cleanFloatingPoint(val, scale = 1) {
   if (!Number.isFinite(val)) return val;
-  if (Math.abs(val) < 1e-15) return 0;
+  if (Math.abs(val) < 1e-15 * scale) return 0;
   // Round to 12 significant digits to eliminate IEEE 754 artifacts like 0.30000000000000004 or sin(30deg)=0.49999999999999994
   const rounded12 = Number(val.toPrecision(12));
   if (Math.abs(val - rounded12) <= Math.abs(val) * 1e-12) {
@@ -271,11 +307,16 @@ function tokenizeExpression(rawExpr, options = {}) {
       }
 
       if (options.variables && Object.prototype.hasOwnProperty.call(options.variables, id)) {
-        tokens.push({ type: 'NUMBER', value: Number(options.variables[id]), isVar: true });
+        tokens.push({ type: 'NUMBER', value: Number(options.variables[id]), isVar: true, name: id });
         continue;
       }
       if (options.variables && Object.prototype.hasOwnProperty.call(options.variables, lower)) {
-        tokens.push({ type: 'NUMBER', value: Number(options.variables[lower]), isVar: true });
+        tokens.push({ type: 'NUMBER', value: Number(options.variables[lower]), isVar: true, name: lower });
+        continue;
+      }
+
+      if (Object.prototype.hasOwnProperty.call(PHYSICAL_CONSTANTS, id)) {
+        tokens.push({ type: 'CONST', name: id, value: PHYSICAL_CONSTANTS[id].value });
         continue;
       }
 
@@ -556,10 +597,11 @@ function evaluateRPN(rpn, options = {}) {
 
       switch (tok.value) {
         case '+':
-          res = a + b;
+          // Cancellation residue (e.g. 0.1 + 0.2 - 0.3) is measured against the operands
+          res = cleanFloatingPoint(a + b, Math.max(Math.abs(a), Math.abs(b)));
           break;
         case '-':
-          res = a - b;
+          res = cleanFloatingPoint(a - b, Math.max(Math.abs(a), Math.abs(b)));
           break;
         case '*':
           res = a * b;
@@ -754,7 +796,7 @@ function evaluateRPN(rpn, options = {}) {
   }
 
   if (stack.length !== 1) throw new CalcError('ERR_SYNTAX');
-  return cleanFloatingPoint(stack[0]);
+  return cleanFloatingPoint(stack[0], 0);
 }
 
 function evaluateExpression(expr, options = {}) {
@@ -763,9 +805,40 @@ function evaluateExpression(expr, options = {}) {
   return evaluateRPN(rpn, options);
 }
 
+/**
+ * Parse an expression once and return a fast evaluator f(x) for repeated sampling
+ * (function plotting, root scanning). The variable token is patched in place on each call.
+ */
+function compileExpression(expr, options = {}) {
+  const variable = options.variable || 'x';
+  const variables = { ...(options.variables || {}), [variable]: 0 };
+  const tokens = tokenizeExpression(expr, { ...options, variables });
+  const rpn = toRPN(tokens);
+  const slots = rpn.filter(tok => tok.isVar && tok.name === variable);
+  const evalOptions = { angleMode: options.angleMode || 'RAD' };
+  return function evaluateAt(x) {
+    for (const slot of slots) slot.value = x;
+    return evaluateRPN(rpn, evalOptions);
+  };
+}
+
+/**
+ * Detect a top-level assignment such as `r = 5` or `area = π r^2`.
+ * Returns { name, expression } or null when the input is a plain expression.
+ */
+function parseAssignment(rawExpr) {
+  const match = String(rawExpr || '').match(/^\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*=(?!=)\s*(.+)$/);
+  if (!match) return null;
+  return { name: match[1], expression: match[2] };
+}
+
 export {
   CalcError,
   CONSTANTS,
+  PHYSICAL_CONSTANTS,
+  isReservedIdentifier,
+  compileExpression,
+  parseAssignment,
   FUNCTION_ALIASES,
   cleanFloatingPoint,
   toRadians,

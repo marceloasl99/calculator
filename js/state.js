@@ -15,17 +15,24 @@ class AppState {
     this.i18n = new I18nManager(this.preferences.locale);
     this.engine = new CalculatorEngine({
       angleMode: this.preferences.angleMode,
-      memory: 0,
-      ans: 0
+      memory: this.storage.loadMemory(),
+      ans: 0,
+      variables: this.storage.loadVariables()
     });
     this.history = new HistoryManager(this.storage, this.preferences.historyLimit);
     this.expression = '';
     this.lastResult = 0;
     this.errorCode = null;
-    this.sideTab = 'history'; // 'history' | 'expert'
-    this.expertCategory = 'complex'; // 'complex'|'matrices'|'statistics'|'solver'|'calculus'|'units'|'numberTheory'
+    this.sideTab = 'history'; // 'history' | 'expert' | 'library'
+    this.expertCategory = 'graph'; // 'graph'|'complex'|'matrices'|'statistics'|'solver'|'calculus'|'units'|'numberTheory'|'finance'
+    this.mobileView = 'calc'; // 'calc' | 'side' (small screens show one column at a time)
     this.viewportMode = 'auto'; // 'auto' | 'desktop' | 'mobile'
     this.confirmingClearHistory = false;
+  }
+
+  persistEngine() {
+    this.storage.saveMemory(this.engine.memory);
+    this.storage.saveVariables(this.engine.variables);
   }
 
   updatePreferences(partial) {

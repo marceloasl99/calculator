@@ -1,4 +1,4 @@
-import { evaluateExpression, cleanFloatingPoint, CalcError } from './expression-parser.js';
+import { evaluateExpression, cleanFloatingPoint, CalcError, parseAssignment, isReservedIdentifier } from './expression-parser.js';
 
 // --- js/calculator-engine.js ---
 /**
@@ -61,6 +61,7 @@ class CalculatorEngine {
     this.ans = Number(initialState.ans) || 0;
     this.angleMode = initialState.angleMode || 'DEG';
     this.lastAction = null; // Stores last top-level binary operation for repeat '='
+    this.variables = { ...(initialState.variables || {}) }; // User-defined variables (e.g. r = 5)
   }
 
   setAngleMode(mode) {
@@ -75,17 +76,47 @@ class CalculatorEngine {
     const result = evaluateExpression(expression, {
       angleMode,
       ans,
-      variables: extraOptions.variables || {}
+      variables: { ...this.variables, ...(extraOptions.variables || {}) }
     });
 
     // Extract top-level binary operation for '=' repeat behavior (e.g. "5 + 3" -> "+ 3")
     const repeatMatch = String(expression).trim().match(/([+\-*/×÷^])\s*([0-9.]+)\s*$/);
-    if (repeatMatch) {
-      this.lastAction = `${repeatMatch[1]} ${repeatMatch[2]}`;
-    }
+    this.lastAction = repeatMatch ? `${repeatMatch[1]} ${repeatMatch[2]}` : null;
 
     this.ans = result;
     return result;
+  }
+
+  /**
+   * Evaluate an input line that may be an assignment (`r = 5`) or a plain expression.
+   * Returns { value, assigned } where assigned is the variable name or null.
+   */
+  run(input, extraOptions = {}) {
+    const assignment = parseAssignment(input);
+    if (assignment) {
+      if (isReservedIdentifier(assignment.name)) throw new CalcError('ERR_RESERVED_NAME', assignment.name);
+      const value = this.evaluate(assignment.expression, extraOptions);
+      this.variables[assignment.name] = value;
+      return { value, assigned: assignment.name };
+    }
+    return { value: this.evaluate(input, extraOptions), assigned: null };
+  }
+
+  /**
+   * Evaluate without side effects on ans / repeat state (used for the live preview).
+   */
+  preview(input, extraOptions = {}) {
+    const assignment = parseAssignment(input);
+    const expr = assignment ? assignment.expression : input;
+    return evaluateExpression(expr, {
+      angleMode: extraOptions.angleMode || this.angleMode,
+      ans: this.ans,
+      variables: { ...this.variables }
+    });
+  }
+
+  deleteVariable(name) {
+    delete this.variables[name];
   }
 
   repeatLast(currentValue) {
@@ -107,21 +138,21 @@ class CalculatorEngine {
   memoryStore(val) {
     const num = Number(val);
     if (!Number.isFinite(num)) throw new CalcError('ERR_INVALID_ARG');
-    this.memory = cleanFloatingPoint(num);
+    this.memory = cleanFloatingPoint(num, Math.abs(num));
     return this.memory;
   }
 
   memoryAdd(val) {
     const num = Number(val);
     if (!Number.isFinite(num)) throw new CalcError('ERR_INVALID_ARG');
-    this.memory = cleanFloatingPoint(this.memory + num);
+    this.memory = cleanFloatingPoint(this.memory + num, Math.max(Math.abs(this.memory), Math.abs(num)));
     return this.memory;
   }
 
   memorySubtract(val) {
     const num = Number(val);
     if (!Number.isFinite(num)) throw new CalcError('ERR_INVALID_ARG');
-    this.memory = cleanFloatingPoint(this.memory - num);
+    this.memory = cleanFloatingPoint(this.memory - num, Math.max(Math.abs(this.memory), Math.abs(num)));
     return this.memory;
   }
 }
