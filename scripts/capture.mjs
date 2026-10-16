@@ -98,6 +98,29 @@ const SCENES = [
       scpApp.runGraphTool();`
   },
   {
+    file: 'v2-it-network.png',
+    viewport: { width: 1440, height: 900, deviceScaleFactor: 2, mobile: false },
+    query: 'theme=ocean&lang=pt-BR&app=converter&tool=network',
+    setup: `
+      const i = document.getElementById('it-cidr'); i.value = '10.20.30.77/26'; i.dispatchEvent(new Event('input'));
+      const s = document.getElementById('it-split-prefix'); s.value = 28; s.dispatchEvent(new Event('input'));`
+  },
+  {
+    file: 'v2-it-bits.png',
+    viewport: { width: 1440, height: 900, deviceScaleFactor: 2, mobile: false },
+    query: 'theme=aurora&lang=pt-BR&app=converter&tool=bases',
+    setup: `
+      document.querySelector('[data-word-width="16"]').click();
+      const i = document.getElementById('it-num-input'); i.value = '0000000010000010'; i.dispatchEvent(new Event('input'));`
+  },
+  {
+    file: 'v2-it-mobile.png',
+    viewport: { width: 390, height: 844, deviceScaleFactor: 3, mobile: true },
+    query: 'theme=purple&lang=pt-BR&app=converter&tool=data',
+    setup: `
+      const v = document.getElementById('it-data-value'); v.value = 500; v.dispatchEvent(new Event('input'));`
+  },
+  {
     file: 'v2-tests-modal.png',
     viewport: { width: 1440, height: 900, deviceScaleFactor: 2, mobile: false },
     query: 'mode=intermediate&theme=dark&lang=en&tests=1',

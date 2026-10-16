@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="css/themes.css" />
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="css/converter.css" />
 </head>
 <body>
 
@@ -35,21 +36,32 @@
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/></symbol>
+  <symbol id="i-network" viewBox="0 0 24 24"><rect x="9" y="2.5" width="6" height="5" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="2.5" y="16.5" width="6" height="5" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="15.5" y="16.5" width="6" height="5" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5V12M5.5 16.5V12h13v4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-binary" viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="7" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M14 4h2.5v7M14 11h5M5.5 13v7M3 20h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="14" y="13" width="5" height="7" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7.5" ry="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 5.5v13c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-13M4.5 12c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.9 1.4-2l-.4-1a1.5 1.5 0 0 1 1.4-2H17a4 4 0 0 0 4-4c0-5-4-9-9-9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="7.5" cy="11" r="1.3" fill="currentColor"/><circle cx="10.5" cy="7" r="1.3" fill="currentColor"/><circle cx="15" cy="7.5" r="1.3" fill="currentColor"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10.5" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5M12 14.5v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
   <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></symbol>
 </svg>
 
 <div class="scp-backdrop" aria-hidden="true"></div>
 
-<div id="scp-app-shell" class="scp-shell" data-mobile-view="calc">
+<div id="scp-app-shell" class="scp-shell" data-mobile-view="calc" data-app="calc">
   <!-- 1. HEADER -->
   <header class="scp-header" role="banner">
     <div class="scp-brand">
       <img class="scp-logo" src="assets/icons/calculator.svg" alt="" width="40" height="40" />
       <div class="scp-brand-text">
-        <h1 id="scp-app-title" class="scp-title">Scientific Calculator Pro <span class="scp-version">v2.0</span></h1>
+        <h1 id="scp-app-title" class="scp-title">Scientific Calculator Pro <span class="scp-version">v2.1</span></h1>
         <p id="scp-app-subtitle" class="scp-subtitle">Suíte Matemática e Científica Multimodo</p>
       </div>
     </div>
+
+    <button type="button" id="btn-app-switch" class="scp-app-switch" aria-pressed="false">
+      <svg class="ico"><use href="#i-network"/></svg><span id="btn-app-switch-label">Conversor TI</span>
+    </button>
 
     <div class="scp-segmented scp-mode-switch" role="tablist" aria-label="Calculator Mode">
       <button type="button" class="scp-seg-btn" data-mode-select="simple">Simples</button>
@@ -499,6 +511,184 @@
     </aside>
   </main>
 
+  <!-- 3. IT CONVERTER (full-page alternative view) -->
+  <main id="scp-converter" class="scp-converter hidden" aria-label="IT Converter">
+    <nav class="scp-it-nav" role="tablist" aria-label="IT tools">
+      <button type="button" class="scp-it-nav-btn active" data-it-tool="network"><svg class="ico"><use href="#i-network"/></svg><span data-i18n="it.tools.network">Rede / CIDR</span></button>
+      <button type="button" class="scp-it-nav-btn" data-it-tool="bases"><svg class="ico"><use href="#i-binary"/></svg><span data-i18n="it.tools.bases">Bases e bits</span></button>
+      <button type="button" class="scp-it-nav-btn" data-it-tool="data"><svg class="ico"><use href="#i-database"/></svg><span data-i18n="it.tools.data">Bits e bytes</span></button>
+      <button type="button" class="scp-it-nav-btn" data-it-tool="text"><svg class="ico"><use href="#i-code"/></svg><span data-i18n="it.tools.text">Texto e codificação</span></button>
+      <button type="button" class="scp-it-nav-btn" data-it-tool="time"><svg class="ico"><use href="#i-clock"/></svg><span data-i18n="it.tools.time">Unix timestamp</span></button>
+      <button type="button" class="scp-it-nav-btn" data-it-tool="color"><svg class="ico"><use href="#i-palette"/></svg><span data-i18n="it.tools.color">Cores</span></button>
+      <button type="button" class="scp-it-nav-btn" data-it-tool="chmod"><svg class="ico"><use href="#i-lock"/></svg><span data-i18n="it.tools.chmod">Permissões chmod</span></button>
+    </nav>
+
+    <section class="scp-it-panel">
+      <!-- NETWORK -->
+      <div data-it-section="network" class="scp-it-section">
+        <header class="scp-it-head"><h2 data-i18n="it.tools.network">Rede / CIDR</h2><p data-i18n="it.desc.network">Calculadora de sub-redes IPv4 e IPv6.</p></header>
+        <div class="scp-it-card">
+          <div class="scp-form-grid">
+            <label class="scp-field"><span data-i18n="it.network.address">Endereço IPv4 / CIDR ou máscara</span>
+              <input id="it-cidr" type="text" class="scp-input scp-mono" value="192.168.1.10/24" spellcheck="false" />
+            </label>
+            <label class="scp-field"><span data-i18n="it.network.hostsNeeded">Hosts necessários → prefixo</span>
+              <input id="it-hosts" type="number" min="1" class="scp-input" placeholder="50" />
+            </label>
+          </div>
+          <label class="scp-field scp-range-field"><span><span data-i18n="it.network.prefix">Prefixo</span> <b id="it-prefix-label">/24</b></span>
+            <input id="it-prefix" type="range" min="0" max="32" value="24" />
+          </label>
+          <div id="it-net-result"></div>
+          <div id="it-net-binary" class="scp-bin-table"></div>
+        </div>
+        <div class="scp-it-card">
+          <h3 class="scp-section-title" data-i18n="it.network.splitTitle">Dividir em sub-redes</h3>
+          <label class="scp-field scp-inline-field"><span data-i18n="it.network.newPrefix">Novo prefixo</span>
+            <input id="it-split-prefix" type="number" min="0" max="32" class="scp-input" value="26" />
+          </label>
+          <div id="it-split-result"></div>
+        </div>
+        <div class="scp-it-card">
+          <h3 class="scp-section-title">IPv6</h3>
+          <label class="scp-field"><span data-i18n="it.network.ipv6Address">Endereço IPv6 / prefixo</span>
+            <input id="it-ipv6" type="text" class="scp-input scp-mono" value="2001:db8:abcd:12::99/64" spellcheck="false" />
+          </label>
+          <div id="it-ipv6-result"></div>
+        </div>
+      </div>
+
+      <!-- BASES & WORDS -->
+      <div data-it-section="bases" class="scp-it-section hidden">
+        <header class="scp-it-head"><h2 data-i18n="it.tools.bases">Bases e bits</h2><p data-i18n="it.desc.bases">Binário, octal, decimal e hexadecimal.</p></header>
+        <div class="scp-it-card">
+          <div class="scp-form-grid">
+            <label class="scp-field"><span data-i18n="it.bases.value">Valor</span>
+              <input id="it-num-input" type="text" class="scp-input scp-mono" value="00000010" spellcheck="false" />
+            </label>
+            <label class="scp-field"><span data-i18n="it.bases.inputBase">Base de entrada</span>
+              <select id="it-num-base" class="scp-select">
+                <option value="2" selected>BIN (2)</option>
+                <option value="8">OCT (8)</option>
+                <option value="10">DEC (10)</option>
+                <option value="16">HEX (16)</option>
+              </select>
+            </label>
+          </div>
+          <div class="scp-field"><span data-i18n="it.bases.wordSize">Tamanho da palavra</span>
+            <div class="scp-segmented scp-word-switch" role="group">
+              <button type="button" class="scp-seg-btn active" data-word-width="8">BYTE · 8</button>
+              <button type="button" class="scp-seg-btn" data-word-width="16">WORD · 16</button>
+              <button type="button" class="scp-seg-btn" data-word-width="32">DWORD · 32</button>
+              <button type="button" class="scp-seg-btn" data-word-width="64">QWORD · 64</button>
+            </div>
+          </div>
+          <div id="it-bit-sum" class="scp-bit-sum scp-mono"></div>
+          <p class="scp-hint" data-i18n="it.bases.clickBits">Clique nos bits para ligá-los ou desligá-los.</p>
+          <div id="it-bit-grid" class="scp-bit-grid"></div>
+          <div id="it-num-result"></div>
+        </div>
+        <details class="scp-it-card scp-details">
+          <summary data-i18n="it.bases.powersTitle">Tabela de potências de 2</summary>
+          <div id="it-powers-table"></div>
+        </details>
+      </div>
+
+      <!-- DATA UNITS -->
+      <div data-it-section="data" class="scp-it-section hidden">
+        <header class="scp-it-head"><h2 data-i18n="it.tools.data">Bits e bytes</h2><p data-i18n="it.desc.data">Unidades de dados.</p></header>
+        <div class="scp-it-card">
+          <div class="scp-form-grid">
+            <label class="scp-field"><span data-i18n="it.data.amount">Quantidade</span><input id="it-data-value" type="number" step="any" min="0" class="scp-input" value="1" /></label>
+            <label class="scp-field"><span data-i18n="it.data.unit">Unidade</span><select id="it-data-unit" class="scp-select"></select></label>
+          </div>
+          <div id="it-data-result"></div>
+        </div>
+        <div class="scp-it-card">
+          <h3 class="scp-section-title" data-i18n="it.data.transferTitle">Tempo de transferência</h3>
+          <div class="scp-form-grid">
+            <label class="scp-field"><span data-i18n="it.data.fileSize">Tamanho do arquivo</span><input id="it-tx-size" type="number" step="any" min="0" class="scp-input" value="4.7" /></label>
+            <label class="scp-field"><span data-i18n="it.data.unit">Unidade</span><select id="it-tx-size-unit" class="scp-select"></select></label>
+            <label class="scp-field"><span data-i18n="it.data.speed">Velocidade (por segundo)</span><input id="it-tx-rate" type="number" step="any" min="0" class="scp-input" value="300" /></label>
+            <label class="scp-field"><span data-i18n="it.data.unit">Unidade</span><select id="it-tx-rate-unit" class="scp-select"></select></label>
+          </div>
+          <div id="it-tx-result"></div>
+        </div>
+      </div>
+
+      <!-- TEXT -->
+      <div data-it-section="text" class="scp-it-section hidden">
+        <header class="scp-it-head"><h2 data-i18n="it.tools.text">Texto e codificação</h2><p data-i18n="it.desc.text">Codificação de texto.</p></header>
+        <div class="scp-it-card">
+          <label class="scp-field"><span data-i18n="it.text.input">Texto</span>
+            <textarea id="it-text-input" class="scp-input scp-textarea" rows="2" spellcheck="false">Olá, TI!</textarea>
+          </label>
+          <div id="it-text-result" class="scp-encode-list"></div>
+        </div>
+        <div class="scp-it-card">
+          <h3 class="scp-section-title" data-i18n="it.text.decodeTitle">Decodificar</h3>
+          <div class="scp-form-grid">
+            <label class="scp-field"><span data-i18n="it.text.encoded">Valor codificado</span>
+              <textarea id="it-decode-input" class="scp-input scp-textarea scp-mono" rows="2" spellcheck="false">54 49 20 3D 20 F0 9F 92 BB</textarea>
+            </label>
+            <label class="scp-field"><span data-i18n="it.text.format">Formato</span>
+              <select id="it-decode-format" class="scp-select">
+                <option value="hex">Hex</option>
+                <option value="binary">Binary</option>
+                <option value="decimal">Decimal</option>
+                <option value="base64">Base64</option>
+                <option value="url">URL</option>
+              </select>
+            </label>
+          </div>
+          <div id="it-decode-result"></div>
+        </div>
+      </div>
+
+      <!-- TIME -->
+      <div data-it-section="time" class="scp-it-section hidden">
+        <header class="scp-it-head"><h2 data-i18n="it.tools.time">Unix timestamp</h2><p data-i18n="it.desc.time">Timestamps Unix.</p></header>
+        <div class="scp-it-card">
+          <div class="scp-form-grid">
+            <label class="scp-field"><span>Timestamp</span><input id="it-unix-input" type="text" class="scp-input scp-mono" spellcheck="false" /></label>
+            <div class="scp-field scp-field-action"><button type="button" id="it-unix-now" class="scp-icon-btn"><svg class="ico"><use href="#i-clock"/></svg><span data-i18n="it.time.now">Agora</span></button></div>
+          </div>
+          <div id="it-unix-result"></div>
+        </div>
+        <div class="scp-it-card">
+          <h3 class="scp-section-title" data-i18n="it.time.dateToUnix">Data → timestamp</h3>
+          <label class="scp-field"><span data-i18n="it.time.localDate">Data e hora local</span><input id="it-date-input" type="datetime-local" step="1" class="scp-input" /></label>
+          <div id="it-date-result"></div>
+        </div>
+      </div>
+
+      <!-- COLOR -->
+      <div data-it-section="color" class="scp-it-section hidden">
+        <header class="scp-it-head"><h2 data-i18n="it.tools.color">Cores</h2><p data-i18n="it.desc.color">Cores.</p></header>
+        <div class="scp-it-card">
+          <div class="scp-color-row">
+            <input id="it-color-picker" type="color" class="scp-color-input scp-color-big" value="#38bdf8" />
+            <label class="scp-field"><span data-i18n="it.color.input">HEX, rgb() ou hsl()</span><input id="it-color-input" type="text" class="scp-input scp-mono" value="#38bdf8" spellcheck="false" /></label>
+          </div>
+          <div id="it-color-result"></div>
+        </div>
+      </div>
+
+      <!-- CHMOD -->
+      <div data-it-section="chmod" class="scp-it-section hidden">
+        <header class="scp-it-head"><h2 data-i18n="it.tools.chmod">Permissões chmod</h2><p data-i18n="it.desc.chmod">Permissões Unix.</p></header>
+        <div class="scp-it-card">
+          <label class="scp-field"><span data-i18n="it.chmod.input">Octal ou simbólico</span><input id="it-chmod-input" type="text" class="scp-input scp-mono" value="755" spellcheck="false" /></label>
+          <table class="scp-chmod-table">
+            <thead><tr><th></th><th data-i18n="it.chmod.read">Leitura (4)</th><th data-i18n="it.chmod.write">Escrita (2)</th><th data-i18n="it.chmod.execute">Execução (1)</th></tr></thead>
+            <tbody id="it-chmod-matrix"></tbody>
+          </table>
+          <div id="it-chmod-result"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
   <!-- MOBILE NAVIGATION -->
   <nav class="scp-mobile-nav" aria-label="Sections">
     <button type="button" class="scp-mobile-nav-btn active" data-mobile-nav="calc"><svg class="ico"><use href="#i-calc"/></svg><span data-i18n="labels.calculator">Calculadora</span></button>
@@ -508,7 +698,7 @@
   </nav>
 
   <footer class="scp-footer">
-    <span>Scientific Calculator Pro <strong>v2.0</strong> · MIT</span>
+    <span>Scientific Calculator Pro <strong>v2.1</strong> · MIT</span>
     <a href="https://github.com/marceloasl99/calculator" target="_blank" rel="noopener"><svg class="ico"><use href="#i-github"/></svg>GitHub</a>
   </footer>
 </div>

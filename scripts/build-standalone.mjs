@@ -21,12 +21,14 @@ const MODULES = [
   'js/tools/number-theory.js',
   'js/tools/finance.js',
   'js/tools/graphing.js',
+  'js/tools/it-tools.js',
   'js/unit-conversions.js',
   'js/storage.js',
   'js/history.js',
   'js/i18n.js',
   'js/state.js',
   'js/keyboard.js',
+  'js/converter.js',
   'js/app.js'
 ];
 

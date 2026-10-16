@@ -22,7 +22,8 @@ const DEFAULT_PREFERENCES = {
   showFraction: false,
   soundEnabled: false,
   livePreview: true,
-  historyLimit: 100
+  historyLimit: 100,
+  appView: 'calc'
 };
 
 const VALID_LOCALES = ['en', 'es', 'pt-BR', 'it', 'fr', 'de'];
@@ -44,6 +45,7 @@ function validatePreferences(raw) {
     showFraction: Boolean(raw.showFraction),
     soundEnabled: Boolean(raw.soundEnabled),
     livePreview: raw.livePreview === undefined ? true : Boolean(raw.livePreview),
+    appView: raw.appView === 'converter' ? 'converter' : 'calc',
     historyLimit: Number.isInteger(Number(raw.historyLimit)) ? Math.min(Math.max(Number(raw.historyLimit), 10), 500) : 100
   };
 }

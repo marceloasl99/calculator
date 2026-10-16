@@ -3,6 +3,23 @@
 All notable changes to Scientific Calculator Pro are documented here.
 The project follows [Semantic Versioning](https://semver.org/).
 
+## [2.1.0] — 2026-10-16
+
+### Added
+- **IT Converter** — a new full-page view opened by the **IT Converter** button in the header (the same button switches back to the calculator; the choice is remembered). Seven tools, all recalculating live, with every result clickable to copy:
+  - **Network / CIDR**: IPv4 subnet calculator (network, mask, wildcard, broadcast, first/last host, usable hosts, class, address type such as private/CGNAT/loopback, IP as integer and hex), accepts `/prefix` or dotted masks, prefix slider, "hosts needed → prefix", colored binary breakdown of network vs host bits, subnet splitting table, and IPv6 expand/compress/network/range.
+  - **Bases & bits**: binary, octal, decimal and hexadecimal with BYTE/WORD/DWORD/QWORD word sizes, clickable bit grid showing each bit's weight (`00000010₂ = 2¹ = 2`), signed (two's complement) and unsigned values, big/little-endian bytes, bit count, ranges and a powers-of-two table.
+  - **Bits & bytes**: bit, byte, SI multiples (kB, MB, GB, TB, PB) and IEC multiples (KiB, MiB, GiB, TiB, PiB), plus download/transfer time for a size at a given link speed.
+  - **Text & encoding**: UTF-8 text to hex, binary, decimal bytes, Base64, URL encoding and Unicode code points, and decoding back.
+  - **Unix timestamp**: seconds or milliseconds to local time, UTC ISO 8601 and relative time; local date to timestamp; "Now" button.
+  - **Colors**: HEX ↔ RGB ↔ HSL ↔ decimal with a preview and WCAG contrast on white and black.
+  - **chmod permissions**: octal ↔ symbolic (`755` ↔ `rwxr-xr-x`) with a clickable owner/group/others matrix.
+- Deep links `?app=converter` and `?tool=network|bases|data|text|time|color|chmod`.
+- All converter text translated into the six languages; 10 new automated tests (64 in total).
+
+### Changed
+- Calculator keyboard shortcuts are paused while the IT Converter is open, so typing never reaches the hidden calculator.
+
 ## [2.0.0] — 2026-10-16
 
 ### Added

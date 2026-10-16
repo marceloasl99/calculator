@@ -25,6 +25,8 @@ class AppState {
     this.errorCode = null;
     this.sideTab = 'history'; // 'history' | 'expert' | 'library'
     this.expertCategory = 'graph'; // 'graph'|'complex'|'matrices'|'statistics'|'solver'|'calculus'|'units'|'numberTheory'|'finance'
+    this.appView = 'calc'; // 'calc' | 'converter' (IT Converter full-page view)
+    this.itTool = 'network';
     this.mobileView = 'calc'; // 'calc' | 'side' (small screens show one column at a time)
     this.viewportMode = 'auto'; // 'auto' | 'desktop' | 'mobile'
     this.confirmingClearHistory = false;

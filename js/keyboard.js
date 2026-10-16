@@ -14,6 +14,8 @@ function initKeyboardShortcuts(handlers) {
       return;
     }
 
+    if (handlers.isCalculatorActive && !handlers.isCalculatorActive()) return;
+
     const active = document.activeElement;
     const isExprInput = active && active.id === 'calc-expression-input';
     const isOtherInput =

@@ -37,8 +37,9 @@ import { UNIT_CATEGORIES, convertUnit } from './unit-conversions.js';
 import { DEFAULT_PREFERENCES, StorageManager } from './storage.js';
 import { HistoryManager } from './history.js';
 import { TRANSLATIONS } from './i18n.js';
+import { initConverter } from './converter.js';
 
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '2.1.0';
 
 // --- tests/math-tests.js ---
 /**
@@ -632,6 +633,10 @@ function bootstrapApp() {
     renderLibrary();
     renderVariablesStrip();
     rerunLabs();
+    if (converter) {
+      converter.refresh();
+      updateAppSwitchLabel();
+    }
   }
 
   // ==================== KEYPAD ====================
@@ -1961,7 +1966,53 @@ function bootstrapApp() {
     onHistoryNavigate: navigateHistory,
     onCopyResult: copyResult,
     onHelp: () => openModal('modal-help'),
-    onCloseModal: closeModal
+    onCloseModal: closeModal,
+    isCalculatorActive: () => state.appView !== 'converter'
+  });
+
+  // ==================== IT CONVERTER VIEW ====================
+  const converter = initConverter({
+    t,
+    tf,
+    escapeHtml,
+    num: (v) => numHtml(fmt(v, { maxFractionDigits: 6 })),
+    copyText: (value) => copyTextToClipboard(value),
+    translateError: (err) => state.i18n.translateError(err),
+    getLocale: () => state.preferences.locale,
+    onToolChange: (tool) => {
+      state.itTool = tool;
+      window.scrollTo({ top: 0 });
+    }
+  });
+
+  function setAppView(view) {
+    const next = view === 'converter' ? 'converter' : 'calc';
+    state.appView = next;
+    if (shellEl) shellEl.setAttribute('data-app', next);
+    $('scp-converter')?.classList.toggle('hidden', next !== 'converter');
+    document.querySelector('.scp-workspace')?.classList.toggle('hidden', next === 'converter');
+    const switchBtn = $('btn-app-switch');
+    if (switchBtn) {
+      switchBtn.setAttribute('aria-pressed', String(next === 'converter'));
+      switchBtn.querySelector('use')?.setAttribute('href', next === 'converter' ? '#i-calc' : '#i-network');
+    }
+    updateAppSwitchLabel();
+    if (state.preferences.appView !== next) state.updatePreferences({ appView: next });
+    window.scrollTo({ top: 0 });
+  }
+
+  function updateAppSwitchLabel() {
+    const label = $('btn-app-switch-label');
+    if (label) label.textContent = state.appView === 'converter' ? t('it.backToCalc') : t('it.appName');
+    if (titleEl && titleEl.firstChild) {
+      titleEl.firstChild.nodeValue = `${state.appView === 'converter' ? t('it.appName') : t('appTitle')} `;
+    }
+    if (subtitleEl) subtitleEl.textContent = state.appView === 'converter' ? t('it.subtitle') : t('appSubtitle');
+    document.title = state.appView === 'converter' ? `${t('it.appName')} · Scientific Calculator Pro` : 'Scientific Calculator Pro';
+  }
+
+  $('btn-app-switch')?.addEventListener('click', () => {
+    setAppView(state.appView === 'converter' ? 'calc' : 'converter');
   });
 
   // Initial setup
@@ -1972,6 +2023,7 @@ function bootstrapApp() {
   setExpertCategory(state.expertCategory);
   populateUnitsForCategory();
   applyTranslations();
+  setAppView(state.preferences.appView);
 
   // URL parameters: deep linking, automation and screenshots
   const params = new URLSearchParams(window.location.search);
@@ -2003,6 +2055,11 @@ function bootstrapApp() {
     setExpression(params.get('expr'));
     handleCalculate();
   }
+  if (params.has('app')) setAppView(params.get('app'));
+  if (params.has('tool') && converter) {
+    setAppView('converter');
+    converter.setTool(params.get('tool'));
+  }
   if (params.has('tests')) {
     openModal('modal-tests');
     executeInAppTests();
@@ -2017,6 +2074,9 @@ function bootstrapApp() {
     setSideTab,
     setExpertCategory,
     setMobileView,
+    setAppView: (view) => setAppView(view),
+    setConverterTool: (tool) => converter && converter.setTool(tool),
+    converter: () => converter,
     runGraphTool,
     runFinanceTool,
     runMatrixOperation,

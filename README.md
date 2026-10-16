@@ -1,14 +1,14 @@
-# 🧮 Scientific Calculator Pro — v2
+# 🧮 Scientific Calculator Pro — v2.1
 
-[![Version](https://img.shields.io/badge/version-2.0.0-38bdf8.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.1.0-38bdf8.svg)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-54%20passing-brightgreen.svg)](#-automated-tests)
+[![Tests](https://img.shields.io/badge/Tests-64%20passing-brightgreen.svg)](#-automated-tests)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-orange.svg)](#-architecture)
 [![PWA](https://img.shields.io/badge/PWA-offline%20ready-blueviolet.svg)](#-progressive-web-app)
 [![i18n](https://img.shields.io/badge/Languages-6-success.svg)](#-languages--regional-formatting)
 [![Themes](https://img.shields.io/badge/Themes-10-informational.svg)](#-themes--accessibility)
 
-> A high-precision, multi-mode scientific calculator for the web — with a **function plotter**, a **finance lab**, **physical constants**, **user variables**, nine expert labs, 10 themes and 6 languages. Pure HTML, CSS and JavaScript: no build step, no runtime dependencies and **no `eval()`**.
+> A high-precision, multi-mode scientific calculator for the web — with a **function plotter**, a **finance lab**, an **IT Converter** (CIDR subnets, bits & bytes, bases, encodings), **physical constants**, **user variables**, nine expert labs, 10 themes and 6 languages. Pure HTML, CSS and JavaScript: no build step, no runtime dependencies and **no `eval()`**.
 
 ### 🌐 [**Open the live app →**](https://marceloasl99.github.io/calculator/)
 
@@ -31,10 +31,47 @@
 | ![Constants library](assets/screenshots/v2-constants-sunset.png) | ![Tests modal](assets/screenshots/v2-tests-modal.png) |
 | *15 CODATA 2018 constants usable in any expression — here `λ = h / (m v)` for a baseball.* | *36 checks run live in the browser; 54 Node.js tests run with `npm test`.* |
 
+| 🌐 IT Converter — CIDR subnet calculator | 🔢 IT Converter — bases, bits and machine words |
+| :---: | :---: |
+| ![IT Converter network tool](assets/screenshots/v2-it-network.png) | ![IT Converter bits tool](assets/screenshots/v2-it-bits.png) |
+| *Network, mask, wildcard, broadcast, host range, address type, network/host bits in color and subnet splitting.* | *Click any bit: `0000 0000 1000 0010₂ = 2⁷ + 2¹ = 130`, as BYTE, WORD, DWORD or QWORD, signed and unsigned.* |
+
 | 📱 Mobile — calculator | 📱 Mobile — plotter |
 | :---: | :---: |
 | <img src="assets/screenshots/v2-mobile-calculator.png" alt="Mobile calculator" width="300"> | <img src="assets/screenshots/v2-mobile-graph.png" alt="Mobile graph lab" width="300"> |
 | *Bottom navigation shows one panel at a time on phones.* | *Every lab works with touch: drag the graph to pan.* |
+
+| 📱 Mobile — IT Converter |
+| :---: |
+| <img src="assets/screenshots/v2-it-mobile.png" alt="Mobile IT Converter" width="300"> |
+| *Bits & bytes in SI (base 1000) and IEC (base 1024) units.* |
+
+---
+
+## 🆕 New in v2.1 — IT Converter
+
+Click **IT Converter** in the header and the whole page turns into a toolkit for networking and IT work; click **Calculator** to go back (your choice is remembered).
+
+| Tool | What it converts |
+| :--- | :--- |
+| 🌐 **Network / CIDR** | IPv4 subnet calculator: network, mask, wildcard, broadcast, first/last host, usable hosts, class, type (private, public, CGNAT, loopback, …), IP as integer/hex; accepts `10.0.0.5/26` or `10.0.0.5 255.255.255.192`; prefix slider; **hosts needed → prefix**; binary view with network bits and host bits in different colors; **subnet splitting** table; **IPv6** expand, compress, network and range. |
+| 🔢 **Bases & bits** | BIN ↔ OCT ↔ DEC ↔ HEX for **BYTE (8), WORD (16), DWORD (32) and QWORD (64)**; clickable bit grid with each bit's weight; signed (two's complement) and unsigned; big/little-endian bytes; bit count; ranges; table of powers of two. |
+| 💾 **Bits & bytes** | bit, byte, kB/MB/GB/TB/PB (base 1000) and KiB/MiB/GiB/TiB/PiB (base 1024); transfer time for a file size at a given link speed (e.g. 4.7 GB at 300 Mb/s = 2 min 5 s). |
+| 🔤 **Text & encoding** | UTF-8 text ↔ hex, binary, decimal bytes, Base64, URL encoding and Unicode code points. |
+| ⏱️ **Unix timestamp** | seconds/milliseconds ↔ local time, UTC ISO 8601 and relative time. |
+| 🎨 **Colors** | HEX ↔ RGB ↔ HSL ↔ decimal, with WCAG contrast on white and black. |
+| 🔐 **chmod permissions** | octal ↔ symbolic (`755` ↔ `rwxr-xr-x`) with a clickable permission matrix. |
+
+**How bit weights work:** bit positions are numbered from the right starting at 0, and each bit is worth 2 to the power of its position:
+
+```text
+0000 0001₂ = 2⁰       = 1
+0000 0010₂ = 2¹       = 2
+1000 0010₂ = 2⁷ + 2¹  = 128 + 2 = 130
+1111 1111₂ = 2⁸ − 1   = 255   (BYTE max, or −1 as a signed byte)
+```
+
+Every result card can be clicked to copy its value.
 
 ---
 
@@ -59,19 +96,20 @@ Bugs fixed along the way: the Primes & Bases lab crashed on every action, the in
 
 ## 📑 Table of Contents
 
-1. [Modes](#-modes)
-2. [Expert labs](#-expert-labs)
-3. [Variables & physical constants](#-variables--physical-constants)
-4. [Math engine & security](#-math-engine--security)
-5. [Languages & regional formatting](#-languages--regional-formatting)
-6. [Themes & accessibility](#-themes--accessibility)
-7. [Quick start](#-quick-start)
-8. [Keyboard shortcuts](#%EF%B8%8F-keyboard-shortcuts)
-9. [Deep links](#-deep-links)
-10. [Architecture](#-architecture)
-11. [Automated tests](#-automated-tests)
-12. [Progressive Web App](#-progressive-web-app)
-13. [License](#-license)
+1. [IT Converter](#-new-in-v21--it-converter)
+2. [Modes](#-modes)
+3. [Expert labs](#-expert-labs)
+4. [Variables & physical constants](#-variables--physical-constants)
+5. [Math engine & security](#-math-engine--security)
+6. [Languages & regional formatting](#-languages--regional-formatting)
+7. [Themes & accessibility](#-themes--accessibility)
+8. [Quick start](#-quick-start)
+9. [Keyboard shortcuts](#%EF%B8%8F-keyboard-shortcuts)
+10. [Deep links](#-deep-links)
+11. [Architecture](#-architecture)
+12. [Automated tests](#-automated-tests)
+13. [Progressive Web App](#-progressive-web-app)
+14. [License](#-license)
 
 ---
 
@@ -196,7 +234,7 @@ Accessibility: visible `:focus-visible` rings, `aria-live` result announcements,
 **Development scripts:**
 
 ```bash
-npm test              # 54 Node.js tests
+npm test              # 64 Node.js tests
 npm run build         # regenerate standalone.html from index.html + css/ + js/
 npm run sync-locales  # regenerate js/i18n.js from locales/*.json
 npm run screenshots   # recapture the README screenshots with headless Chrome
@@ -233,11 +271,13 @@ Two-argument functions use `;` as separator: `nthRoot(27; 3)`, `logBase(64; 2)`,
 | `tab` | `history`, `expert`, `library` | open a side-panel tab |
 | `expertTab` | `graph`, `finance`, `matrices`, … | open an expert lab |
 | `view` | `calc`, `history`, `expert`, `library` | panel shown on phones |
+| `app` | `converter` | open the IT Converter |
+| `tool` | `network`, `bases`, `data`, `text`, `time`, `color`, `chmod` | open an IT Converter tool |
 | `tests` | `1` | open the test runner |
 
 The **Link** button under the display copies a link with the current expression, mode and angle unit.
 
-Example: <https://marceloasl99.github.io/calculator/?mode=expert&expertTab=graph&lang=en>
+Examples: <https://marceloasl99.github.io/calculator/?mode=expert&expertTab=graph&lang=en> · <https://marceloasl99.github.io/calculator/?app=converter&tool=network>
 
 ---
 
@@ -252,9 +292,11 @@ calculator/
 ├── css/
 │   ├── themes.css           # 10 themes as design tokens
 │   ├── styles.css           # Components and layout
-│   └── responsive.css       # Breakpoints, mobile navigation, landscape
+│   ├── responsive.css       # Breakpoints, mobile navigation, landscape
+│   └── converter.css        # IT Converter view (v2.1)
 ├── js/
 │   ├── app.js               # UI controller + in-browser test suite
+│   ├── converter.js         # IT Converter view controller (v2.1)
 │   ├── state.js             # App state, persistence of memory & variables
 │   ├── calculator-engine.js # Evaluation, assignments, preview, memory, fractions
 │   ├── expression-parser.js # Tokenizer, shunting-yard, RPN, constants, compiler
@@ -265,6 +307,7 @@ calculator/
 │   ├── i18n.js              # Generated from locales/*.json
 │   ├── unit-conversions.js  # 13 unit categories
 │   └── tools/
+│       ├── it-tools.js      # CIDR/IPv6, words & bits, data units, encodings, time, colors, chmod (v2.1)
 │       ├── graphing.js      # Sampling, asymptote breaks, roots, extrema   (new)
 │       ├── finance.js       # Compound interest, Price, SAC, rates          (new)
 │       ├── complex.js · matrices.js · statistics.js
@@ -285,11 +328,12 @@ calculator/
 npm test
 ```
 
-54 tests with the built-in `node:test` runner:
+64 tests with the built-in `node:test` runner:
 
 - **`math-tests.test.js`** (29) — arithmetic, precedence, trig in all angle units, percentages, memory, error codes, matrices, statistics, solver, calculus, complex numbers, units, number theory, fractions.
 - **`localization.test.js`** (6) — locale files, regional formatting, comma/dot parsing, translation fallback, storage recovery, history.
 - **`interface.test.js`** (4) — required UI elements, **no `eval`/`new Function`**, PWA files, all 10 themes.
+- **`it-tools.test.js`** (10) — IPv4 parsing and masks, CIDR for /24, /26, /31, /32, subnet splitting, hosts → prefix, IPv6 expand/compress/ranges, bases and bit weights (`00000001 = 2⁰`, `00000010 = 2¹`), two's complement and endianness, SI vs IEC units, transfer time, UTF-8/hex/Base64/URL round-trips, Unix time, colors and chmod.
 - **`v2-features.test.js`** (15) — physical constants, variables, preview, compiled expressions, plotter roots/extrema/asymptotes, compound interest, Price & SAC, rate conversion, persistence, translation key parity, `i18n.js` ↔ JSON sync, `data-i18n` coverage, tiny-value precision, and the full in-browser suite.
 
 The **flask** button in the header runs 36 checks live in the browser, against an isolated store so your data is never touched.

@@ -2223,6 +2223,527 @@ kbd {
   }
 }
 </style>
+  <style>
+/* Scientific Calculator Pro — IT Converter view */
+
+/* Header switch between the calculator and the IT Converter */
+.scp-app-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 55%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 22%, transparent), color-mix(in srgb, var(--color-secondary) 12%, transparent));
+  color: var(--color-text);
+  font-size: 0.84rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: transform 0.12s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.scp-app-switch .ico {
+  color: var(--color-primary);
+}
+
+.scp-app-switch:hover {
+  box-shadow: 0 8px 22px -10px var(--color-primary);
+  transform: translateY(-1px);
+}
+
+.scp-app-switch[aria-pressed="true"] {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border-color: transparent;
+}
+
+.scp-app-switch[aria-pressed="true"] .ico {
+  color: var(--color-on-primary);
+}
+
+.scp-app-switch:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Converter view hides calculator-only chrome */
+.scp-shell[data-app="converter"] .scp-mode-switch,
+.scp-shell[data-app="converter"] .scp-mobile-nav,
+.scp-shell[data-app="converter"] #btn-open-tests {
+  display: none;
+}
+
+.scp-mono {
+  font-family: var(--font-mono);
+}
+
+.scp-converter {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.scp-it-nav {
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-elevated);
+}
+
+.scp-it-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--color-text-muted);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-align: left;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.scp-it-nav-btn:hover {
+  color: var(--color-text);
+  background: var(--color-surface-secondary);
+}
+
+.scp-it-nav-btn.active {
+  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-primary) 16%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
+}
+
+.scp-it-nav-btn.active .ico {
+  color: var(--color-primary);
+}
+
+.scp-it-nav-btn:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.scp-it-panel {
+  min-width: 0;
+}
+
+.scp-it-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.scp-it-head h2 {
+  font-size: 1.35rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.scp-it-head p {
+  margin-top: 4px;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  max-width: 78ch;
+}
+
+.scp-it-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: 16px;
+  box-shadow: var(--shadow-elevated);
+  backdrop-filter: blur(16px);
+  min-width: 0;
+}
+
+.scp-copyable {
+  cursor: copy;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+.scp-converter .scp-metrics {
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+}
+
+.scp-converter .scp-metric span {
+  white-space: normal;
+}
+
+button.scp-metric {
+  transition: border-color 0.15s ease, transform 0.1s ease;
+}
+
+button.scp-metric:hover {
+  border-color: var(--color-primary);
+}
+
+button.scp-metric:active {
+  transform: scale(0.98);
+}
+
+.scp-range-field input[type="range"] {
+  width: 100%;
+  accent-color: var(--color-primary);
+}
+
+.scp-range-field b {
+  font-family: var(--font-mono);
+  color: var(--color-secondary);
+}
+
+.scp-inline-field {
+  max-width: 200px;
+}
+
+.scp-field-action {
+  justify-content: flex-end;
+}
+
+/* Binary breakdown of IPv4 addresses */
+.scp-bin-table {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: var(--display-bg);
+  border: 1px solid var(--color-border);
+}
+
+.scp-bin-table:empty {
+  display: none;
+}
+
+.scp-bin-row {
+  display: grid;
+  grid-template-columns: 110px auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.scp-bin-row span {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.scp-bin-row code {
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+}
+
+.scp-bin-row i,
+.scp-bin-legend span {
+  font-style: normal;
+}
+
+.scp-bin-row .net,
+.scp-bin-legend .net {
+  color: var(--color-primary);
+}
+
+.scp-bin-row .host,
+.scp-bin-legend .host {
+  color: var(--plot-2);
+}
+
+.scp-bin-row .dot {
+  color: var(--color-text-muted);
+}
+
+.scp-bin-legend {
+  display: flex;
+  gap: 14px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+/* Bit grid */
+.scp-word-switch {
+  flex-wrap: wrap;
+}
+
+.scp-bit-sum {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--display-bg);
+  border: 1px solid var(--color-border);
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+.scp-bit-sum:empty {
+  display: none;
+}
+
+.scp-bit-sum span:first-child {
+  color: var(--color-text-muted);
+}
+
+.scp-bit-sum strong {
+  font-size: 1.5rem;
+  color: var(--color-secondary);
+}
+
+.scp-bit-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.scp-bit-byte {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--color-surface-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.scp-bit {
+  width: 40px;
+  height: 46px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-key-function);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  transition: background-color 0.12s ease, color 0.12s ease, transform 0.08s ease;
+}
+
+.scp-bit b {
+  font-size: 1rem;
+}
+
+.scp-bit small {
+  font-size: 0.6rem;
+  opacity: 0.75;
+}
+
+.scp-bit.on {
+  background: var(--color-primary);
+  border-color: transparent;
+  color: var(--color-on-primary);
+  box-shadow: 0 4px 14px -6px var(--color-primary);
+}
+
+.scp-bit:active {
+  transform: scale(0.94);
+}
+
+.scp-bit:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.scp-warning {
+  color: var(--color-warning);
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.scp-details summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.scp-details[open] summary {
+  margin-bottom: 4px;
+}
+
+.scp-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* Text encodings */
+.scp-textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 64px;
+  line-height: 1.5;
+}
+
+.scp-encode-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scp-encode-row {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 12px;
+  align-items: baseline;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-secondary);
+  transition: border-color 0.15s ease;
+}
+
+.scp-encode-row:hover {
+  border-color: var(--color-primary);
+}
+
+.scp-encode-row span {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.scp-encode-row code {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.scp-decoded code {
+  font-family: var(--font-sans);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* Colors */
+.scp-color-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: end;
+}
+
+.scp-color-big {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+}
+
+.scp-swatch {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 12px;
+  min-height: 110px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 4px;
+}
+
+/* chmod matrix */
+.scp-chmod-table {
+  border-collapse: separate;
+  border-spacing: 0 6px;
+  width: 100%;
+  max-width: 520px;
+}
+
+.scp-chmod-table th {
+  font-size: 0.76rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-align: center;
+  padding: 0 6px;
+}
+
+.scp-chmod-table tbody th {
+  text-align: left;
+  color: var(--color-text);
+  font-size: 0.86rem;
+}
+
+.scp-chmod-table td {
+  text-align: center;
+}
+
+.scp-chmod-table input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .scp-converter {
+    grid-template-columns: 1fr;
+  }
+  .scp-it-nav {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .scp-it-nav-btn {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .scp-shell[data-app="converter"] {
+    padding-bottom: 24px;
+  }
+  .scp-app-switch {
+    order: 2;
+    padding: 8px 12px;
+  }
+  .scp-two-col {
+    grid-template-columns: 1fr;
+  }
+  .scp-bit {
+    width: 34px;
+    height: 42px;
+  }
+  .scp-bin-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}
+
+@media (max-width: 420px) {
+  .scp-bit-byte {
+    gap: 3px;
+  }
+  .scp-bit {
+    width: 30px;
+  }
+}
+</style>
 </head>
 <body>
 
@@ -2244,21 +2765,32 @@ kbd {
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
   <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/></symbol>
+  <symbol id="i-network" viewBox="0 0 24 24"><rect x="9" y="2.5" width="6" height="5" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="2.5" y="16.5" width="6" height="5" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="15.5" y="16.5" width="6" height="5" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5V12M5.5 16.5V12h13v4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="i-binary" viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="7" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M14 4h2.5v7M14 11h5M5.5 13v7M3 20h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><rect x="14" y="13" width="5" height="7" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7.5" ry="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 5.5v13c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3v-13M4.5 12c0 1.7 3.4 3 7.5 3s7.5-1.3 7.5-3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.9 1.4-2l-.4-1a1.5 1.5 0 0 1 1.4-2H17a4 4 0 0 0 4-4c0-5-4-9-9-9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="7.5" cy="11" r="1.3" fill="currentColor"/><circle cx="10.5" cy="7" r="1.3" fill="currentColor"/><circle cx="15" cy="7.5" r="1.3" fill="currentColor"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10.5" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5M12 14.5v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
   <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.6 22.4c.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A11.5 11.5 0 0 0 12 .5z"/></symbol>
 </svg>
 
 <div class="scp-backdrop" aria-hidden="true"></div>
 
-<div id="scp-app-shell" class="scp-shell" data-mobile-view="calc">
+<div id="scp-app-shell" class="scp-shell" data-mobile-view="calc" data-app="calc">
   <!-- 1. HEADER -->
   <header class="scp-header" role="banner">
     <div class="scp-brand">
       <img class="scp-logo" src="assets/icons/calculator.svg" alt="" width="40" height="40" />
       <div class="scp-brand-text">
-        <h1 id="scp-app-title" class="scp-title">Scientific Calculator Pro <span class="scp-version">v2.0</span></h1>
+        <h1 id="scp-app-title" class="scp-title">Scientific Calculator Pro <span class="scp-version">v2.1</span></h1>
         <p id="scp-app-subtitle" class="scp-subtitle">Suíte Matemática e Científica Multimodo</p>
       </div>
     </div>
+
+    <button type="button" id="btn-app-switch" class="scp-app-switch" aria-pressed="false">
+      <svg class="ico"><use href="#i-network"/></svg><span id="btn-app-switch-label">Conversor TI</span>
+    </button>
 
     <div class="scp-segmented scp-mode-switch" role="tablist" aria-label="Calculator Mode">
       <button type="button" class="scp-seg-btn" data-mode-select="simple">Simples</button>
@@ -2708,6 +3240,184 @@ kbd {
     </aside>
   </main>
 
+  <!-- 3. IT CONVERTER (full-page alternative view) -->
+  <main id="scp-converter" class="scp-converter hidden" aria-label="IT Converter">
+    <nav class="scp-it-nav" role="tablist" aria-label="IT tools">
+      <button type="button" class="scp-it-nav-btn active" data-it-tool="network"><svg class="ico"><use href="#i-network"/></svg><span data-i18n="it.tools.network">Rede / CIDR</span></button>
+      <button type="button" class="scp-it-nav-btn" data-it-tool="bases"><svg class="ico"><use href="#i-binary"/></svg><span data-i18n="it.tools.bases">Bases e bits</span></button>
+      <button type="button" class="scp-it-nav-btn" data-it-tool="data"><svg class="ico"><use href="#i-database"/></svg><span data-i18n="it.tools.data">Bits e bytes</span></button>
+      <button type="button" class="scp-it-nav-btn" data-it-tool="text"><svg class="ico"><use href="#i-code"/></svg><span data-i18n="it.tools.text">Texto e codificação</span></button>
+      <button type="button" class="scp-it-nav-btn" data-it-tool="time"><svg class="ico"><use href="#i-clock"/></svg><span data-i18n="it.tools.time">Unix timestamp</span></button>
+      <button type="button" class="scp-it-nav-btn" data-it-tool="color"><svg class="ico"><use href="#i-palette"/></svg><span data-i18n="it.tools.color">Cores</span></button>
+      <button type="button" class="scp-it-nav-btn" data-it-tool="chmod"><svg class="ico"><use href="#i-lock"/></svg><span data-i18n="it.tools.chmod">Permissões chmod</span></button>
+    </nav>
+
+    <section class="scp-it-panel">
+      <!-- NETWORK -->
+      <div data-it-section="network" class="scp-it-section">
+        <header class="scp-it-head"><h2 data-i18n="it.tools.network">Rede / CIDR</h2><p data-i18n="it.desc.network">Calculadora de sub-redes IPv4 e IPv6.</p></header>
+        <div class="scp-it-card">
+          <div class="scp-form-grid">
+            <label class="scp-field"><span data-i18n="it.network.address">Endereço IPv4 / CIDR ou máscara</span>
+              <input id="it-cidr" type="text" class="scp-input scp-mono" value="192.168.1.10/24" spellcheck="false" />
+            </label>
+            <label class="scp-field"><span data-i18n="it.network.hostsNeeded">Hosts necessários → prefixo</span>
+              <input id="it-hosts" type="number" min="1" class="scp-input" placeholder="50" />
+            </label>
+          </div>
+          <label class="scp-field scp-range-field"><span><span data-i18n="it.network.prefix">Prefixo</span> <b id="it-prefix-label">/24</b></span>
+            <input id="it-prefix" type="range" min="0" max="32" value="24" />
+          </label>
+          <div id="it-net-result"></div>
+          <div id="it-net-binary" class="scp-bin-table"></div>
+        </div>
+        <div class="scp-it-card">
+          <h3 class="scp-section-title" data-i18n="it.network.splitTitle">Dividir em sub-redes</h3>
+          <label class="scp-field scp-inline-field"><span data-i18n="it.network.newPrefix">Novo prefixo</span>
+            <input id="it-split-prefix" type="number" min="0" max="32" class="scp-input" value="26" />
+          </label>
+          <div id="it-split-result"></div>
+        </div>
+        <div class="scp-it-card">
+          <h3 class="scp-section-title">IPv6</h3>
+          <label class="scp-field"><span data-i18n="it.network.ipv6Address">Endereço IPv6 / prefixo</span>
+            <input id="it-ipv6" type="text" class="scp-input scp-mono" value="2001:db8:abcd:12::99/64" spellcheck="false" />
+          </label>
+          <div id="it-ipv6-result"></div>
+        </div>
+      </div>
+
+      <!-- BASES & WORDS -->
+      <div data-it-section="bases" class="scp-it-section hidden">
+        <header class="scp-it-head"><h2 data-i18n="it.tools.bases">Bases e bits</h2><p data-i18n="it.desc.bases">Binário, octal, decimal e hexadecimal.</p></header>
+        <div class="scp-it-card">
+          <div class="scp-form-grid">
+            <label class="scp-field"><span data-i18n="it.bases.value">Valor</span>
+              <input id="it-num-input" type="text" class="scp-input scp-mono" value="00000010" spellcheck="false" />
+            </label>
+            <label class="scp-field"><span data-i18n="it.bases.inputBase">Base de entrada</span>
+              <select id="it-num-base" class="scp-select">
+                <option value="2" selected>BIN (2)</option>
+                <option value="8">OCT (8)</option>
+                <option value="10">DEC (10)</option>
+                <option value="16">HEX (16)</option>
+              </select>
+            </label>
+          </div>
+          <div class="scp-field"><span data-i18n="it.bases.wordSize">Tamanho da palavra</span>
+            <div class="scp-segmented scp-word-switch" role="group">
+              <button type="button" class="scp-seg-btn active" data-word-width="8">BYTE · 8</button>
+              <button type="button" class="scp-seg-btn" data-word-width="16">WORD · 16</button>
+              <button type="button" class="scp-seg-btn" data-word-width="32">DWORD · 32</button>
+              <button type="button" class="scp-seg-btn" data-word-width="64">QWORD · 64</button>
+            </div>
+          </div>
+          <div id="it-bit-sum" class="scp-bit-sum scp-mono"></div>
+          <p class="scp-hint" data-i18n="it.bases.clickBits">Clique nos bits para ligá-los ou desligá-los.</p>
+          <div id="it-bit-grid" class="scp-bit-grid"></div>
+          <div id="it-num-result"></div>
+        </div>
+        <details class="scp-it-card scp-details">
+          <summary data-i18n="it.bases.powersTitle">Tabela de potências de 2</summary>
+          <div id="it-powers-table"></div>
+        </details>
+      </div>
+
+      <!-- DATA UNITS -->
+      <div data-it-section="data" class="scp-it-section hidden">
+        <header class="scp-it-head"><h2 data-i18n="it.tools.data">Bits e bytes</h2><p data-i18n="it.desc.data">Unidades de dados.</p></header>
+        <div class="scp-it-card">
+          <div class="scp-form-grid">
+            <label class="scp-field"><span data-i18n="it.data.amount">Quantidade</span><input id="it-data-value" type="number" step="any" min="0" class="scp-input" value="1" /></label>
+            <label class="scp-field"><span data-i18n="it.data.unit">Unidade</span><select id="it-data-unit" class="scp-select"></select></label>
+          </div>
+          <div id="it-data-result"></div>
+        </div>
+        <div class="scp-it-card">
+          <h3 class="scp-section-title" data-i18n="it.data.transferTitle">Tempo de transferência</h3>
+          <div class="scp-form-grid">
+            <label class="scp-field"><span data-i18n="it.data.fileSize">Tamanho do arquivo</span><input id="it-tx-size" type="number" step="any" min="0" class="scp-input" value="4.7" /></label>
+            <label class="scp-field"><span data-i18n="it.data.unit">Unidade</span><select id="it-tx-size-unit" class="scp-select"></select></label>
+            <label class="scp-field"><span data-i18n="it.data.speed">Velocidade (por segundo)</span><input id="it-tx-rate" type="number" step="any" min="0" class="scp-input" value="300" /></label>
+            <label class="scp-field"><span data-i18n="it.data.unit">Unidade</span><select id="it-tx-rate-unit" class="scp-select"></select></label>
+          </div>
+          <div id="it-tx-result"></div>
+        </div>
+      </div>
+
+      <!-- TEXT -->
+      <div data-it-section="text" class="scp-it-section hidden">
+        <header class="scp-it-head"><h2 data-i18n="it.tools.text">Texto e codificação</h2><p data-i18n="it.desc.text">Codificação de texto.</p></header>
+        <div class="scp-it-card">
+          <label class="scp-field"><span data-i18n="it.text.input">Texto</span>
+            <textarea id="it-text-input" class="scp-input scp-textarea" rows="2" spellcheck="false">Olá, TI!</textarea>
+          </label>
+          <div id="it-text-result" class="scp-encode-list"></div>
+        </div>
+        <div class="scp-it-card">
+          <h3 class="scp-section-title" data-i18n="it.text.decodeTitle">Decodificar</h3>
+          <div class="scp-form-grid">
+            <label class="scp-field"><span data-i18n="it.text.encoded">Valor codificado</span>
+              <textarea id="it-decode-input" class="scp-input scp-textarea scp-mono" rows="2" spellcheck="false">54 49 20 3D 20 F0 9F 92 BB</textarea>
+            </label>
+            <label class="scp-field"><span data-i18n="it.text.format">Formato</span>
+              <select id="it-decode-format" class="scp-select">
+                <option value="hex">Hex</option>
+                <option value="binary">Binary</option>
+                <option value="decimal">Decimal</option>
+                <option value="base64">Base64</option>
+                <option value="url">URL</option>
+              </select>
+            </label>
+          </div>
+          <div id="it-decode-result"></div>
+        </div>
+      </div>
+
+      <!-- TIME -->
+      <div data-it-section="time" class="scp-it-section hidden">
+        <header class="scp-it-head"><h2 data-i18n="it.tools.time">Unix timestamp</h2><p data-i18n="it.desc.time">Timestamps Unix.</p></header>
+        <div class="scp-it-card">
+          <div class="scp-form-grid">
+            <label class="scp-field"><span>Timestamp</span><input id="it-unix-input" type="text" class="scp-input scp-mono" spellcheck="false" /></label>
+            <div class="scp-field scp-field-action"><button type="button" id="it-unix-now" class="scp-icon-btn"><svg class="ico"><use href="#i-clock"/></svg><span data-i18n="it.time.now">Agora</span></button></div>
+          </div>
+          <div id="it-unix-result"></div>
+        </div>
+        <div class="scp-it-card">
+          <h3 class="scp-section-title" data-i18n="it.time.dateToUnix">Data → timestamp</h3>
+          <label class="scp-field"><span data-i18n="it.time.localDate">Data e hora local</span><input id="it-date-input" type="datetime-local" step="1" class="scp-input" /></label>
+          <div id="it-date-result"></div>
+        </div>
+      </div>
+
+      <!-- COLOR -->
+      <div data-it-section="color" class="scp-it-section hidden">
+        <header class="scp-it-head"><h2 data-i18n="it.tools.color">Cores</h2><p data-i18n="it.desc.color">Cores.</p></header>
+        <div class="scp-it-card">
+          <div class="scp-color-row">
+            <input id="it-color-picker" type="color" class="scp-color-input scp-color-big" value="#38bdf8" />
+            <label class="scp-field"><span data-i18n="it.color.input">HEX, rgb() ou hsl()</span><input id="it-color-input" type="text" class="scp-input scp-mono" value="#38bdf8" spellcheck="false" /></label>
+          </div>
+          <div id="it-color-result"></div>
+        </div>
+      </div>
+
+      <!-- CHMOD -->
+      <div data-it-section="chmod" class="scp-it-section hidden">
+        <header class="scp-it-head"><h2 data-i18n="it.tools.chmod">Permissões chmod</h2><p data-i18n="it.desc.chmod">Permissões Unix.</p></header>
+        <div class="scp-it-card">
+          <label class="scp-field"><span data-i18n="it.chmod.input">Octal ou simbólico</span><input id="it-chmod-input" type="text" class="scp-input scp-mono" value="755" spellcheck="false" /></label>
+          <table class="scp-chmod-table">
+            <thead><tr><th></th><th data-i18n="it.chmod.read">Leitura (4)</th><th data-i18n="it.chmod.write">Escrita (2)</th><th data-i18n="it.chmod.execute">Execução (1)</th></tr></thead>
+            <tbody id="it-chmod-matrix"></tbody>
+          </table>
+          <div id="it-chmod-result"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
   <!-- MOBILE NAVIGATION -->
   <nav class="scp-mobile-nav" aria-label="Sections">
     <button type="button" class="scp-mobile-nav-btn active" data-mobile-nav="calc"><svg class="ico"><use href="#i-calc"/></svg><span data-i18n="labels.calculator">Calculadora</span></button>
@@ -2717,7 +3427,7 @@ kbd {
   </nav>
 
   <footer class="scp-footer">
-    <span>Scientific Calculator Pro <strong>v2.0</strong> · MIT</span>
+    <span>Scientific Calculator Pro <strong>v2.1</strong> · MIT</span>
     <a href="https://github.com/marceloasl99/calculator" target="_blank" rel="noopener"><svg class="ico"><use href="#i-github"/></svg>GitHub</a>
   </footer>
 </div>
@@ -5062,6 +5772,554 @@ function niceStep(span, targetTicks = 10) {
   return factor * magnitude;
 }
 
+// --- js/tools/it-tools.js ---
+/**
+ * Scientific Calculator Pro — IT Converter toolkit
+ * IPv4/IPv6 subnetting, integer bases & machine words, data units, text encodings,
+ * Unix time, colors and Unix permissions. Pure functions, no DOM.
+ */
+
+// ==================== IPv4 / CIDR ====================
+
+function parseIPv4(str) {
+  const parts = String(str || '').trim().split('.');
+  if (parts.length !== 4) throw new CalcError('ERR_IT_IP');
+  let value = 0;
+  for (const part of parts) {
+    if (!/^\d{1,3}$/.test(part)) throw new CalcError('ERR_IT_IP');
+    const octet = Number(part);
+    if (octet > 255) throw new CalcError('ERR_IT_IP');
+    value = value * 256 + octet;
+  }
+  return value >>> 0;
+}
+
+function ipv4ToString(n) {
+  const v = n >>> 0;
+  return [v >>> 24, (v >>> 16) & 255, (v >>> 8) & 255, v & 255].join('.');
+}
+
+function prefixToMask(prefix) {
+  return prefix === 0 ? 0 : (0xFFFFFFFF << (32 - prefix)) >>> 0;
+}
+
+function maskToPrefix(maskStr) {
+  const mask = parseIPv4(maskStr);
+  const inverted = (~mask) >>> 0;
+  // A valid mask is a run of 1s followed by 0s, so (inverted + 1) is a power of two
+  if ((inverted & (inverted + 1)) !== 0) throw new CalcError('ERR_IT_MASK');
+  return 32 - Math.log2(inverted + 1);
+}
+
+function ipv4Binary(n) {
+  return (n >>> 0).toString(2).padStart(32, '0').replace(/(.{8})(?!$)/g, '$1.');
+}
+
+function ipv4Class(ip) {
+  const first = ip >>> 24;
+  if (first < 128) return 'A';
+  if (first < 192) return 'B';
+  if (first < 224) return 'C';
+  if (first < 240) return 'D';
+  return 'E';
+}
+
+const IPV4_RANGES = [
+  ['0.0.0.0', 8, 'thisNetwork'],
+  ['10.0.0.0', 8, 'private'],
+  ['100.64.0.0', 10, 'cgnat'],
+  ['127.0.0.0', 8, 'loopback'],
+  ['169.254.0.0', 16, 'linkLocal'],
+  ['172.16.0.0', 12, 'private'],
+  ['192.0.2.0', 24, 'documentation'],
+  ['192.168.0.0', 16, 'private'],
+  ['198.18.0.0', 15, 'benchmark'],
+  ['198.51.100.0', 24, 'documentation'],
+  ['203.0.113.0', 24, 'documentation'],
+  ['224.0.0.0', 4, 'multicast'],
+  ['255.255.255.255', 32, 'broadcast'],
+  ['240.0.0.0', 4, 'reserved']
+];
+
+function ipv4Scope(ip) {
+  for (const [base, prefix, scope] of IPV4_RANGES) {
+    const mask = prefixToMask(prefix);
+    if (((ip & mask) >>> 0) === parseIPv4(base)) return scope;
+  }
+  return 'public';
+}
+
+/**
+ * Parse "192.168.1.10/24", "192.168.1.10 255.255.255.0" or a bare address (assumed /32).
+ */
+function parseCidr(input) {
+  const text = String(input || '').trim();
+  const match = text.match(/^([\d.]+)\s*(?:\/\s*(\d{1,2})|\s+([\d.]+))?$/);
+  if (!match) throw new CalcError('ERR_IT_IP');
+  const ip = parseIPv4(match[1]);
+  let prefix = 32;
+  if (match[2] !== undefined) {
+    prefix = Number(match[2]);
+    if (prefix > 32) throw new CalcError('ERR_IT_PREFIX');
+  } else if (match[3] !== undefined) {
+    prefix = maskToPrefix(match[3]);
+  }
+  return { ip, prefix };
+}
+
+function cidrInfo(input, prefixOverride = null) {
+  const parsed = parseCidr(input);
+  const ip = parsed.ip;
+  const prefix = prefixOverride === null ? parsed.prefix : Number(prefixOverride);
+  if (!Number.isInteger(prefix) || prefix < 0 || prefix > 32) throw new CalcError('ERR_IT_PREFIX');
+
+  const mask = prefixToMask(prefix);
+  const wildcard = (~mask) >>> 0;
+  const network = (ip & mask) >>> 0;
+  const broadcast = (network | wildcard) >>> 0;
+  const total = 2 ** (32 - prefix);
+  let firstHost = network;
+  let lastHost = broadcast;
+  let usable = total;
+  if (prefix <= 30) {
+    firstHost = network + 1;
+    lastHost = broadcast - 1;
+    usable = total - 2;
+  }
+
+  return {
+    ip: ipv4ToString(ip),
+    prefix,
+    cidr: `${ipv4ToString(network)}/${prefix}`,
+    mask: ipv4ToString(mask),
+    wildcard: ipv4ToString(wildcard),
+    network: ipv4ToString(network),
+    broadcast: ipv4ToString(broadcast),
+    firstHost: ipv4ToString(firstHost),
+    lastHost: ipv4ToString(lastHost),
+    totalAddresses: total,
+    usableHosts: usable,
+    ipClass: ipv4Class(ip),
+    scope: ipv4Scope(ip),
+    ipDecimal: ip,
+    ipHex: '0x' + ip.toString(16).toUpperCase().padStart(8, '0'),
+    binary: {
+      ip: ipv4Binary(ip),
+      mask: ipv4Binary(mask),
+      network: ipv4Binary(network),
+      broadcast: ipv4Binary(broadcast)
+    }
+  };
+}
+
+/**
+ * Split a network into equal subnets of a longer prefix (limited to the first `limit` rows).
+ */
+function splitSubnets(input, newPrefix, limit = 256) {
+  const { ip, prefix } = parseCidr(input);
+  const target = Number(newPrefix);
+  if (!Number.isInteger(target) || target < prefix || target > 32) throw new CalcError('ERR_IT_PREFIX');
+  const network = (ip & prefixToMask(prefix)) >>> 0;
+  const count = 2 ** (target - prefix);
+  const size = 2 ** (32 - target);
+  const rows = [];
+  for (let k = 0; k < Math.min(count, limit); k++) {
+    const net = network + k * size;
+    const info = cidrInfo(ipv4ToString(net), target);
+    rows.push({ cidr: info.cidr, firstHost: info.firstHost, lastHost: info.lastHost, broadcast: info.broadcast, usableHosts: info.usableHosts });
+  }
+  return { count, size, rows, truncated: count > limit };
+}
+
+/**
+ * Smallest prefix whose subnet holds at least `hosts` usable addresses.
+ */
+function prefixForHosts(hosts) {
+  const n = Math.ceil(Number(hosts));
+  if (!Number.isFinite(n) || n < 1 || n > 2 ** 32 - 2) throw new CalcError('ERR_INVALID_ARG');
+  if (n === 1) return 32;
+  if (n === 2) return 31;
+  return 32 - Math.ceil(Math.log2(n + 2));
+}
+
+// ==================== IPv6 ====================
+
+function expandIPv6(str) {
+  let text = String(str || '').trim().toLowerCase();
+  if (!text || !/^[0-9a-f:.]+$/.test(text)) throw new CalcError('ERR_IT_IPV6');
+  // Embedded IPv4 tail, e.g. ::ffff:192.168.0.1
+  const v4 = text.match(/(\d+\.\d+\.\d+\.\d+)$/);
+  if (v4) {
+    const n = parseIPv4(v4[1]);
+    text = text.slice(0, -v4[1].length) + `${(n >>> 16).toString(16)}:${(n & 0xffff).toString(16)}`;
+  }
+  const halves = text.split('::');
+  if (halves.length > 2) throw new CalcError('ERR_IT_IPV6');
+  const head = halves[0] ? halves[0].split(':') : [];
+  const tail = halves.length === 2 && halves[1] ? halves[1].split(':') : [];
+  const missing = 8 - head.length - tail.length;
+  if ((halves.length === 1 && missing !== 0) || (halves.length === 2 && missing < 1)) throw new CalcError('ERR_IT_IPV6');
+  const groups = [...head, ...Array(halves.length === 2 ? missing : 0).fill('0'), ...tail];
+  if (groups.some(g => !/^[0-9a-f]{1,4}$/.test(g))) throw new CalcError('ERR_IT_IPV6');
+  return groups.map(g => g.padStart(4, '0')).join(':');
+}
+
+function ipv6ToBigInt(expanded) {
+  return BigInt('0x' + expanded.replace(/:/g, ''));
+}
+
+function bigIntToIPv6(value) {
+  const hex = value.toString(16).padStart(32, '0');
+  return hex.match(/.{4}/g).join(':');
+}
+
+function compressIPv6(str) {
+  const groups = expandIPv6(str).split(':').map(g => g.replace(/^0+(?=.)/, ''));
+  // Find the longest run (length ≥ 2) of zero groups — RFC 5952
+  let bestStart = -1;
+  let bestLen = 0;
+  for (let i = 0; i < 8; i++) {
+    if (groups[i] !== '0') continue;
+    let j = i;
+    while (j < 8 && groups[j] === '0') j++;
+    if (j - i > bestLen && j - i >= 2) {
+      bestStart = i;
+      bestLen = j - i;
+    }
+    i = j;
+  }
+  if (bestStart === -1) return groups.join(':');
+  const left = groups.slice(0, bestStart).join(':');
+  const right = groups.slice(bestStart + bestLen).join(':');
+  return `${left}::${right}`;
+}
+
+function ipv6Info(input) {
+  const [addr, prefixStr] = String(input || '').trim().split('/');
+  const prefix = prefixStr === undefined ? 128 : Number(prefixStr);
+  if (!Number.isInteger(prefix) || prefix < 0 || prefix > 128) throw new CalcError('ERR_IT_PREFIX');
+  const expanded = expandIPv6(addr);
+  const value = ipv6ToBigInt(expanded);
+  const hostBits = BigInt(128 - prefix);
+  const mask = ((1n << 128n) - 1n) ^ ((1n << hostBits) - 1n);
+  const network = value & mask;
+  const last = network | ((1n << hostBits) - 1n);
+  const first16 = Number(value >> 112n);
+  let scope = 'global';
+  if (value === 0n) scope = 'unspecified';
+  else if (value === 1n) scope = 'loopback';
+  else if ((first16 & 0xffc0) === 0xfe80) scope = 'linkLocal';
+  else if ((first16 & 0xfe00) === 0xfc00) scope = 'uniqueLocal';
+  else if ((first16 & 0xff00) === 0xff00) scope = 'multicast';
+  else if (first16 === 0x2001 && Number((value >> 96n) & 0xffffn) === 0x0db8) scope = 'documentation';
+  return {
+    expanded,
+    compressed: compressIPv6(expanded),
+    prefix,
+    network: `${compressIPv6(bigIntToIPv6(network))}/${prefix}`,
+    firstAddress: compressIPv6(bigIntToIPv6(network)),
+    lastAddress: compressIPv6(bigIntToIPv6(last)),
+    totalAddresses: (1n << hostBits).toString(),
+    totalPower: `2^${128 - prefix}`,
+    scope
+  };
+}
+
+// ==================== Integer bases & machine words ====================
+
+const WORD_SIZES = { 8: 'BYTE', 16: 'WORD', 32: 'DWORD', 64: 'QWORD' };
+
+/**
+ * Parse an integer in base 2, 8, 10 or 16 (prefixes 0b/0o/0x, spaces, underscores and a leading minus allowed).
+ */
+function parseInteger(text, base = 10) {
+  let s = String(text || '').trim().replace(/[\s_]/g, '').toLowerCase();
+  if (!s) throw new CalcError('ERR_EMPTY');
+  let negative = false;
+  if (s.startsWith('-')) {
+    negative = true;
+    s = s.slice(1);
+  }
+  const prefixes = { 2: '0b', 8: '0o', 16: '0x' };
+  if (prefixes[base] && s.startsWith(prefixes[base])) s = s.slice(2);
+  const patterns = { 2: /^[01]+$/, 8: /^[0-7]+$/, 10: /^\d+$/, 16: /^[0-9a-f]+$/ };
+  if (!patterns[base] || !patterns[base].test(s)) throw new CalcError('ERR_INVALID_BASE_DIGIT');
+  const literal = base === 10 ? s : `${prefixes[base]}${s}`;
+  const value = BigInt(literal);
+  return negative ? -value : value;
+}
+
+/**
+ * Represent `value` (BigInt) as a machine word of `width` bits (two's complement for negatives).
+ */
+function wordInfo(value, width = 32) {
+  const bits = BigInt(width);
+  const modulus = 1n << bits;
+  const max = modulus - 1n;
+  const signedMin = -(1n << (bits - 1n));
+  const signedMax = (1n << (bits - 1n)) - 1n;
+  const overflow = value > max || value < signedMin;
+  const unsigned = ((value % modulus) + modulus) % modulus;
+  const signed = unsigned > signedMax ? unsigned - modulus : unsigned;
+
+  const binary = unsigned.toString(2).padStart(width, '0');
+  const hex = unsigned.toString(16).toUpperCase().padStart(width / 4, '0');
+  const bytes = hex.match(/.{2}/g);
+  const setBits = [];
+  for (let i = 0; i < width; i++) {
+    if (binary[width - 1 - i] === '1') setBits.push(i);
+  }
+  setBits.reverse();
+
+  return {
+    width,
+    wordName: WORD_SIZES[width] || `${width}-bit`,
+    unsigned: unsigned.toString(),
+    signed: signed.toString(),
+    binary,
+    binaryGrouped: binary.replace(/(.{4})(?!$)/g, '$1 '),
+    octal: unsigned.toString(8),
+    hex,
+    hexGrouped: bytes.join(' '),
+    bytesBigEndian: bytes.join(' '),
+    bytesLittleEndian: [...bytes].reverse().join(' '),
+    setBits,
+    powerSum: setBits.length ? setBits.map(b => `2^${b}`).join(' + ') : '0',
+    popCount: setBits.length,
+    overflow,
+    range: { unsignedMax: max.toString(), signedMin: signedMin.toString(), signedMax: signedMax.toString() }
+  };
+}
+
+// ==================== Data units ====================
+
+const DATA_UNITS = [
+  { key: 'bit', bits: 1 },
+  { key: 'B', bits: 8 },
+  { key: 'kb', bits: 1e3 },
+  { key: 'kB', bits: 8e3 },
+  { key: 'KiB', bits: 8 * 1024 },
+  { key: 'Mb', bits: 1e6 },
+  { key: 'MB', bits: 8e6 },
+  { key: 'MiB', bits: 8 * 1024 ** 2 },
+  { key: 'Gb', bits: 1e9 },
+  { key: 'GB', bits: 8e9 },
+  { key: 'GiB', bits: 8 * 1024 ** 3 },
+  { key: 'Tb', bits: 1e12 },
+  { key: 'TB', bits: 8e12 },
+  { key: 'TiB', bits: 8 * 1024 ** 4 },
+  { key: 'PB', bits: 8e15 },
+  { key: 'PiB', bits: 8 * 1024 ** 5 }
+];
+
+function convertData(value, fromKey) {
+  const v = Number(value);
+  const from = DATA_UNITS.find(u => u.key === fromKey);
+  if (!Number.isFinite(v) || v < 0 || !from) throw new CalcError('ERR_INVALID_ARG');
+  const bits = v * from.bits;
+  return DATA_UNITS.map(u => ({ key: u.key, value: bits / u.bits }));
+}
+
+/**
+ * Time to transfer `size` (in sizeUnit) over a link of `rate` (in rateUnit per second), in seconds.
+ */
+function transferTime(size, sizeUnit, rate, rateUnit) {
+  const s = DATA_UNITS.find(u => u.key === sizeUnit);
+  const r = DATA_UNITS.find(u => u.key === rateUnit);
+  const sizeBits = Number(size) * (s ? s.bits : NaN);
+  const rateBits = Number(rate) * (r ? r.bits : NaN);
+  if (!Number.isFinite(sizeBits) || !Number.isFinite(rateBits) || sizeBits < 0 || rateBits <= 0) throw new CalcError('ERR_INVALID_ARG');
+  return sizeBits / rateBits;
+}
+
+function formatDuration(totalSeconds) {
+  if (!Number.isFinite(totalSeconds)) return '—';
+  if (totalSeconds < 1) return `${(totalSeconds * 1000).toFixed(totalSeconds < 0.01 ? 3 : 1)} ms`;
+  let rest = Math.round(totalSeconds);
+  const d = Math.floor(rest / 86400); rest %= 86400;
+  const h = Math.floor(rest / 3600); rest %= 3600;
+  const m = Math.floor(rest / 60);
+  const sec = rest % 60;
+  const parts = [];
+  if (d) parts.push(`${d}d`);
+  if (h) parts.push(`${h}h`);
+  if (m) parts.push(`${m}min`);
+  if (sec || parts.length === 0) parts.push(`${sec}s`);
+  return parts.join(' ');
+}
+
+// ==================== Text encodings ====================
+
+function utf8Bytes(text) {
+  return Array.from(new TextEncoder().encode(String(text)));
+}
+
+function bytesToText(bytes) {
+  try {
+    return new TextDecoder('utf-8', { fatal: true }).decode(new Uint8Array(bytes));
+  } catch (_) {
+    throw new CalcError('ERR_IT_TEXT');
+  }
+}
+
+function encodeText(text) {
+  const bytes = utf8Bytes(text);
+  let binaryStr = '';
+  bytes.forEach(b => { binaryStr += String.fromCharCode(b); });
+  return {
+    hex: bytes.map(b => b.toString(16).toUpperCase().padStart(2, '0')).join(' '),
+    binary: bytes.map(b => b.toString(2).padStart(8, '0')).join(' '),
+    decimal: bytes.join(' '),
+    base64: btoa(binaryStr),
+    url: encodeURIComponent(String(text)),
+    codePoints: Array.from(String(text)).map(ch => `U+${ch.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}`).join(' '),
+    byteLength: bytes.length,
+    charLength: Array.from(String(text)).length
+  };
+}
+
+function decodeText(input, format) {
+  const s = String(input || '').trim();
+  if (format === 'hex') {
+    const clean = s.replace(/0x/gi, '').replace(/[\s,:-]/g, '');
+    if (!/^([0-9a-fA-F]{2})*$/.test(clean)) throw new CalcError('ERR_IT_HEX');
+    return bytesToText(clean.match(/.{2}/g)?.map(h => parseInt(h, 16)) || []);
+  }
+  if (format === 'binary') {
+    const groups = s.split(/[\s,]+/).filter(Boolean);
+    if (groups.some(g => !/^[01]{1,8}$/.test(g))) throw new CalcError('ERR_INVALID_BASE_DIGIT');
+    return bytesToText(groups.map(g => parseInt(g, 2)));
+  }
+  if (format === 'decimal') {
+    const groups = s.split(/[\s,]+/).filter(Boolean).map(Number);
+    if (groups.some(n => !Number.isInteger(n) || n < 0 || n > 255)) throw new CalcError('ERR_INVALID_ARG');
+    return bytesToText(groups);
+  }
+  if (format === 'base64') {
+    let raw;
+    try {
+      raw = atob(s.replace(/\s/g, '').replace(/-/g, '+').replace(/_/g, '/'));
+    } catch (_) {
+      throw new CalcError('ERR_IT_BASE64');
+    }
+    return bytesToText(Array.from(raw, ch => ch.charCodeAt(0)));
+  }
+  if (format === 'url') {
+    try {
+      return decodeURIComponent(s.replace(/\+/g, ' '));
+    } catch (_) {
+      throw new CalcError('ERR_IT_TEXT');
+    }
+  }
+  throw new CalcError('ERR_INVALID_ARG');
+}
+
+// ==================== Unix time ====================
+
+function unixToDate(input) {
+  const n = Number(String(input).trim());
+  if (!Number.isFinite(n)) throw new CalcError('ERR_IT_DATE');
+  // 13+ digit values are treated as milliseconds
+  const ms = Math.abs(n) >= 1e11 ? n : n * 1000;
+  const date = new Date(ms);
+  if (Number.isNaN(date.getTime())) throw new CalcError('ERR_IT_DATE');
+  return { date, ms, seconds: Math.floor(ms / 1000), iso: date.toISOString(), unit: Math.abs(n) >= 1e11 ? 'ms' : 's' };
+}
+
+function dateToUnix(input) {
+  const date = input instanceof Date ? input : new Date(String(input));
+  if (Number.isNaN(date.getTime())) throw new CalcError('ERR_IT_DATE');
+  return { seconds: Math.floor(date.getTime() / 1000), ms: date.getTime(), iso: date.toISOString() };
+}
+
+// ==================== Colors ====================
+
+function parseColor(input) {
+  const s = String(input || '').trim().toLowerCase();
+  let m = s.match(/^#?([0-9a-f]{3}|[0-9a-f]{6})$/);
+  if (m) {
+    let hex = m[1];
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    const n = parseInt(hex, 16);
+    return colorInfo((n >> 16) & 255, (n >> 8) & 255, n & 255);
+  }
+  m = s.match(/^rgba?\(\s*(\d{1,3})\s*[, ]\s*(\d{1,3})\s*[, ]\s*(\d{1,3})/) || s.match(/^(\d{1,3})\s*[, ]\s*(\d{1,3})\s*[, ]\s*(\d{1,3})$/);
+  if (m) {
+    const [r, g, b] = m.slice(1, 4).map(Number);
+    if ([r, g, b].some(v => v > 255)) throw new CalcError('ERR_IT_COLOR');
+    return colorInfo(r, g, b);
+  }
+  m = s.match(/^hsla?\(\s*(-?[\d.]+)\s*[, ]\s*([\d.]+)%\s*[, ]\s*([\d.]+)%/);
+  if (m) {
+    const [r, g, b] = hslToRgb(Number(m[1]), Number(m[2]), Number(m[3]));
+    return colorInfo(r, g, b);
+  }
+  throw new CalcError('ERR_IT_COLOR');
+}
+
+function hslToRgb(h, s, l) {
+  const sat = s / 100;
+  const light = l / 100;
+  const k = (n) => (n + h / 30) % 12;
+  const a = sat * Math.min(light, 1 - light);
+  const f = (n) => light - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return [f(0), f(8), f(4)].map(v => Math.round(v * 255));
+}
+
+function colorInfo(r, g, b) {
+  const rn = r / 255, gn = g / 255, bn = b / 255;
+  const max = Math.max(rn, gn, bn);
+  const min = Math.min(rn, gn, bn);
+  const l = (max + min) / 2;
+  let h = 0;
+  let s = 0;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === rn) h = (gn - bn) / d + (gn < bn ? 6 : 0);
+    else if (max === gn) h = (bn - rn) / d + 2;
+    else h = (rn - gn) / d + 4;
+    h *= 60;
+  }
+  const channel = (c) => {
+    const v = c / 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  };
+  const luminance = 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+  const hex = '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('').toUpperCase();
+  return {
+    hex,
+    rgb: `rgb(${r}, ${g}, ${b})`,
+    hsl: `hsl(${Math.round(h)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%)`,
+    decimal: (r << 16) + (g << 8) + b,
+    r, g, b,
+    contrastWhite: (1.05 / (luminance + 0.05)),
+    contrastBlack: ((luminance + 0.05) / 0.05)
+  };
+}
+
+// ==================== Unix permissions (chmod) ====================
+
+function parsePermissions(input) {
+  const s = String(input || '').trim();
+  let octal;
+  if (/^[0-7]{3,4}$/.test(s)) {
+    octal = s.slice(-3);
+  } else {
+    const sym = s.length === 10 && /^[-dlcbps]/.test(s) ? s.slice(1) : s; // accepts ls -l style with a type char
+    if (!/^[r-][w-][x-][r-][w-][x-][r-][w-][x-]$/.test(sym)) throw new CalcError('ERR_IT_CHMOD');
+    octal = [0, 3, 6].map(i => (sym[i] === 'r' ? 4 : 0) + (sym[i + 1] === 'w' ? 2 : 0) + (sym[i + 2] === 'x' ? 1 : 0)).join('');
+  }
+  const digits = octal.split('').map(Number);
+  const symbolic = digits.map(d => `${d & 4 ? 'r' : '-'}${d & 2 ? 'w' : '-'}${d & 1 ? 'x' : '-'}`).join('');
+  const matrix = digits.map(d => ({ read: Boolean(d & 4), write: Boolean(d & 2), execute: Boolean(d & 1) }));
+  return { octal, symbolic, command: `chmod ${octal}`, matrix };
+}
+
+function permissionsFromMatrix(matrix) {
+  return matrix.map(p => (p.read ? 4 : 0) + (p.write ? 2 : 0) + (p.execute ? 1 : 0)).join('');
+}
+
 // --- js/unit-conversions.js ---
 /**
  * Scientific Calculator Pro — Expert Module F: 13-Category Unit Converter
@@ -5274,7 +6532,8 @@ const DEFAULT_PREFERENCES = {
   showFraction: false,
   soundEnabled: false,
   livePreview: true,
-  historyLimit: 100
+  historyLimit: 100,
+  appView: 'calc'
 };
 
 const VALID_LOCALES = ['en', 'es', 'pt-BR', 'it', 'fr', 'de'];
@@ -5296,6 +6555,7 @@ function validatePreferences(raw) {
     showFraction: Boolean(raw.showFraction),
     soundEnabled: Boolean(raw.soundEnabled),
     livePreview: raw.livePreview === undefined ? true : Boolean(raw.livePreview),
+    appView: raw.appView === 'converter' ? 'converter' : 'calc',
     historyLimit: Number.isInteger(Number(raw.historyLimit)) ? Math.min(Math.max(Number(raw.historyLimit), 10), 500) : 100
   };
 }
@@ -5627,7 +6887,17 @@ const TRANSLATIONS = {
       "ERR_LIMIT_EXCEEDED": "Input exceeds safety bound (10¹²) to prevent UI blocking.",
       "ERR_INVALID_BASE_DIGIT": "Number contains digits invalid for the selected base.",
       "ERR_ABS_ZERO": "Temperature cannot be below absolute zero (0 K / -273.15 °C).",
-      "ERR_RESERVED_NAME": "This name is reserved for a function or constant; choose another variable name."
+      "ERR_RESERVED_NAME": "This name is reserved for a function or constant; choose another variable name.",
+      "ERR_IT_IP": "Invalid IPv4 address (use four numbers from 0 to 255, e.g. 192.168.1.10/24).",
+      "ERR_IT_MASK": "Invalid subnet mask: the 1 bits must be contiguous (e.g. 255.255.255.0).",
+      "ERR_IT_PREFIX": "Invalid prefix length (0–32 for IPv4, 0–128 for IPv6, and not shorter than the network).",
+      "ERR_IT_IPV6": "Invalid IPv6 address.",
+      "ERR_IT_TEXT": "The bytes are not valid UTF-8 text.",
+      "ERR_IT_HEX": "Invalid hexadecimal: use pairs of digits 0–9 and A–F.",
+      "ERR_IT_BASE64": "Invalid Base64 string.",
+      "ERR_IT_DATE": "Invalid date or timestamp.",
+      "ERR_IT_COLOR": "Unrecognized color: use #RRGGBB, rgb(r, g, b) or hsl(h, s%, l%).",
+      "ERR_IT_CHMOD": "Invalid permissions: use 3 octal digits (755) or 9 symbols (rwxr-xr-x)."
     },
     "lab": {
       "graphIntro": "Plot up to three functions of x. Drag to pan, scroll to zoom and hover to read values.",
@@ -5780,6 +7050,141 @@ const TRANSLATIONS = {
       "openHelp": "Open this help",
       "multiArg": "Two-argument functions use ; as separator: nthRoot(27; 3), logBase(64; 2), gcd(360; 48), nCr(10; 3).",
       "variables": "Variables: type r = 5 and press =, then use π r^2. Physical constants: c, h, hbar, G, NA, kB, R, qe, me, mp, eps0, mu0, sigma, atm, g0."
+    },
+    "it": {
+      "appName": "IT Converter",
+      "backToCalc": "Calculator",
+      "subtitle": "Networking, bits & bytes and developer conversions",
+      "tools": {
+        "network": "Network / CIDR",
+        "bases": "Bases & bits",
+        "data": "Bits & bytes",
+        "text": "Text & encoding",
+        "time": "Unix timestamp",
+        "color": "Colors",
+        "chmod": "chmod permissions"
+      },
+      "desc": {
+        "network": "IPv4 and IPv6 subnet calculator: network address, broadcast, mask, wildcard, host range and subnetting.",
+        "bases": "Convert between binary, octal, decimal and hexadecimal, see the weight of every bit (2ⁿ) and read the value as a BYTE, WORD, DWORD or QWORD.",
+        "data": "Convert sizes between bits, bytes, decimal multiples (kB, MB, GB — base 1000) and binary multiples (KiB, MiB, GiB — base 1024), and estimate transfer time.",
+        "text": "Encode text as UTF-8 hexadecimal, binary, decimal, Base64 and URL — or decode it back.",
+        "time": "Convert Unix timestamps (seconds or milliseconds since 1970-01-01 UTC) to dates and back.",
+        "color": "Convert colors between HEX, RGB, HSL and decimal, with the WCAG contrast against white and black.",
+        "chmod": "Convert Unix permissions between octal (755) and symbolic (rwxr-xr-x) notation."
+      },
+      "network": {
+        "address": "IPv4 address / CIDR or mask",
+        "hostsNeeded": "Hosts needed → prefix",
+        "prefix": "Prefix",
+        "splitTitle": "Split into subnets",
+        "newPrefix": "New prefix",
+        "ipv6Address": "IPv6 address / prefix",
+        "networkAddr": "Network",
+        "mask": "Subnet mask",
+        "wildcard": "Wildcard",
+        "broadcast": "Broadcast",
+        "firstHost": "First host",
+        "lastHost": "Last host",
+        "usableHosts": "Usable hosts",
+        "totalAddresses": "Total addresses",
+        "ipClass": "Class",
+        "scope": "Type",
+        "ipDecimal": "IP as integer",
+        "ipHex": "IP in hex",
+        "subnet": "Subnet",
+        "subnetsCount": "{count} subnets of {size} addresses",
+        "truncated": "showing the first {limit}",
+        "expanded": "Expanded",
+        "compressed": "Compressed",
+        "firstAddress": "First address",
+        "lastAddress": "Last address",
+        "legendNet": "network bits",
+        "legendHost": "host bits"
+      },
+      "scope": {
+        "private": "Private (RFC 1918)",
+        "public": "Public",
+        "loopback": "Loopback",
+        "linkLocal": "Link-local",
+        "cgnat": "Carrier-grade NAT",
+        "documentation": "Documentation",
+        "benchmark": "Benchmarking",
+        "multicast": "Multicast",
+        "broadcast": "Broadcast",
+        "reserved": "Reserved",
+        "thisNetwork": "\"This\" network",
+        "global": "Global unicast",
+        "uniqueLocal": "Unique local",
+        "unspecified": "Unspecified"
+      },
+      "bases": {
+        "value": "Value",
+        "inputBase": "Input base",
+        "wordSize": "Word size",
+        "clickBits": "Click the bits to switch them on or off.",
+        "powersTitle": "Powers of two table",
+        "unsigned": "unsigned",
+        "signed": "signed",
+        "bigEndian": "Bytes (big-endian)",
+        "littleEndian": "Bytes (little-endian)",
+        "popCount": "Bits set",
+        "rangeUnsigned": "range (unsigned)",
+        "rangeSigned": "range (signed)",
+        "overflow": "The value does not fit in {width} bits — showing the lowest {width} bits.",
+        "power": "Power",
+        "name": "Common name"
+      },
+      "data": {
+        "amount": "Amount",
+        "unit": "Unit",
+        "transferTitle": "Transfer time",
+        "fileSize": "File size",
+        "speed": "Speed (per second)",
+        "duration": "Duration",
+        "seconds": "Seconds",
+        "si": "Decimal (SI, base 1000)",
+        "iec": "Binary (IEC, base 1024)",
+        "note": "1 byte = 8 bits. Network speeds are usually quoted in bits (Mb/s) and file sizes in bytes (MB)."
+      },
+      "text": {
+        "input": "Text",
+        "decodeTitle": "Decode",
+        "encoded": "Encoded value",
+        "format": "Format",
+        "decoded": "Decoded text",
+        "counts": "{chars} characters · {bytes} bytes (UTF-8)"
+      },
+      "time": {
+        "now": "Now",
+        "dateToUnix": "Date → timestamp",
+        "localDate": "Local date and time",
+        "utc": "UTC (ISO 8601)",
+        "local": "Local time",
+        "seconds": "Seconds",
+        "milliseconds": "Milliseconds",
+        "relative": "Relative"
+      },
+      "color": {
+        "input": "HEX, rgb() or hsl()",
+        "decimal": "Decimal",
+        "contrastWhite": "Contrast on white",
+        "contrastBlack": "Contrast on black",
+        "pass": "AA ok",
+        "fail": "below AA"
+      },
+      "chmod": {
+        "input": "Octal or symbolic",
+        "read": "Read (4)",
+        "write": "Write (2)",
+        "execute": "Execute (1)",
+        "owner": "Owner",
+        "group": "Group",
+        "others": "Others",
+        "octal": "Octal",
+        "symbolic": "Symbolic",
+        "command": "Command"
+      }
     }
   },
   "es": {
@@ -5913,7 +7318,17 @@ const TRANSLATIONS = {
       "ERR_LIMIT_EXCEEDED": "El valor supera el límite de seguridad (10¹²).",
       "ERR_INVALID_BASE_DIGIT": "El número contiene dígitos inválidos para la base seleccionada.",
       "ERR_ABS_ZERO": "La temperatura no puede ser inferior al cero absoluto (0 K).",
-      "ERR_RESERVED_NAME": "Este nombre está reservado para una función o constante; elige otro nombre de variable."
+      "ERR_RESERVED_NAME": "Este nombre está reservado para una función o constante; elige otro nombre de variable.",
+      "ERR_IT_IP": "Dirección IPv4 no válida (usa cuatro números de 0 a 255, p. ej. 192.168.1.10/24).",
+      "ERR_IT_MASK": "Máscara no válida: los bits 1 deben ser contiguos (p. ej. 255.255.255.0).",
+      "ERR_IT_PREFIX": "Prefijo no válido (0–32 en IPv4, 0–128 en IPv6, y no menor que el de la red).",
+      "ERR_IT_IPV6": "Dirección IPv6 no válida.",
+      "ERR_IT_TEXT": "Los bytes no forman un texto UTF-8 válido.",
+      "ERR_IT_HEX": "Hexadecimal no válido: usa pares de dígitos 0–9 y A–F.",
+      "ERR_IT_BASE64": "Cadena Base64 no válida.",
+      "ERR_IT_DATE": "Fecha o timestamp no válido.",
+      "ERR_IT_COLOR": "Color no reconocido: usa #RRGGBB, rgb(r, g, b) o hsl(h, s%, l%).",
+      "ERR_IT_CHMOD": "Permisos no válidos: usa 3 dígitos octales (755) o 9 símbolos (rwxr-xr-x)."
     },
     "lab": {
       "graphIntro": "Grafica hasta tres funciones de x. Arrastra para mover, usa la rueda para hacer zoom y pasa el cursor para leer valores.",
@@ -6066,6 +7481,141 @@ const TRANSLATIONS = {
       "openHelp": "Abrir esta ayuda",
       "multiArg": "Las funciones de 2 argumentos usan ; como separador: nthRoot(27; 3), logBase(64; 2), gcd(360; 48), nCr(10; 3).",
       "variables": "Variables: escribe r = 5 y pulsa =, luego usa π r^2. Constantes físicas: c, h, hbar, G, NA, kB, R, qe, me, mp, eps0, mu0, sigma, atm, g0."
+    },
+    "it": {
+      "appName": "Conversor TI",
+      "backToCalc": "Calculadora",
+      "subtitle": "Redes, bits y bytes y conversiones para desarrolladores",
+      "tools": {
+        "network": "Red / CIDR",
+        "bases": "Bases y bits",
+        "data": "Bits y bytes",
+        "text": "Texto y codificación",
+        "time": "Unix timestamp",
+        "color": "Colores",
+        "chmod": "Permisos chmod"
+      },
+      "desc": {
+        "network": "Calculadora de subredes IPv4 e IPv6: dirección de red, broadcast, máscara, wildcard, rango de hosts y división en subredes.",
+        "bases": "Convierte entre binario, octal, decimal y hexadecimal, mira el peso de cada bit (2ⁿ) e interpreta el valor como BYTE, WORD, DWORD o QWORD.",
+        "data": "Convierte tamaños entre bits, bytes, múltiplos decimales (kB, MB, GB — base 1000) y binarios (KiB, MiB, GiB — base 1024), y estima el tiempo de transferencia.",
+        "text": "Codifica texto UTF-8 como hexadecimal, binario, decimal, Base64 y URL — o decodifícalo.",
+        "time": "Convierte timestamps Unix (segundos o milisegundos desde 1970-01-01 UTC) en fechas y viceversa.",
+        "color": "Convierte colores entre HEX, RGB, HSL y decimal, con el contraste WCAG sobre blanco y negro.",
+        "chmod": "Convierte permisos Unix entre notación octal (755) y simbólica (rwxr-xr-x)."
+      },
+      "network": {
+        "address": "Dirección IPv4 / CIDR o máscara",
+        "hostsNeeded": "Hosts necesarios → prefijo",
+        "prefix": "Prefijo",
+        "splitTitle": "Dividir en subredes",
+        "newPrefix": "Nuevo prefijo",
+        "ipv6Address": "Dirección IPv6 / prefijo",
+        "networkAddr": "Red",
+        "mask": "Máscara",
+        "wildcard": "Wildcard",
+        "broadcast": "Broadcast",
+        "firstHost": "Primer host",
+        "lastHost": "Último host",
+        "usableHosts": "Hosts utilizables",
+        "totalAddresses": "Total de direcciones",
+        "ipClass": "Clase",
+        "scope": "Tipo",
+        "ipDecimal": "IP como entero",
+        "ipHex": "IP en hex",
+        "subnet": "Subred",
+        "subnetsCount": "{count} subredes de {size} direcciones",
+        "truncated": "mostrando las primeras {limit}",
+        "expanded": "Expandida",
+        "compressed": "Comprimida",
+        "firstAddress": "Primera dirección",
+        "lastAddress": "Última dirección",
+        "legendNet": "bits de red",
+        "legendHost": "bits de host"
+      },
+      "scope": {
+        "private": "Privada (RFC 1918)",
+        "public": "Pública",
+        "loopback": "Loopback",
+        "linkLocal": "Link-local",
+        "cgnat": "CGNAT (NAT de operador)",
+        "documentation": "Documentación",
+        "benchmark": "Benchmark",
+        "multicast": "Multicast",
+        "broadcast": "Broadcast",
+        "reserved": "Reservada",
+        "thisNetwork": "Esta red",
+        "global": "Unicast global",
+        "uniqueLocal": "Local única",
+        "unspecified": "No especificada"
+      },
+      "bases": {
+        "value": "Valor",
+        "inputBase": "Base de entrada",
+        "wordSize": "Tamaño de palabra",
+        "clickBits": "Haz clic en los bits para encenderlos o apagarlos.",
+        "powersTitle": "Tabla de potencias de 2",
+        "unsigned": "sin signo",
+        "signed": "con signo",
+        "bigEndian": "Bytes (big-endian)",
+        "littleEndian": "Bytes (little-endian)",
+        "popCount": "Bits activos",
+        "rangeUnsigned": "rango (sin signo)",
+        "rangeSigned": "rango (con signo)",
+        "overflow": "El valor no cabe en {width} bits — se muestran los {width} bits menos significativos.",
+        "power": "Potencia",
+        "name": "Nombre común"
+      },
+      "data": {
+        "amount": "Cantidad",
+        "unit": "Unidad",
+        "transferTitle": "Tiempo de transferencia",
+        "fileSize": "Tamaño del archivo",
+        "speed": "Velocidad (por segundo)",
+        "duration": "Duración",
+        "seconds": "Segundos",
+        "si": "Decimal (SI, base 1000)",
+        "iec": "Binario (IEC, base 1024)",
+        "note": "1 byte = 8 bits. Las velocidades de red suelen darse en bits (Mb/s) y los tamaños de archivo en bytes (MB)."
+      },
+      "text": {
+        "input": "Texto",
+        "decodeTitle": "Decodificar",
+        "encoded": "Valor codificado",
+        "format": "Formato",
+        "decoded": "Texto decodificado",
+        "counts": "{chars} caracteres · {bytes} bytes (UTF-8)"
+      },
+      "time": {
+        "now": "Ahora",
+        "dateToUnix": "Fecha → timestamp",
+        "localDate": "Fecha y hora local",
+        "utc": "UTC (ISO 8601)",
+        "local": "Hora local",
+        "seconds": "Segundos",
+        "milliseconds": "Milisegundos",
+        "relative": "Relativo"
+      },
+      "color": {
+        "input": "HEX, rgb() o hsl()",
+        "decimal": "Decimal",
+        "contrastWhite": "Contraste sobre blanco",
+        "contrastBlack": "Contraste sobre negro",
+        "pass": "AA ok",
+        "fail": "por debajo de AA"
+      },
+      "chmod": {
+        "input": "Octal o simbólico",
+        "read": "Lectura (4)",
+        "write": "Escritura (2)",
+        "execute": "Ejecución (1)",
+        "owner": "Dueño",
+        "group": "Grupo",
+        "others": "Otros",
+        "octal": "Octal",
+        "symbolic": "Simbólico",
+        "command": "Comando"
+      }
     }
   },
   "pt-BR": {
@@ -6199,7 +7749,17 @@ const TRANSLATIONS = {
       "ERR_LIMIT_EXCEEDED": "O valor excede o limite de segurança (10¹²) para preservar a fluidez.",
       "ERR_INVALID_BASE_DIGIT": "O valor contém dígitos inválidos para a base numérica selecionada.",
       "ERR_ABS_ZERO": "A temperatura não pode ser inferior ao zero absoluto (0 K / -273,15 °C).",
-      "ERR_RESERVED_NAME": "Este nome é reservado para uma função ou constante; escolha outro nome de variável."
+      "ERR_RESERVED_NAME": "Este nome é reservado para uma função ou constante; escolha outro nome de variável.",
+      "ERR_IT_IP": "Endereço IPv4 inválido (use quatro números de 0 a 255, ex.: 192.168.1.10/24).",
+      "ERR_IT_MASK": "Máscara inválida: os bits 1 precisam ser contíguos (ex.: 255.255.255.0).",
+      "ERR_IT_PREFIX": "Prefixo inválido (0–32 para IPv4, 0–128 para IPv6, e não menor que o da rede).",
+      "ERR_IT_IPV6": "Endereço IPv6 inválido.",
+      "ERR_IT_TEXT": "Os bytes não formam um texto UTF-8 válido.",
+      "ERR_IT_HEX": "Hexadecimal inválido: use pares de dígitos 0–9 e A–F.",
+      "ERR_IT_BASE64": "Texto Base64 inválido.",
+      "ERR_IT_DATE": "Data ou timestamp inválido.",
+      "ERR_IT_COLOR": "Cor não reconhecida: use #RRGGBB, rgb(r, g, b) ou hsl(h, s%, l%).",
+      "ERR_IT_CHMOD": "Permissões inválidas: use 3 dígitos octais (755) ou 9 símbolos (rwxr-xr-x)."
     },
     "lab": {
       "graphIntro": "Plote até três funções de x. Arraste para mover, use a roda do mouse para zoom e passe o cursor para ler valores.",
@@ -6352,6 +7912,141 @@ const TRANSLATIONS = {
       "openHelp": "Abrir esta ajuda",
       "multiArg": "Funções de 2 argumentos usam ; como separador: nthRoot(27; 3), logBase(64; 2), gcd(360; 48), nCr(10; 3).",
       "variables": "Variáveis: digite r = 5 e pressione =, depois use π r^2. Constantes físicas: c, h, hbar, G, NA, kB, R, qe, me, mp, eps0, mu0, sigma, atm, g0."
+    },
+    "it": {
+      "appName": "Conversor TI",
+      "backToCalc": "Calculadora",
+      "subtitle": "Redes, bits e bytes e conversões para desenvolvedores",
+      "tools": {
+        "network": "Rede / CIDR",
+        "bases": "Bases e bits",
+        "data": "Bits e bytes",
+        "text": "Texto e codificação",
+        "time": "Unix timestamp",
+        "color": "Cores",
+        "chmod": "Permissões chmod"
+      },
+      "desc": {
+        "network": "Calculadora de sub-redes IPv4 e IPv6: endereço de rede, broadcast, máscara, wildcard, faixa de hosts e divisão em sub-redes.",
+        "bases": "Converta entre binário, octal, decimal e hexadecimal, veja o peso de cada bit (2ⁿ) e interprete o valor como BYTE, WORD, DWORD ou QWORD.",
+        "data": "Converta tamanhos entre bits, bytes, múltiplos decimais (kB, MB, GB — base 1000) e binários (KiB, MiB, GiB — base 1024), e estime o tempo de transferência.",
+        "text": "Codifique texto em UTF-8 como hexadecimal, binário, decimal, Base64 e URL — ou decodifique de volta.",
+        "time": "Converta timestamps Unix (segundos ou milissegundos desde 1970-01-01 UTC) em datas e vice-versa.",
+        "color": "Converta cores entre HEX, RGB, HSL e decimal, com o contraste WCAG sobre branco e preto.",
+        "chmod": "Converta permissões Unix entre notação octal (755) e simbólica (rwxr-xr-x)."
+      },
+      "network": {
+        "address": "Endereço IPv4 / CIDR ou máscara",
+        "hostsNeeded": "Hosts necessários → prefixo",
+        "prefix": "Prefixo",
+        "splitTitle": "Dividir em sub-redes",
+        "newPrefix": "Novo prefixo",
+        "ipv6Address": "Endereço IPv6 / prefixo",
+        "networkAddr": "Rede",
+        "mask": "Máscara",
+        "wildcard": "Wildcard",
+        "broadcast": "Broadcast",
+        "firstHost": "Primeiro host",
+        "lastHost": "Último host",
+        "usableHosts": "Hosts utilizáveis",
+        "totalAddresses": "Total de endereços",
+        "ipClass": "Classe",
+        "scope": "Tipo",
+        "ipDecimal": "IP como inteiro",
+        "ipHex": "IP em hex",
+        "subnet": "Sub-rede",
+        "subnetsCount": "{count} sub-redes de {size} endereços",
+        "truncated": "exibindo as primeiras {limit}",
+        "expanded": "Expandido",
+        "compressed": "Comprimido",
+        "firstAddress": "Primeiro endereço",
+        "lastAddress": "Último endereço",
+        "legendNet": "bits de rede",
+        "legendHost": "bits de host"
+      },
+      "scope": {
+        "private": "Privado (RFC 1918)",
+        "public": "Público",
+        "loopback": "Loopback",
+        "linkLocal": "Link-local",
+        "cgnat": "CGNAT (NAT de operadora)",
+        "documentation": "Documentação",
+        "benchmark": "Benchmark",
+        "multicast": "Multicast",
+        "broadcast": "Broadcast",
+        "reserved": "Reservado",
+        "thisNetwork": "Esta rede",
+        "global": "Unicast global",
+        "uniqueLocal": "Local único",
+        "unspecified": "Não especificado"
+      },
+      "bases": {
+        "value": "Valor",
+        "inputBase": "Base de entrada",
+        "wordSize": "Tamanho da palavra",
+        "clickBits": "Clique nos bits para ligá-los ou desligá-los.",
+        "powersTitle": "Tabela de potências de 2",
+        "unsigned": "sem sinal",
+        "signed": "com sinal",
+        "bigEndian": "Bytes (big-endian)",
+        "littleEndian": "Bytes (little-endian)",
+        "popCount": "Bits ligados",
+        "rangeUnsigned": "faixa (sem sinal)",
+        "rangeSigned": "faixa (com sinal)",
+        "overflow": "O valor não cabe em {width} bits — exibindo os {width} bits menos significativos.",
+        "power": "Potência",
+        "name": "Nome comum"
+      },
+      "data": {
+        "amount": "Quantidade",
+        "unit": "Unidade",
+        "transferTitle": "Tempo de transferência",
+        "fileSize": "Tamanho do arquivo",
+        "speed": "Velocidade (por segundo)",
+        "duration": "Duração",
+        "seconds": "Segundos",
+        "si": "Decimal (SI, base 1000)",
+        "iec": "Binário (IEC, base 1024)",
+        "note": "1 byte = 8 bits. Velocidades de rede costumam ser informadas em bits (Mb/s); tamanhos de arquivo, em bytes (MB)."
+      },
+      "text": {
+        "input": "Texto",
+        "decodeTitle": "Decodificar",
+        "encoded": "Valor codificado",
+        "format": "Formato",
+        "decoded": "Texto decodificado",
+        "counts": "{chars} caracteres · {bytes} bytes (UTF-8)"
+      },
+      "time": {
+        "now": "Agora",
+        "dateToUnix": "Data → timestamp",
+        "localDate": "Data e hora local",
+        "utc": "UTC (ISO 8601)",
+        "local": "Horário local",
+        "seconds": "Segundos",
+        "milliseconds": "Milissegundos",
+        "relative": "Relativo"
+      },
+      "color": {
+        "input": "HEX, rgb() ou hsl()",
+        "decimal": "Decimal",
+        "contrastWhite": "Contraste no branco",
+        "contrastBlack": "Contraste no preto",
+        "pass": "AA ok",
+        "fail": "abaixo de AA"
+      },
+      "chmod": {
+        "input": "Octal ou simbólico",
+        "read": "Leitura (4)",
+        "write": "Escrita (2)",
+        "execute": "Execução (1)",
+        "owner": "Dono",
+        "group": "Grupo",
+        "others": "Outros",
+        "octal": "Octal",
+        "symbolic": "Simbólico",
+        "command": "Comando"
+      }
     }
   },
   "it": {
@@ -6485,7 +8180,17 @@ const TRANSLATIONS = {
       "ERR_LIMIT_EXCEEDED": "Il valore supera il limite di sicurezza (10¹²).",
       "ERR_INVALID_BASE_DIGIT": "Il numero contiene cifre non valide per la base selezionata.",
       "ERR_ABS_ZERO": "La temperatura non può essere inferiore allo zero assoluto (0 K).",
-      "ERR_RESERVED_NAME": "Questo nome è riservato a una funzione o costante; scegli un altro nome di variabile."
+      "ERR_RESERVED_NAME": "Questo nome è riservato a una funzione o costante; scegli un altro nome di variabile.",
+      "ERR_IT_IP": "Indirizzo IPv4 non valido (usa quattro numeri da 0 a 255, es. 192.168.1.10/24).",
+      "ERR_IT_MASK": "Maschera non valida: i bit a 1 devono essere contigui (es. 255.255.255.0).",
+      "ERR_IT_PREFIX": "Prefisso non valido (0–32 per IPv4, 0–128 per IPv6, e non più corto di quello della rete).",
+      "ERR_IT_IPV6": "Indirizzo IPv6 non valido.",
+      "ERR_IT_TEXT": "I byte non formano un testo UTF-8 valido.",
+      "ERR_IT_HEX": "Esadecimale non valido: usa coppie di cifre 0–9 e A–F.",
+      "ERR_IT_BASE64": "Stringa Base64 non valida.",
+      "ERR_IT_DATE": "Data o timestamp non valido.",
+      "ERR_IT_COLOR": "Colore non riconosciuto: usa #RRGGBB, rgb(r, g, b) o hsl(h, s%, l%).",
+      "ERR_IT_CHMOD": "Permessi non validi: usa 3 cifre ottali (755) o 9 simboli (rwxr-xr-x)."
     },
     "lab": {
       "graphIntro": "Traccia fino a tre funzioni di x. Trascina per spostare, usa la rotella per lo zoom e passa il cursore per leggere i valori.",
@@ -6638,6 +8343,141 @@ const TRANSLATIONS = {
       "openHelp": "Apri questa guida",
       "multiArg": "Le funzioni a 2 argomenti usano ; come separatore: nthRoot(27; 3), logBase(64; 2), gcd(360; 48), nCr(10; 3).",
       "variables": "Variabili: digita r = 5 e premi =, poi usa π r^2. Costanti fisiche: c, h, hbar, G, NA, kB, R, qe, me, mp, eps0, mu0, sigma, atm, g0."
+    },
+    "it": {
+      "appName": "Convertitore IT",
+      "backToCalc": "Calcolatrice",
+      "subtitle": "Reti, bit e byte e conversioni per sviluppatori",
+      "tools": {
+        "network": "Rete / CIDR",
+        "bases": "Basi e bit",
+        "data": "Bit e byte",
+        "text": "Testo e codifica",
+        "time": "Unix timestamp",
+        "color": "Colori",
+        "chmod": "Permessi chmod"
+      },
+      "desc": {
+        "network": "Calcolatore di sottoreti IPv4 e IPv6: indirizzo di rete, broadcast, maschera, wildcard, intervallo di host e suddivisione in sottoreti.",
+        "bases": "Converti tra binario, ottale, decimale ed esadecimale, osserva il peso di ogni bit (2ⁿ) e interpreta il valore come BYTE, WORD, DWORD o QWORD.",
+        "data": "Converti dimensioni tra bit, byte, multipli decimali (kB, MB, GB — base 1000) e binari (KiB, MiB, GiB — base 1024) e stima il tempo di trasferimento.",
+        "text": "Codifica il testo UTF-8 in esadecimale, binario, decimale, Base64 e URL — o decodificalo.",
+        "time": "Converti timestamp Unix (secondi o millisecondi dal 1970-01-01 UTC) in date e viceversa.",
+        "color": "Converti colori tra HEX, RGB, HSL e decimale, con il contrasto WCAG su bianco e nero.",
+        "chmod": "Converti i permessi Unix tra notazione ottale (755) e simbolica (rwxr-xr-x)."
+      },
+      "network": {
+        "address": "Indirizzo IPv4 / CIDR o maschera",
+        "hostsNeeded": "Host necessari → prefisso",
+        "prefix": "Prefisso",
+        "splitTitle": "Dividi in sottoreti",
+        "newPrefix": "Nuovo prefisso",
+        "ipv6Address": "Indirizzo IPv6 / prefisso",
+        "networkAddr": "Rete",
+        "mask": "Maschera",
+        "wildcard": "Wildcard",
+        "broadcast": "Broadcast",
+        "firstHost": "Primo host",
+        "lastHost": "Ultimo host",
+        "usableHosts": "Host utilizzabili",
+        "totalAddresses": "Indirizzi totali",
+        "ipClass": "Classe",
+        "scope": "Tipo",
+        "ipDecimal": "IP come intero",
+        "ipHex": "IP in esadecimale",
+        "subnet": "Sottorete",
+        "subnetsCount": "{count} sottoreti da {size} indirizzi",
+        "truncated": "mostrate le prime {limit}",
+        "expanded": "Espanso",
+        "compressed": "Compresso",
+        "firstAddress": "Primo indirizzo",
+        "lastAddress": "Ultimo indirizzo",
+        "legendNet": "bit di rete",
+        "legendHost": "bit di host"
+      },
+      "scope": {
+        "private": "Privato (RFC 1918)",
+        "public": "Pubblico",
+        "loopback": "Loopback",
+        "linkLocal": "Link-local",
+        "cgnat": "CGNAT (NAT di operatore)",
+        "documentation": "Documentazione",
+        "benchmark": "Benchmark",
+        "multicast": "Multicast",
+        "broadcast": "Broadcast",
+        "reserved": "Riservato",
+        "thisNetwork": "Questa rete",
+        "global": "Unicast globale",
+        "uniqueLocal": "Locale unico",
+        "unspecified": "Non specificato"
+      },
+      "bases": {
+        "value": "Valore",
+        "inputBase": "Base di input",
+        "wordSize": "Dimensione della parola",
+        "clickBits": "Fai clic sui bit per attivarli o disattivarli.",
+        "powersTitle": "Tabella delle potenze di 2",
+        "unsigned": "senza segno",
+        "signed": "con segno",
+        "bigEndian": "Byte (big-endian)",
+        "littleEndian": "Byte (little-endian)",
+        "popCount": "Bit attivi",
+        "rangeUnsigned": "intervallo (senza segno)",
+        "rangeSigned": "intervallo (con segno)",
+        "overflow": "Il valore non sta in {width} bit — vengono mostrati i {width} bit meno significativi.",
+        "power": "Potenza",
+        "name": "Nome comune"
+      },
+      "data": {
+        "amount": "Quantità",
+        "unit": "Unità",
+        "transferTitle": "Tempo di trasferimento",
+        "fileSize": "Dimensione del file",
+        "speed": "Velocità (al secondo)",
+        "duration": "Durata",
+        "seconds": "Secondi",
+        "si": "Decimale (SI, base 1000)",
+        "iec": "Binario (IEC, base 1024)",
+        "note": "1 byte = 8 bit. Le velocità di rete si indicano di solito in bit (Mb/s), le dimensioni dei file in byte (MB)."
+      },
+      "text": {
+        "input": "Testo",
+        "decodeTitle": "Decodifica",
+        "encoded": "Valore codificato",
+        "format": "Formato",
+        "decoded": "Testo decodificato",
+        "counts": "{chars} caratteri · {bytes} byte (UTF-8)"
+      },
+      "time": {
+        "now": "Adesso",
+        "dateToUnix": "Data → timestamp",
+        "localDate": "Data e ora locali",
+        "utc": "UTC (ISO 8601)",
+        "local": "Ora locale",
+        "seconds": "Secondi",
+        "milliseconds": "Millisecondi",
+        "relative": "Relativo"
+      },
+      "color": {
+        "input": "HEX, rgb() o hsl()",
+        "decimal": "Decimale",
+        "contrastWhite": "Contrasto su bianco",
+        "contrastBlack": "Contrasto su nero",
+        "pass": "AA ok",
+        "fail": "sotto AA"
+      },
+      "chmod": {
+        "input": "Ottale o simbolico",
+        "read": "Lettura (4)",
+        "write": "Scrittura (2)",
+        "execute": "Esecuzione (1)",
+        "owner": "Proprietario",
+        "group": "Gruppo",
+        "others": "Altri",
+        "octal": "Ottale",
+        "symbolic": "Simbolico",
+        "command": "Comando"
+      }
     }
   },
   "fr": {
@@ -6771,7 +8611,17 @@ const TRANSLATIONS = {
       "ERR_LIMIT_EXCEEDED": "La valeur dépasse la limite de sécurité (10¹²).",
       "ERR_INVALID_BASE_DIGIT": "Le nombre contient des chiffres invalides pour la base choisie.",
       "ERR_ABS_ZERO": "La température ne peut pas être inférieure au zéro absolu (0 K).",
-      "ERR_RESERVED_NAME": "Ce nom est réservé à une fonction ou une constante ; choisissez un autre nom de variable."
+      "ERR_RESERVED_NAME": "Ce nom est réservé à une fonction ou une constante ; choisissez un autre nom de variable.",
+      "ERR_IT_IP": "Adresse IPv4 invalide (utilisez quatre nombres de 0 à 255, ex. 192.168.1.10/24).",
+      "ERR_IT_MASK": "Masque invalide : les bits à 1 doivent être contigus (ex. 255.255.255.0).",
+      "ERR_IT_PREFIX": "Préfixe invalide (0–32 en IPv4, 0–128 en IPv6, et pas plus court que celui du réseau).",
+      "ERR_IT_IPV6": "Adresse IPv6 invalide.",
+      "ERR_IT_TEXT": "Les octets ne forment pas un texte UTF-8 valide.",
+      "ERR_IT_HEX": "Hexadécimal invalide : utilisez des paires de chiffres 0–9 et A–F.",
+      "ERR_IT_BASE64": "Chaîne Base64 invalide.",
+      "ERR_IT_DATE": "Date ou horodatage invalide.",
+      "ERR_IT_COLOR": "Couleur non reconnue : utilisez #RRGGBB, rgb(r, g, b) ou hsl(h, s%, l%).",
+      "ERR_IT_CHMOD": "Permissions invalides : utilisez 3 chiffres octaux (755) ou 9 symboles (rwxr-xr-x)."
     },
     "lab": {
       "graphIntro": "Tracez jusqu'à trois fonctions de x. Faites glisser pour déplacer, utilisez la molette pour zoomer et survolez pour lire les valeurs.",
@@ -6924,6 +8774,141 @@ const TRANSLATIONS = {
       "openHelp": "Ouvrir cette aide",
       "multiArg": "Les fonctions à 2 arguments utilisent ; comme séparateur : nthRoot(27; 3), logBase(64; 2), gcd(360; 48), nCr(10; 3).",
       "variables": "Variables : tapez r = 5 puis =, ensuite utilisez π r^2. Constantes physiques : c, h, hbar, G, NA, kB, R, qe, me, mp, eps0, mu0, sigma, atm, g0."
+    },
+    "it": {
+      "appName": "Convertisseur IT",
+      "backToCalc": "Calculatrice",
+      "subtitle": "Réseaux, bits et octets et conversions pour développeurs",
+      "tools": {
+        "network": "Réseau / CIDR",
+        "bases": "Bases et bits",
+        "data": "Bits et octets",
+        "text": "Texte et encodage",
+        "time": "Horodatage Unix",
+        "color": "Couleurs",
+        "chmod": "Permissions chmod"
+      },
+      "desc": {
+        "network": "Calculateur de sous-réseaux IPv4 et IPv6 : adresse réseau, broadcast, masque, wildcard, plage d’hôtes et découpage en sous-réseaux.",
+        "bases": "Convertissez entre binaire, octal, décimal et hexadécimal, voyez le poids de chaque bit (2ⁿ) et interprétez la valeur comme BYTE, WORD, DWORD ou QWORD.",
+        "data": "Convertissez des tailles entre bits, octets, multiples décimaux (kB, MB, GB — base 1000) et binaires (KiB, MiB, GiB — base 1024), et estimez le temps de transfert.",
+        "text": "Encodez du texte UTF-8 en hexadécimal, binaire, décimal, Base64 et URL — ou décodez-le.",
+        "time": "Convertissez des horodatages Unix (secondes ou millisecondes depuis le 1970-01-01 UTC) en dates et inversement.",
+        "color": "Convertissez les couleurs entre HEX, RGB, HSL et décimal, avec le contraste WCAG sur blanc et noir.",
+        "chmod": "Convertissez les permissions Unix entre notation octale (755) et symbolique (rwxr-xr-x)."
+      },
+      "network": {
+        "address": "Adresse IPv4 / CIDR ou masque",
+        "hostsNeeded": "Hôtes nécessaires → préfixe",
+        "prefix": "Préfixe",
+        "splitTitle": "Découper en sous-réseaux",
+        "newPrefix": "Nouveau préfixe",
+        "ipv6Address": "Adresse IPv6 / préfixe",
+        "networkAddr": "Réseau",
+        "mask": "Masque",
+        "wildcard": "Wildcard",
+        "broadcast": "Broadcast",
+        "firstHost": "Premier hôte",
+        "lastHost": "Dernier hôte",
+        "usableHosts": "Hôtes utilisables",
+        "totalAddresses": "Adresses au total",
+        "ipClass": "Classe",
+        "scope": "Type",
+        "ipDecimal": "IP en entier",
+        "ipHex": "IP en hex",
+        "subnet": "Sous-réseau",
+        "subnetsCount": "{count} sous-réseaux de {size} adresses",
+        "truncated": "affichage des {limit} premiers",
+        "expanded": "Développée",
+        "compressed": "Compressée",
+        "firstAddress": "Première adresse",
+        "lastAddress": "Dernière adresse",
+        "legendNet": "bits réseau",
+        "legendHost": "bits hôte"
+      },
+      "scope": {
+        "private": "Privée (RFC 1918)",
+        "public": "Publique",
+        "loopback": "Bouclage",
+        "linkLocal": "Lien local",
+        "cgnat": "CGNAT (NAT opérateur)",
+        "documentation": "Documentation",
+        "benchmark": "Tests de performance",
+        "multicast": "Multicast",
+        "broadcast": "Broadcast",
+        "reserved": "Réservée",
+        "thisNetwork": "Ce réseau",
+        "global": "Unicast global",
+        "uniqueLocal": "Locale unique",
+        "unspecified": "Non spécifiée"
+      },
+      "bases": {
+        "value": "Valeur",
+        "inputBase": "Base d'entrée",
+        "wordSize": "Taille du mot",
+        "clickBits": "Cliquez sur les bits pour les activer ou les désactiver.",
+        "powersTitle": "Table des puissances de 2",
+        "unsigned": "non signé",
+        "signed": "signé",
+        "bigEndian": "Octets (big-endian)",
+        "littleEndian": "Octets (little-endian)",
+        "popCount": "Bits à 1",
+        "rangeUnsigned": "plage (non signé)",
+        "rangeSigned": "plage (signé)",
+        "overflow": "La valeur ne tient pas sur {width} bits — affichage des {width} bits de poids faible.",
+        "power": "Puissance",
+        "name": "Nom courant"
+      },
+      "data": {
+        "amount": "Quantité",
+        "unit": "Unité",
+        "transferTitle": "Temps de transfert",
+        "fileSize": "Taille du fichier",
+        "speed": "Débit (par seconde)",
+        "duration": "Durée",
+        "seconds": "Secondes",
+        "si": "Décimal (SI, base 1000)",
+        "iec": "Binaire (CEI, base 1024)",
+        "note": "1 octet = 8 bits. Les débits réseau sont généralement exprimés en bits (Mb/s) et les tailles de fichiers en octets (MB)."
+      },
+      "text": {
+        "input": "Texte",
+        "decodeTitle": "Décoder",
+        "encoded": "Valeur encodée",
+        "format": "Format",
+        "decoded": "Texte décodé",
+        "counts": "{chars} caractères · {bytes} octets (UTF-8)"
+      },
+      "time": {
+        "now": "Maintenant",
+        "dateToUnix": "Date → horodatage",
+        "localDate": "Date et heure locales",
+        "utc": "UTC (ISO 8601)",
+        "local": "Heure locale",
+        "seconds": "Secondes",
+        "milliseconds": "Millisecondes",
+        "relative": "Relatif"
+      },
+      "color": {
+        "input": "HEX, rgb() ou hsl()",
+        "decimal": "Décimal",
+        "contrastWhite": "Contraste sur blanc",
+        "contrastBlack": "Contraste sur noir",
+        "pass": "AA ok",
+        "fail": "sous AA"
+      },
+      "chmod": {
+        "input": "Octal ou symbolique",
+        "read": "Lecture (4)",
+        "write": "Écriture (2)",
+        "execute": "Exécution (1)",
+        "owner": "Propriétaire",
+        "group": "Groupe",
+        "others": "Autres",
+        "octal": "Octal",
+        "symbolic": "Symbolique",
+        "command": "Commande"
+      }
     }
   },
   "de": {
@@ -7057,7 +9042,17 @@ const TRANSLATIONS = {
       "ERR_LIMIT_EXCEEDED": "Eingabe überschreitet Sicherheitsgrenze (10¹²).",
       "ERR_INVALID_BASE_DIGIT": "Zahl enthält ungültige Ziffern für die gewählte Basis.",
       "ERR_ABS_ZERO": "Temperatur kann nicht unter dem absoluten Nullpunkt (0 K) liegen.",
-      "ERR_RESERVED_NAME": "Dieser Name ist für eine Funktion oder Konstante reserviert; wählen Sie einen anderen Variablennamen."
+      "ERR_RESERVED_NAME": "Dieser Name ist für eine Funktion oder Konstante reserviert; wählen Sie einen anderen Variablennamen.",
+      "ERR_IT_IP": "Ungültige IPv4-Adresse (vier Zahlen von 0 bis 255, z. B. 192.168.1.10/24).",
+      "ERR_IT_MASK": "Ungültige Maske: die 1-Bits müssen zusammenhängend sein (z. B. 255.255.255.0).",
+      "ERR_IT_PREFIX": "Ungültiges Präfix (0–32 für IPv4, 0–128 für IPv6 und nicht kürzer als das des Netzes).",
+      "ERR_IT_IPV6": "Ungültige IPv6-Adresse.",
+      "ERR_IT_TEXT": "Die Bytes ergeben keinen gültigen UTF-8-Text.",
+      "ERR_IT_HEX": "Ungültiges Hexadezimal: Ziffernpaare 0–9 und A–F verwenden.",
+      "ERR_IT_BASE64": "Ungültige Base64-Zeichenkette.",
+      "ERR_IT_DATE": "Ungültiges Datum oder ungültiger Zeitstempel.",
+      "ERR_IT_COLOR": "Farbe nicht erkannt: #RRGGBB, rgb(r, g, b) oder hsl(h, s%, l%) verwenden.",
+      "ERR_IT_CHMOD": "Ungültige Rechte: 3 Oktalziffern (755) oder 9 Symbole (rwxr-xr-x) verwenden."
     },
     "lab": {
       "graphIntro": "Bis zu drei Funktionen von x plotten. Ziehen zum Verschieben, Mausrad zum Zoomen, Zeiger halten zum Ablesen.",
@@ -7210,6 +9205,141 @@ const TRANSLATIONS = {
       "openHelp": "Diese Hilfe öffnen",
       "multiArg": "Funktionen mit 2 Argumenten verwenden ; als Trennzeichen: nthRoot(27; 3), logBase(64; 2), gcd(360; 48), nCr(10; 3).",
       "variables": "Variablen: r = 5 eingeben und = drücken, dann π r^2 verwenden. Physikalische Konstanten: c, h, hbar, G, NA, kB, R, qe, me, mp, eps0, mu0, sigma, atm, g0."
+    },
+    "it": {
+      "appName": "IT-Konverter",
+      "backToCalc": "Rechner",
+      "subtitle": "Netzwerke, Bits & Bytes und Entwickler-Umrechnungen",
+      "tools": {
+        "network": "Netzwerk / CIDR",
+        "bases": "Basen & Bits",
+        "data": "Bits & Bytes",
+        "text": "Text & Kodierung",
+        "time": "Unix-Zeitstempel",
+        "color": "Farben",
+        "chmod": "chmod-Rechte"
+      },
+      "desc": {
+        "network": "IPv4- und IPv6-Subnetzrechner: Netzadresse, Broadcast, Maske, Wildcard, Hostbereich und Subnetting.",
+        "bases": "Zwischen Binär, Oktal, Dezimal und Hexadezimal umrechnen, das Gewicht jedes Bits (2ⁿ) sehen und den Wert als BYTE, WORD, DWORD oder QWORD lesen.",
+        "data": "Größen zwischen Bits, Bytes, dezimalen (kB, MB, GB — Basis 1000) und binären Vielfachen (KiB, MiB, GiB — Basis 1024) umrechnen und die Übertragungszeit schätzen.",
+        "text": "UTF-8-Text als Hexadezimal, Binär, Dezimal, Base64 und URL kodieren — oder zurück dekodieren.",
+        "time": "Unix-Zeitstempel (Sekunden oder Millisekunden seit 1970-01-01 UTC) in Datumswerte umrechnen und zurück.",
+        "color": "Farben zwischen HEX, RGB, HSL und Dezimal umrechnen, mit WCAG-Kontrast auf Weiß und Schwarz.",
+        "chmod": "Unix-Rechte zwischen oktaler (755) und symbolischer Schreibweise (rwxr-xr-x) umrechnen."
+      },
+      "network": {
+        "address": "IPv4-Adresse / CIDR oder Maske",
+        "hostsNeeded": "Benötigte Hosts → Präfix",
+        "prefix": "Präfix",
+        "splitTitle": "In Subnetze aufteilen",
+        "newPrefix": "Neues Präfix",
+        "ipv6Address": "IPv6-Adresse / Präfix",
+        "networkAddr": "Netz",
+        "mask": "Subnetzmaske",
+        "wildcard": "Wildcard",
+        "broadcast": "Broadcast",
+        "firstHost": "Erster Host",
+        "lastHost": "Letzter Host",
+        "usableHosts": "Nutzbare Hosts",
+        "totalAddresses": "Adressen gesamt",
+        "ipClass": "Klasse",
+        "scope": "Typ",
+        "ipDecimal": "IP als Ganzzahl",
+        "ipHex": "IP in Hex",
+        "subnet": "Subnetz",
+        "subnetsCount": "{count} Subnetze mit je {size} Adressen",
+        "truncated": "die ersten {limit} werden angezeigt",
+        "expanded": "Ausgeschrieben",
+        "compressed": "Gekürzt",
+        "firstAddress": "Erste Adresse",
+        "lastAddress": "Letzte Adresse",
+        "legendNet": "Netzbits",
+        "legendHost": "Hostbits"
+      },
+      "scope": {
+        "private": "Privat (RFC 1918)",
+        "public": "Öffentlich",
+        "loopback": "Loopback",
+        "linkLocal": "Link-local",
+        "cgnat": "Carrier-Grade-NAT",
+        "documentation": "Dokumentation",
+        "benchmark": "Benchmark",
+        "multicast": "Multicast",
+        "broadcast": "Broadcast",
+        "reserved": "Reserviert",
+        "thisNetwork": "Dieses Netz",
+        "global": "Globales Unicast",
+        "uniqueLocal": "Unique Local",
+        "unspecified": "Unspezifiziert"
+      },
+      "bases": {
+        "value": "Wert",
+        "inputBase": "Eingabebasis",
+        "wordSize": "Wortbreite",
+        "clickBits": "Klicken Sie auf die Bits, um sie ein- oder auszuschalten.",
+        "powersTitle": "Tabelle der Zweierpotenzen",
+        "unsigned": "vorzeichenlos",
+        "signed": "vorzeichenbehaftet",
+        "bigEndian": "Bytes (Big-Endian)",
+        "littleEndian": "Bytes (Little-Endian)",
+        "popCount": "Gesetzte Bits",
+        "rangeUnsigned": "Bereich (vorzeichenlos)",
+        "rangeSigned": "Bereich (vorzeichenbehaftet)",
+        "overflow": "Der Wert passt nicht in {width} Bit — die niedrigsten {width} Bits werden angezeigt.",
+        "power": "Potenz",
+        "name": "Übliche Bezeichnung"
+      },
+      "data": {
+        "amount": "Menge",
+        "unit": "Einheit",
+        "transferTitle": "Übertragungszeit",
+        "fileSize": "Dateigröße",
+        "speed": "Geschwindigkeit (pro Sekunde)",
+        "duration": "Dauer",
+        "seconds": "Sekunden",
+        "si": "Dezimal (SI, Basis 1000)",
+        "iec": "Binär (IEC, Basis 1024)",
+        "note": "1 Byte = 8 Bit. Netzwerkgeschwindigkeiten werden meist in Bit (Mb/s), Dateigrößen in Byte (MB) angegeben."
+      },
+      "text": {
+        "input": "Text",
+        "decodeTitle": "Dekodieren",
+        "encoded": "Kodierter Wert",
+        "format": "Format",
+        "decoded": "Dekodierter Text",
+        "counts": "{chars} Zeichen · {bytes} Bytes (UTF-8)"
+      },
+      "time": {
+        "now": "Jetzt",
+        "dateToUnix": "Datum → Zeitstempel",
+        "localDate": "Lokales Datum und Uhrzeit",
+        "utc": "UTC (ISO 8601)",
+        "local": "Ortszeit",
+        "seconds": "Sekunden",
+        "milliseconds": "Millisekunden",
+        "relative": "Relativ"
+      },
+      "color": {
+        "input": "HEX, rgb() oder hsl()",
+        "decimal": "Dezimal",
+        "contrastWhite": "Kontrast auf Weiß",
+        "contrastBlack": "Kontrast auf Schwarz",
+        "pass": "AA ok",
+        "fail": "unter AA"
+      },
+      "chmod": {
+        "input": "Oktal oder symbolisch",
+        "read": "Lesen (4)",
+        "write": "Schreiben (2)",
+        "execute": "Ausführen (1)",
+        "owner": "Besitzer",
+        "group": "Gruppe",
+        "others": "Andere",
+        "octal": "Oktal",
+        "symbolic": "Symbolisch",
+        "command": "Befehl"
+      }
     }
   }
 };
@@ -7283,6 +9413,8 @@ class AppState {
     this.errorCode = null;
     this.sideTab = 'history'; // 'history' | 'expert' | 'library'
     this.expertCategory = 'graph'; // 'graph'|'complex'|'matrices'|'statistics'|'solver'|'calculus'|'units'|'numberTheory'|'finance'
+    this.appView = 'calc'; // 'calc' | 'converter' (IT Converter full-page view)
+    this.itTool = 'network';
     this.mobileView = 'calc'; // 'calc' | 'side' (small screens show one column at a time)
     this.viewportMode = 'auto'; // 'auto' | 'desktop' | 'mobile'
     this.confirmingClearHistory = false;
@@ -7320,6 +9452,8 @@ function initKeyboardShortcuts(handlers) {
       }
       return;
     }
+
+    if (handlers.isCalculatorActive && !handlers.isCalculatorActive()) return;
 
     const active = document.activeElement;
     const isExprInput = active && active.id === 'calc-expression-input';
@@ -7387,7 +9521,492 @@ function initKeyboardShortcuts(handlers) {
   });
 }
 
-const APP_VERSION = '2.0.0';
+// --- js/converter.js ---
+/**
+ * Scientific Calculator Pro — IT Converter view controller.
+ * Every tool recalculates live on input; any result card can be clicked to copy its value.
+ */
+
+const IT_TOOLS = ['network', 'bases', 'data', 'text', 'time', 'color', 'chmod'];
+
+function initConverter(ctx) {
+  const { t, tf, escapeHtml, num, copyText, translateError, getLocale } = ctx;
+  const $ = (id) => document.getElementById(id);
+  const root = $('scp-converter');
+  if (!root) return null;
+
+  let activeTool = 'network';
+  let wordWidth = 8;
+  let currentValue = 2n;
+
+  const intFmt = (n) => new Intl.NumberFormat(getLocale()).format(n);
+  const bigFmt = (s) => {
+    try {
+      return new Intl.NumberFormat(getLocale()).format(BigInt(s));
+    } catch (_) {
+      return s;
+    }
+  };
+
+  // ---------- shared renderers ----------
+  function metrics(items, accent = -1) {
+    return `<div class="scp-metrics">${items
+      .filter(Boolean)
+      .map(([label, value, copyValue], i) => {
+        const copy = copyValue !== undefined ? copyValue : value;
+        return `<button type="button" class="scp-metric scp-copyable${i === accent ? ' accent' : ''}" data-copy="${escapeHtml(copy)}" title="${escapeHtml(t('labels.copy'))}"><span>${escapeHtml(label)}</span><strong class="scp-mono">${escapeHtml(value)}</strong></button>`;
+      })
+      .join('')}</div>`;
+  }
+
+  function errorBox(err) {
+    return `<div class="scp-result-card"><div class="scp-result-error">${escapeHtml(translateError(err))}</div></div>`;
+  }
+
+  function setHtml(id, html) {
+    const el = $(id);
+    if (el) el.innerHTML = html;
+  }
+
+  // ---------- 1. NETWORK ----------
+  function renderBinaryRow(label, bits, prefix) {
+    let idx = 0;
+    const cells = bits.split('').map(ch => {
+      if (ch === '.') return '<i class="dot">.</i>';
+      const cls = idx++ < prefix ? 'net' : 'host';
+      return `<i class="${cls}">${ch}</i>`;
+    }).join('');
+    return `<div class="scp-bin-row"><span>${escapeHtml(label)}</span><code>${cells}</code></div>`;
+  }
+
+  function runNetwork() {
+    const input = $('it-cidr').value;
+    try {
+      const info = cidrInfo(input);
+      $('it-prefix').value = info.prefix;
+      $('it-prefix-label').textContent = `/${info.prefix}`;
+      setHtml('it-net-result', metrics([
+        [t('it.network.networkAddr'), info.cidr],
+        [t('it.network.mask'), info.mask],
+        [t('it.network.wildcard'), info.wildcard],
+        [t('it.network.broadcast'), info.broadcast],
+        [t('it.network.firstHost'), info.firstHost],
+        [t('it.network.lastHost'), info.lastHost],
+        [t('it.network.usableHosts'), intFmt(info.usableHosts), String(info.usableHosts)],
+        [t('it.network.totalAddresses'), intFmt(info.totalAddresses), String(info.totalAddresses)],
+        [t('it.network.ipClass'), info.ipClass],
+        [t('it.network.scope'), t(`it.scope.${info.scope}`)],
+        [t('it.network.ipDecimal'), String(info.ipDecimal)],
+        [t('it.network.ipHex'), info.ipHex]
+      ], 0));
+      setHtml('it-net-binary', `<div class="scp-bin-legend"><span class="net">■ ${escapeHtml(t('it.network.legendNet'))}</span><span class="host">■ ${escapeHtml(t('it.network.legendHost'))}</span></div>
+        ${renderBinaryRow('IP', info.binary.ip, info.prefix)}
+        ${renderBinaryRow(t('it.network.mask'), info.binary.mask, info.prefix)}
+        ${renderBinaryRow(t('it.network.networkAddr'), info.binary.network, info.prefix)}
+        ${renderBinaryRow(t('it.network.broadcast'), info.binary.broadcast, info.prefix)}`);
+      const split = $('it-split-prefix');
+      if (Number(split.value) < info.prefix) split.value = Math.min(info.prefix + 2, 32);
+      runSplit();
+    } catch (err) {
+      setHtml('it-net-result', errorBox(err));
+      setHtml('it-net-binary', '');
+      setHtml('it-split-result', '');
+    }
+  }
+
+  function setPrefix(prefix) {
+    const input = $('it-cidr');
+    const ip = input.value.trim().split(/[\s/]/)[0] || '0.0.0.0';
+    input.value = `${ip}/${prefix}`;
+    runNetwork();
+  }
+
+  function runSplit() {
+    try {
+      const res = splitSubnets($('it-cidr').value, Number($('it-split-prefix').value), 256);
+      const rows = res.rows.map((r, i) => `<tr><td>${i + 1}</td><td>${r.cidr}</td><td>${r.firstHost}</td><td>${r.lastHost}</td><td>${r.broadcast}</td><td>${intFmt(r.usableHosts)}</td></tr>`).join('');
+      setHtml('it-split-result', `<p class="scp-hint">${escapeHtml(tf('it.network.subnetsCount', { count: intFmt(res.count), size: intFmt(res.size) }))}${res.truncated ? ` · ${escapeHtml(tf('it.network.truncated', { limit: 256 }))}` : ''}</p>
+        <div class="scp-table-scroll"><table class="scp-data-table scp-mono"><thead><tr><th>#</th><th>${escapeHtml(t('it.network.subnet'))}</th><th>${escapeHtml(t('it.network.firstHost'))}</th><th>${escapeHtml(t('it.network.lastHost'))}</th><th>${escapeHtml(t('it.network.broadcast'))}</th><th>${escapeHtml(t('it.network.usableHosts'))}</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+    } catch (err) {
+      setHtml('it-split-result', errorBox(err));
+    }
+  }
+
+  function runHosts() {
+    const value = $('it-hosts').value;
+    if (!value) return;
+    try {
+      setPrefix(prefixForHosts(Number(value)));
+    } catch (err) {
+      setHtml('it-net-result', errorBox(err));
+    }
+  }
+
+  function runIPv6() {
+    try {
+      const info = ipv6Info($('it-ipv6').value);
+      setHtml('it-ipv6-result', metrics([
+        [t('it.network.compressed'), info.compressed],
+        [t('it.network.expanded'), info.expanded],
+        [t('it.network.networkAddr'), info.network],
+        [t('it.network.firstAddress'), info.firstAddress],
+        [t('it.network.lastAddress'), info.lastAddress],
+        [t('it.network.totalAddresses'), `${info.totalPower} = ${bigFmt(info.totalAddresses)}`, info.totalAddresses],
+        [t('it.network.scope'), t(`it.scope.${info.scope}`)]
+      ], 0));
+    } catch (err) {
+      setHtml('it-ipv6-result', errorBox(err));
+    }
+  }
+
+  // ---------- 2. BASES & WORDS ----------
+  function formatInBase(value, base) {
+    if (base === 2) return value.toString(2).padStart(wordWidth, '0');
+    if (base === 16) return value.toString(16).toUpperCase();
+    return value.toString(base);
+  }
+
+  function runBases(fromInput = true) {
+    const base = Number($('it-num-base').value);
+    if (fromInput) {
+      try {
+        currentValue = parseInteger($('it-num-input').value, base);
+      } catch (err) {
+        setHtml('it-num-result', errorBox(err));
+        setHtml('it-bit-sum', '');
+        return;
+      }
+    }
+    const w = wordInfo(currentValue, wordWidth);
+    const unsigned = BigInt(w.unsigned);
+
+    // Bit grid, most significant bit first, grouped by byte
+    let grid = '';
+    for (let byte = wordWidth / 8 - 1; byte >= 0; byte--) {
+      let cells = '';
+      for (let bit = byte * 8 + 7; bit >= byte * 8; bit--) {
+        const on = (unsigned >> BigInt(bit)) & 1n;
+        cells += `<button type="button" class="scp-bit${on ? ' on' : ''}" data-bit="${bit}" title="2^${bit} = ${(1n << BigInt(bit)).toString()}"><b>${on}</b><small>${bit}</small></button>`;
+      }
+      grid += `<div class="scp-bit-byte">${cells}</div>`;
+    }
+    setHtml('it-bit-grid', grid);
+
+    const binary = `${w.binaryGrouped}₂`;
+    const weights = w.setBits.length > 0 && w.setBits.length <= 8
+      ? ` = ${w.setBits.map(b => (1n << BigInt(b)).toString()).join(' + ')}`
+      : '';
+    const powers = w.setBits.length === 0
+      ? '0'
+      : w.setBits.length <= 12 ? w.setBits.map(b => `2<sup>${b}</sup>`).join(' + ') : `${w.popCount} bits`;
+    setHtml('it-bit-sum', `<span>${escapeHtml(binary)}</span><span>= ${powers}${escapeHtml(w.setBits.length > 1 ? weights : '')}</span><strong>= ${escapeHtml(bigFmt(w.unsigned))}</strong>`);
+
+    setHtml('it-num-result', `${w.overflow ? `<p class="scp-warning">${escapeHtml(tf('it.bases.overflow', { width: wordWidth }))}</p>` : ''}${metrics([
+      [`DEC (${t('it.bases.unsigned')})`, w.unsigned],
+      [`DEC (${t('it.bases.signed')})`, w.signed],
+      ['HEX', `0x${w.hex}`],
+      ['OCT', `0o${w.octal}`],
+      ['BIN', w.binaryGrouped, w.binary],
+      [t('it.bases.bigEndian'), w.bytesBigEndian],
+      [t('it.bases.littleEndian'), w.bytesLittleEndian],
+      [t('it.bases.popCount'), String(w.popCount)],
+      [`${w.wordName} ${t('it.bases.rangeUnsigned')}`, `0 … ${w.range.unsignedMax}`],
+      [`${w.wordName} ${t('it.bases.rangeSigned')}`, `${w.range.signedMin} … ${w.range.signedMax}`]
+    ], 0)}`);
+  }
+
+  function toggleBit(bit) {
+    const w = wordInfo(currentValue, wordWidth);
+    currentValue = BigInt(w.unsigned) ^ (1n << BigInt(bit));
+    $('it-num-input').value = formatInBase(currentValue, Number($('it-num-base').value));
+    runBases(false);
+  }
+
+  function setWordWidth(width) {
+    wordWidth = width;
+    root.querySelectorAll('[data-word-width]').forEach(btn => {
+      btn.classList.toggle('active', Number(btn.getAttribute('data-word-width')) === width);
+    });
+    if (Number($('it-num-base').value) === 2) {
+      const w = wordInfo(currentValue, wordWidth);
+      $('it-num-input').value = formatInBase(BigInt(w.unsigned), 2);
+    }
+    runBases();
+  }
+
+  function renderPowersTable() {
+    const names = { 10: '1 KiB', 16: '64 KiB', 20: '1 MiB', 30: '1 GiB', 32: 'IPv4', 40: '1 TiB', 64: 'QWORD' };
+    const exps = [...Array(17).keys(), 20, 24, 30, 31, 32, 40, 48, 63, 64];
+    const rows = exps.map(e => {
+      const v = 1n << BigInt(e);
+      return `<tr><td>2^${e}</td><td>${bigFmt(v.toString())}</td><td>0x${v.toString(16).toUpperCase()}</td><td>${names[e] || ''}</td></tr>`;
+    }).join('');
+    setHtml('it-powers-table', `<div class="scp-table-scroll"><table class="scp-data-table scp-mono"><thead><tr><th>${escapeHtml(t('it.bases.power'))}</th><th>DEC</th><th>HEX</th><th>${escapeHtml(t('it.bases.name'))}</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+  }
+
+  // ---------- 3. DATA UNITS ----------
+  function populateDataSelects() {
+    const fill = (id, selected) => {
+      const sel = $(id);
+      if (!sel || sel.options.length) return;
+      DATA_UNITS.forEach(u => sel.appendChild(new Option(u.key, u.key)));
+      sel.value = selected;
+    };
+    fill('it-data-unit', 'GB');
+    fill('it-tx-size-unit', 'GB');
+    fill('it-tx-rate-unit', 'Mb');
+  }
+
+  function runData() {
+    try {
+      const unit = $('it-data-unit').value;
+      const list = convertData(Number($('it-data-value').value), unit);
+      const row = (u) => `<tr class="${u.key === unit ? 'highlight' : ''}"><td>${u.key}</td><td>${num(u.value)}</td></tr>`;
+      const isIec = (k) => k.endsWith('iB');
+      const si = list.filter(u => !isIec(u.key)).map(row).join('');
+      const iec = list.filter(u => isIec(u.key)).map(row).join('');
+      setHtml('it-data-result', `<div class="scp-two-col">
+        <div><div class="scp-subhead">${escapeHtml(t('it.data.si'))}</div><table class="scp-data-table scp-mono">${si}</table></div>
+        <div><div class="scp-subhead">${escapeHtml(t('it.data.iec'))}</div><table class="scp-data-table scp-mono">${iec}</table></div>
+      </div><p class="scp-hint">${escapeHtml(t('it.data.note'))}</p>`);
+    } catch (err) {
+      setHtml('it-data-result', errorBox(err));
+    }
+  }
+
+  function runTransfer() {
+    try {
+      const seconds = transferTime(Number($('it-tx-size').value), $('it-tx-size-unit').value, Number($('it-tx-rate').value), $('it-tx-rate-unit').value);
+      setHtml('it-tx-result', metrics([
+        [t('it.data.duration'), formatDuration(seconds)],
+        [t('it.data.seconds'), new Intl.NumberFormat(getLocale(), { maximumFractionDigits: 3 }).format(seconds)]
+      ], 0));
+    } catch (err) {
+      setHtml('it-tx-result', errorBox(err));
+    }
+  }
+
+  // ---------- 4. TEXT ----------
+  function runText() {
+    const text = $('it-text-input').value;
+    const enc = encodeText(text);
+    const rows = [
+      ['Hex', enc.hex],
+      ['Binary', enc.binary],
+      ['Decimal', enc.decimal],
+      ['Base64', enc.base64],
+      ['URL', enc.url],
+      ['Unicode', enc.codePoints]
+    ];
+    setHtml('it-text-result', `<p class="scp-hint">${escapeHtml(tf('it.text.counts', { chars: enc.charLength, bytes: enc.byteLength }))}</p>${rows.map(([label, value]) =>
+      `<button type="button" class="scp-encode-row scp-copyable" data-copy="${escapeHtml(value)}"><span>${label}</span><code>${escapeHtml(value || '—')}</code></button>`).join('')}`);
+  }
+
+  function runDecode() {
+    try {
+      const text = decodeText($('it-decode-input').value, $('it-decode-format').value);
+      setHtml('it-decode-result', `<button type="button" class="scp-encode-row scp-copyable scp-decoded" data-copy="${escapeHtml(text)}"><span>${escapeHtml(t('it.text.decoded'))}</span><code>${escapeHtml(text)}</code></button>`);
+    } catch (err) {
+      setHtml('it-decode-result', errorBox(err));
+    }
+  }
+
+  // ---------- 5. TIME ----------
+  function relativeTime(ms) {
+    const diff = (ms - Date.now()) / 1000;
+    const units = [['year', 31536000], ['month', 2592000], ['day', 86400], ['hour', 3600], ['minute', 60], ['second', 1]];
+    const rtf = new Intl.RelativeTimeFormat(getLocale(), { numeric: 'auto' });
+    for (const [unit, secs] of units) {
+      if (Math.abs(diff) >= secs || unit === 'second') return rtf.format(Math.round(diff / secs), unit);
+    }
+    return '';
+  }
+
+  function runUnix() {
+    try {
+      const res = unixToDate($('it-unix-input').value);
+      const local = res.date.toLocaleString(getLocale(), { dateStyle: 'full', timeStyle: 'long' });
+      setHtml('it-unix-result', metrics([
+        [t('it.time.local'), local],
+        [t('it.time.utc'), res.iso],
+        [t('it.time.seconds'), String(res.seconds)],
+        [t('it.time.milliseconds'), String(res.ms)],
+        [t('it.time.relative'), relativeTime(res.ms)]
+      ], 0));
+    } catch (err) {
+      setHtml('it-unix-result', errorBox(err));
+    }
+  }
+
+  function toLocalInputValue(date) {
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+  }
+
+  function runDate() {
+    const value = $('it-date-input').value;
+    if (!value) {
+      setHtml('it-date-result', '');
+      return;
+    }
+    try {
+      const res = dateToUnix(new Date(value));
+      setHtml('it-date-result', metrics([
+        [t('it.time.seconds'), String(res.seconds)],
+        [t('it.time.milliseconds'), String(res.ms)],
+        [t('it.time.utc'), res.iso]
+      ], 0));
+    } catch (err) {
+      setHtml('it-date-result', errorBox(err));
+    }
+  }
+
+  function setNow() {
+    const now = new Date();
+    $('it-unix-input').value = String(Math.floor(now.getTime() / 1000));
+    $('it-date-input').value = toLocalInputValue(now);
+    runUnix();
+    runDate();
+  }
+
+  // ---------- 6. COLOR ----------
+  function runColor(fromPicker = false) {
+    const input = $('it-color-input');
+    if (fromPicker) input.value = $('it-color-picker').value;
+    try {
+      const c = parseColor(input.value);
+      $('it-color-picker').value = c.hex.toLowerCase();
+      const ratio = (v) => `${v.toFixed(2)}:1 · ${v >= 4.5 ? t('it.color.pass') : t('it.color.fail')}`;
+      setHtml('it-color-result', `<div class="scp-swatch" style="background:${c.hex}">
+          <span style="color:#fff">Aa ${escapeHtml(ratio(c.contrastWhite))}</span>
+          <span style="color:#000">Aa ${escapeHtml(ratio(c.contrastBlack))}</span>
+        </div>${metrics([
+          ['HEX', c.hex],
+          ['RGB', c.rgb],
+          ['HSL', c.hsl],
+          [t('it.color.decimal'), String(c.decimal)],
+          [t('it.color.contrastWhite'), `${c.contrastWhite.toFixed(2)}:1`],
+          [t('it.color.contrastBlack'), `${c.contrastBlack.toFixed(2)}:1`]
+        ], 0)}`);
+    } catch (err) {
+      setHtml('it-color-result', errorBox(err));
+    }
+  }
+
+  // ---------- 7. CHMOD ----------
+  function runChmod() {
+    try {
+      const p = parsePermissions($('it-chmod-input').value);
+      const who = ['owner', 'group', 'others'];
+      setHtml('it-chmod-matrix', p.matrix.map((row, i) => `<tr><th>${escapeHtml(t(`it.chmod.${who[i]}`))}</th>${['read', 'write', 'execute'].map(k =>
+        `<td><input type="checkbox" data-perm-row="${i}" data-perm-key="${k}" ${row[k] ? 'checked' : ''} aria-label="${escapeHtml(t(`it.chmod.${who[i]}`))} ${k}" /></td>`).join('')}</tr>`).join(''));
+      setHtml('it-chmod-result', metrics([
+        [t('it.chmod.octal'), p.octal],
+        [t('it.chmod.symbolic'), p.symbolic],
+        [t('it.chmod.command'), `${p.command} file`]
+      ], 0));
+    } catch (err) {
+      setHtml('it-chmod-result', errorBox(err));
+    }
+  }
+
+  function onPermissionToggle() {
+    const matrix = [0, 1, 2].map(i => ({
+      read: root.querySelector(`[data-perm-row="${i}"][data-perm-key="read"]`).checked,
+      write: root.querySelector(`[data-perm-row="${i}"][data-perm-key="write"]`).checked,
+      execute: root.querySelector(`[data-perm-row="${i}"][data-perm-key="execute"]`).checked
+    }));
+    $('it-chmod-input').value = permissionsFromMatrix(matrix);
+    runChmod();
+  }
+
+  // ---------- navigation & wiring ----------
+  function setTool(tool) {
+    activeTool = IT_TOOLS.includes(tool) ? tool : 'network';
+    root.querySelectorAll('[data-it-tool]').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-it-tool') === activeTool);
+    });
+    root.querySelectorAll('[data-it-section]').forEach(sec => {
+      sec.classList.toggle('hidden', sec.getAttribute('data-it-section') !== activeTool);
+    });
+  }
+
+  function refresh() {
+    populateDataSelects();
+    runNetwork();
+    runIPv6();
+    runBases();
+    renderPowersTable();
+    runData();
+    runTransfer();
+    runText();
+    runDecode();
+    runUnix();
+    runDate();
+    runColor();
+    runChmod();
+  }
+
+  root.addEventListener('click', (event) => {
+    const toolBtn = event.target.closest('[data-it-tool]');
+    if (toolBtn) {
+      setTool(toolBtn.getAttribute('data-it-tool'));
+      if (ctx.onToolChange) ctx.onToolChange(activeTool);
+      return;
+    }
+    const bitBtn = event.target.closest('[data-bit]');
+    if (bitBtn) {
+      toggleBit(Number(bitBtn.getAttribute('data-bit')));
+      return;
+    }
+    const widthBtn = event.target.closest('[data-word-width]');
+    if (widthBtn) {
+      setWordWidth(Number(widthBtn.getAttribute('data-word-width')));
+      return;
+    }
+    const copyEl = event.target.closest('[data-copy]');
+    if (copyEl) copyText(copyEl.getAttribute('data-copy'));
+  });
+
+  root.addEventListener('change', (event) => {
+    if (event.target.matches('[data-perm-row]')) onPermissionToggle();
+  });
+
+  const on = (id, evt, fn) => $(id)?.addEventListener(evt, fn);
+  on('it-cidr', 'input', runNetwork);
+  on('it-prefix', 'input', () => setPrefix(Number($('it-prefix').value)));
+  on('it-hosts', 'input', runHosts);
+  on('it-split-prefix', 'input', runSplit);
+  on('it-ipv6', 'input', runIPv6);
+  on('it-num-input', 'input', () => runBases());
+  on('it-num-base', 'change', () => {
+    $('it-num-input').value = formatInBase(BigInt(wordInfo(currentValue, wordWidth).unsigned), Number($('it-num-base').value));
+    runBases();
+  });
+  ['it-data-value', 'it-data-unit'].forEach(id => { on(id, 'input', runData); on(id, 'change', runData); });
+  ['it-tx-size', 'it-tx-size-unit', 'it-tx-rate', 'it-tx-rate-unit'].forEach(id => { on(id, 'input', runTransfer); on(id, 'change', runTransfer); });
+  on('it-text-input', 'input', runText);
+  on('it-decode-input', 'input', runDecode);
+  on('it-decode-format', 'change', runDecode);
+  on('it-unix-input', 'input', runUnix);
+  on('it-unix-now', 'click', setNow);
+  on('it-date-input', 'input', runDate);
+  on('it-color-input', 'input', () => runColor(false));
+  on('it-color-picker', 'input', () => runColor(true));
+  on('it-chmod-input', 'input', runChmod);
+
+  setNow();
+  setTool(activeTool);
+
+  return {
+    setTool,
+    getTool: () => activeTool,
+    refresh,
+    setWordWidth
+  };
+}
+
+const APP_VERSION = '2.1.0';
 
 // --- tests/math-tests.js ---
 /**
@@ -7981,6 +10600,10 @@ function bootstrapApp() {
     renderLibrary();
     renderVariablesStrip();
     rerunLabs();
+    if (converter) {
+      converter.refresh();
+      updateAppSwitchLabel();
+    }
   }
 
   // ==================== KEYPAD ====================
@@ -9310,7 +11933,53 @@ function bootstrapApp() {
     onHistoryNavigate: navigateHistory,
     onCopyResult: copyResult,
     onHelp: () => openModal('modal-help'),
-    onCloseModal: closeModal
+    onCloseModal: closeModal,
+    isCalculatorActive: () => state.appView !== 'converter'
+  });
+
+  // ==================== IT CONVERTER VIEW ====================
+  const converter = initConverter({
+    t,
+    tf,
+    escapeHtml,
+    num: (v) => numHtml(fmt(v, { maxFractionDigits: 6 })),
+    copyText: (value) => copyTextToClipboard(value),
+    translateError: (err) => state.i18n.translateError(err),
+    getLocale: () => state.preferences.locale,
+    onToolChange: (tool) => {
+      state.itTool = tool;
+      window.scrollTo({ top: 0 });
+    }
+  });
+
+  function setAppView(view) {
+    const next = view === 'converter' ? 'converter' : 'calc';
+    state.appView = next;
+    if (shellEl) shellEl.setAttribute('data-app', next);
+    $('scp-converter')?.classList.toggle('hidden', next !== 'converter');
+    document.querySelector('.scp-workspace')?.classList.toggle('hidden', next === 'converter');
+    const switchBtn = $('btn-app-switch');
+    if (switchBtn) {
+      switchBtn.setAttribute('aria-pressed', String(next === 'converter'));
+      switchBtn.querySelector('use')?.setAttribute('href', next === 'converter' ? '#i-calc' : '#i-network');
+    }
+    updateAppSwitchLabel();
+    if (state.preferences.appView !== next) state.updatePreferences({ appView: next });
+    window.scrollTo({ top: 0 });
+  }
+
+  function updateAppSwitchLabel() {
+    const label = $('btn-app-switch-label');
+    if (label) label.textContent = state.appView === 'converter' ? t('it.backToCalc') : t('it.appName');
+    if (titleEl && titleEl.firstChild) {
+      titleEl.firstChild.nodeValue = `${state.appView === 'converter' ? t('it.appName') : t('appTitle')} `;
+    }
+    if (subtitleEl) subtitleEl.textContent = state.appView === 'converter' ? t('it.subtitle') : t('appSubtitle');
+    document.title = state.appView === 'converter' ? `${t('it.appName')} · Scientific Calculator Pro` : 'Scientific Calculator Pro';
+  }
+
+  $('btn-app-switch')?.addEventListener('click', () => {
+    setAppView(state.appView === 'converter' ? 'calc' : 'converter');
   });
 
   // Initial setup
@@ -9321,6 +11990,7 @@ function bootstrapApp() {
   setExpertCategory(state.expertCategory);
   populateUnitsForCategory();
   applyTranslations();
+  setAppView(state.preferences.appView);
 
   // URL parameters: deep linking, automation and screenshots
   const params = new URLSearchParams(window.location.search);
@@ -9352,6 +12022,11 @@ function bootstrapApp() {
     setExpression(params.get('expr'));
     handleCalculate();
   }
+  if (params.has('app')) setAppView(params.get('app'));
+  if (params.has('tool') && converter) {
+    setAppView('converter');
+    converter.setTool(params.get('tool'));
+  }
   if (params.has('tests')) {
     openModal('modal-tests');
     executeInAppTests();
@@ -9366,6 +12041,9 @@ function bootstrapApp() {
     setSideTab,
     setExpertCategory,
     setMobileView,
+    setAppView: (view) => setAppView(view),
+    setConverterTool: (tool) => converter && converter.setTool(tool),
+    converter: () => converter,
     runGraphTool,
     runFinanceTool,
     runMatrixOperation,

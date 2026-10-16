@@ -1,5 +1,5 @@
 // Bump on every release so old caches are dropped on activate
-const CACHE_NAME = 'scicalc-pro-2.0.0';
+const CACHE_NAME = 'scicalc-pro-2.1.0';
 
 const PRECACHE_ASSETS = [
   './',
@@ -10,6 +10,7 @@ const PRECACHE_ASSETS = [
   './css/themes.css',
   './css/styles.css',
   './css/responsive.css',
+  './css/converter.css',
   './js/app.js',
   './js/state.js',
   './js/calculator-engine.js',
@@ -28,6 +29,8 @@ const PRECACHE_ASSETS = [
   './js/tools/number-theory.js',
   './js/tools/finance.js',
   './js/tools/graphing.js',
+  './js/tools/it-tools.js',
+  './js/converter.js',
   './locales/en.json',
   './locales/es.json',
   './locales/pt-BR.json',

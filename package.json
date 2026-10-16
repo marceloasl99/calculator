@@ -1,7 +1,7 @@
 {
   "name": "scientific-calculator-pro",
-  "version": "2.0.0",
-  "description": "Scientific Calculator Pro v2 — high-precision multi-mode scientific calculator with function plotter, financial math, physical constants, user variables, 10 themes and 6 languages. Zero dependencies, zero eval().",
+  "version": "2.1.0",
+  "description": "Scientific Calculator Pro v2 — high-precision multi-mode scientific calculator with function plotter, financial math, physical constants, user variables, an IT Converter (CIDR, bits & bytes, encodings), 10 themes and 6 languages. Zero dependencies, zero eval().",
   "type": "module",
   "main": "js/app.js",
   "scripts": {
@@ -24,7 +24,12 @@
     "graphing-calculator",
     "function-plotter",
     "finance",
-    "physical-constants"
+    "physical-constants",
+    "cidr",
+    "subnet-calculator",
+    "ip-calculator",
+    "base-converter",
+    "it-tools"
   ],
   "author": "marceloasl99",
   "license": "MIT",
